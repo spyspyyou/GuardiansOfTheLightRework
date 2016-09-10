@@ -2,7 +2,6 @@ package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -12,7 +11,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import testing.gotl.spyspyyo.bluetoothtesting.App;
+import testing.gotl.spyspyyo.bluetoothtesting.UI.App;
 
 
 /**

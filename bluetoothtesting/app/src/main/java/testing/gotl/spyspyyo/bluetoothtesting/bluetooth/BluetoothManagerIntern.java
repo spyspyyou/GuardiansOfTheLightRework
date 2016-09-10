@@ -1,5 +1,6 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
@@ -9,36 +10,103 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import java.util.UUID;
+import testing.gotl.spyspyyo.bluetoothtesting.UI.App;
+import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
+import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
-import testing.gotl.spyspyyo.bluetoothtesting.App;
-import testing.gotl.spyspyyo.bluetoothtesting.AppEvents;
-import testing.gotl.spyspyyo.bluetoothtesting.TODS;
-
-public class BluetoothManagerIntern implements TODS, AppEvents{
+public class BluetoothManagerIntern implements TODS, GlobalTrigger {
+    private enum BLUETOOTH_STATES{
+        DISABLED,
+        ENABLED,
+        DISCOVERABLE
+    }
+    private static BLUETOOTH_STATES bluetoothState = BLUETOOTH_STATES.DISABLED;
     private static BluetoothAdapter bA;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver;
+
+    // start of all the outside access method that the app has onto the bluetooth sector.
+
+
+    //active methods
+
+    public static void getAvailableGames(){
+
+    }
+
+    public static void getAvailableAppUsers(){
+
+    }
+
+    public static void updateFriendsStatus(){
+
+    }
+
+    //trigger methods
 
     public void onAppStart(){
         bA = BluetoothAdapter.getDefaultAdapter();
         if (bA == null)handleNonBluetoothDevice();
-        BluetoothBroadcastReceiver.setupReceiver();
-        if (startBluetoothOnAppStart)enableBluetooth();
+        if (startBluetoothOnAppEntering)enableBluetooth();
     }
 
+    public void onAppResume(){
+        BluetoothBroadcastReceiver.setupReceiver();
+        //TODO - reminder with activation button for bluetooth
+    }
+
+    public void onAppStop(){
+        if (stopBluetoothOnAppLeaving)disableBluetooth();
+        unregisterReceiver();
+    }
+
+    public void onActivityResult(int resultCode, Intent data){
+        if (resultCode == Activity.RESULT_CANCELED){
+            switch (bluetoothState){
+                case DISABLED:
+                    App.toast("Bluetooth was not enabled.");
+                    break;
+                case ENABLED:
+                    App.toast("Discoverable was not enabled.");
+                    break;
+                case DISCOVERABLE:
+                    App.toast("If this is displayed, I failed. ^^");
+                    break;
+            }
+        }
+    }
+
+    // end of the outside access methods
+
     public static void enableBluetooth(){
-        if(bA.isEnabled())return;
-        bA.enable();
+        if(bA.isEnabled()&& bA.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)return;
+        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+        App.accessActiveActivity(null).startActivityForResult(intent, REQUEST_START_DISCOVERABLE);
     }
 
     private static void disableBluetooth(){
         if (!bA.isEnabled())return;
         bA.disable();
-        destroyReceiver();
+        unregisterReceiver();
     }
 
-    public static void onAppLeave(){
-        disableBluetooth();
+    private static void badBluetoothDisabling(){
+        if (alertBluetoothTurnedOff){
+            new AlertDialog.Builder(App.accessActiveActivity(null))
+                    .setTitle("Bluetooth required")
+                    .setMessage("Without bluetooth turned on, you can't be invited to games.")
+                    .setPositiveButton("re-enable", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            enableBluetooth();
+                        }
+                    }).setNegativeButton("Understood", new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+            }).show();
+        }
     }
 
     private static void handleNonBluetoothDevice(){
@@ -54,7 +122,7 @@ public class BluetoothManagerIntern implements TODS, AppEvents{
                 .show();
     }
 
-    private static void destroyReceiver(){
+    private static void unregisterReceiver(){
         App.accessActiveActivity(null).unregisterReceiver(bluetoothBroadcastReceiver);
     }
 
@@ -84,6 +152,9 @@ public class BluetoothManagerIntern implements TODS, AppEvents{
                 case BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED:
                     onNameChange(intent);
                     break;
+                case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
+                    onNameChange(intent);
+                    break;
                 default:
                     Log.i("BBReceiver", "Received an unidentifiable Intent");
             }
@@ -93,15 +164,19 @@ public class BluetoothManagerIntern implements TODS, AppEvents{
             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, INVALID_STATE);
             switch (extra){
                case BluetoothAdapter.STATE_ON:
+                   if (bluetoothState!=BLUETOOTH_STATES.DISCOVERABLE)bluetoothState = BLUETOOTH_STATES.ENABLED;
                     break;
                 case BluetoothAdapter.STATE_OFF:
+                    bluetoothState = BLUETOOTH_STATES.DISABLED;
                     break;
                 case BluetoothAdapter.STATE_TURNING_ON:
+                    bluetoothState = BLUETOOTH_STATES.DISABLED;
                     break;
                 case BluetoothAdapter.STATE_TURNING_OFF:
+                    bluetoothState = BLUETOOTH_STATES.DISABLED;
+                    //todo:only call when the app is in a bluetooth requiring state
+                    if (App.isActive())badBluetoothDisabling();
                     break;
-                default:
-                    Log.e(this.toString(), "Received an invalid Bluetooth state changed Intent.");
             }
         }
 
