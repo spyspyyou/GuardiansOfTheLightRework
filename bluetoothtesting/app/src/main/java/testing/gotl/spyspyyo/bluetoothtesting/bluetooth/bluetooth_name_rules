@@ -1,0 +1,6 @@
+contains:
+    - if it hosts a game
+    - the name of the player
+    - name of the game if existing
+
+*player_name_String*_*game_hosting_boolean*-*game_name_string*

@@ -3,12 +3,18 @@ package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 import testing.gotl.spyspyyo.bluetoothtesting.UI.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
@@ -29,16 +35,22 @@ public class BluetoothManagerIntern implements TODS, GlobalTrigger {
 
     //active methods
 
-    public static void getAvailableGames(){
-
+    /**
+     * this method directly returns info about connected games and then searches for further games
+     * triggering a ui method when finding one
+     */
+    public static ArrayList<BluetoothDevice> getAvailableGames(){
+        enableBluetooth();
+        bA.startDiscovery();
+        return ConnectionManager.getGameHostingDevices();
     }
 
     public static void getAvailableAppUsers(){
-
+        enableBluetooth();
     }
 
     public static void updateFriendsStatus(){
-
+        enableBluetooth();
     }
 
     //trigger methods
@@ -126,6 +138,18 @@ public class BluetoothManagerIntern implements TODS, GlobalTrigger {
         App.accessActiveActivity(null).unregisterReceiver(bluetoothBroadcastReceiver);
     }
 
+    private static void setBluetoothName(){
+        bA.setName(playerName + "_" + ((hostingGame)?"1-"+gameName:0));
+    }
+
+    public static BluetoothServerSocket getBluetoothServerSocket(UUID uuid) throws IOException{
+        return bA.listenUsingRfcommWithServiceRecord(APP_IDENTIFIER, uuid);
+    }
+
+    public static BluetoothServerSocket getInsecureBluetoothServerSocket(UUID uuid) throws IOException{
+        return bA.listenUsingInsecureRfcommWithServiceRecord(APP_IDENTIFIER, uuid);
+    }
+
     public static class BluetoothBroadcastReceiver extends BroadcastReceiver {
         private final int INVALID_STATE = -1;
 
@@ -133,7 +157,8 @@ public class BluetoothManagerIntern implements TODS, GlobalTrigger {
                 BluetoothAdapter.ACTION_STATE_CHANGED,
                 BluetoothAdapter.ACTION_DISCOVERY_STARTED,
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED,
-                BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED
+                BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED,
+                BluetoothDevice.ACTION_FOUND
         };
 
         @Override
@@ -152,8 +177,8 @@ public class BluetoothManagerIntern implements TODS, GlobalTrigger {
                 case BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED:
                     onNameChange(intent);
                     break;
-                case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
-                    onNameChange(intent);
+                case BluetoothDevice.ACTION_FOUND:
+                    onDeviceFound(intent);
                     break;
                 default:
                     Log.i("BBReceiver", "Received an unidentifiable Intent");
@@ -163,8 +188,9 @@ public class BluetoothManagerIntern implements TODS, GlobalTrigger {
         private void onStateChanged(Intent intent){
             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, INVALID_STATE);
             switch (extra){
-               case BluetoothAdapter.STATE_ON:
-                   if (bluetoothState!=BLUETOOTH_STATES.DISCOVERABLE)bluetoothState = BLUETOOTH_STATES.ENABLED;
+                case BluetoothAdapter.STATE_ON:
+                    if (bluetoothState!=BLUETOOTH_STATES.DISCOVERABLE)bluetoothState = BLUETOOTH_STATES.ENABLED;
+                    setBluetoothName();
                     break;
                 case BluetoothAdapter.STATE_OFF:
                     bluetoothState = BLUETOOTH_STATES.DISABLED;
@@ -189,7 +215,14 @@ public class BluetoothManagerIntern implements TODS, GlobalTrigger {
         }
 
         private void onNameChange(Intent intent){
+            if (bluetoothState == BLUETOOTH_STATES.DISABLED)return;
+            setBluetoothName();
+            App.toast("BluetoothName was changed to '"+intent.getStringExtra(BluetoothAdapter.EXTRA_LOCAL_NAME)+"' by an unknown source. To assure App functionality, the name was changed back to its original string.");
+        }
 
+        private void onDeviceFound(Intent intent){
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            // give the device to the UI requesting the info
         }
 
         private static void setupReceiver(){

@@ -7,12 +7,12 @@ import java.util.UUID;
  */
 public interface UUIDS {
     UUID[] UUIDS = {
-            UUID.fromString("a810452d-2fda-4113-977e-3494579d3eea"),
-            UUID.fromString("b810452d-2fda-4113-977e-3494579d3eea"),
-            UUID.fromString("c810452d-2fda-4113-977e-3494579d3eea"),
-            UUID.fromString("d810452d-2fda-4113-977e-3494579d3eea"),
-            UUID.fromString("e810452d-2fda-4113-977e-3494579d3eea"),
-            UUID.fromString("f810452d-2fda-4113-977e-3494579d3eea"),
-            UUID.fromString("g810452d-2fda-4113-977e-3494579d3eea"),
+            UUID.fromString("a810452d-2fda-4113-977e-3494579d3ee0"),
+            UUID.fromString("b810452d-2fda-4113-977e-3494579d3ee1"),
+            UUID.fromString("c810452d-2fda-4113-977e-3494579d3ee2"),
+            UUID.fromString("d810452d-2fda-4113-977e-3494579d3ee3"),
+            UUID.fromString("e810452d-2fda-4113-977e-3494579d3ee4"),
+            UUID.fromString("f810452d-2fda-4113-977e-3494579d3ee5"),
+            UUID.fromString("g810452d-2fda-4113-977e-3494579d3ee6"),
     };
 }
