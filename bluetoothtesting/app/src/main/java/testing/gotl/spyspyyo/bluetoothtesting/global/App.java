@@ -1,4 +1,4 @@
-package testing.gotl.spyspyyo.bluetoothtesting.UI;
+package testing.gotl.spyspyyo.bluetoothtesting.global;
 
 import android.app.Activity;
 import android.content.Context;

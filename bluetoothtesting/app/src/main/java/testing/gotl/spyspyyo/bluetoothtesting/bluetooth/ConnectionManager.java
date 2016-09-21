@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import testing.gotl.spyspyyo.bluetoothtesting.UI.App;
+import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
 
