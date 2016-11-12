@@ -13,6 +13,6 @@ public interface GlobalTrigger {
 
     void onAppStop();
 
-    void onActivityResult(int resultCode, Intent data);
+    void onActivityResult(int requestCode, int resultCode, Intent data);
 
 }

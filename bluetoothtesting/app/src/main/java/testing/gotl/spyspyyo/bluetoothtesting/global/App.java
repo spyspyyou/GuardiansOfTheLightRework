@@ -6,15 +6,14 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.BluetoothManagerIntern;
-import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
-import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
+import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.AppBluetoothManager;
 
 /**
  *
  */
 
-//todo:professionalize the strings
+//todo:professionalize the strings;
+//todo:exchange toast with Snackbar
 public class App implements TODS {
 
     private static boolean appActive = false;
@@ -22,17 +21,9 @@ public class App implements TODS {
 
     private static Activity currentActivity;
 
-    //lists with the places to be noticed on the mentioned event
-    private static GlobalTrigger[] onAppStartTrigger = {
-            new BluetoothManagerIntern()
-    };
-
-    private static GlobalTrigger[] onAppResumeTrigger = {
-            new BluetoothManagerIntern()
-    };
-
-    private static GlobalTrigger[] onAppStopTrigger = {
-            new BluetoothManagerIntern()
+    //lists with the places to be noticed on big App Events
+    private static GlobalTrigger[] onAppTrigger = {
+            new AppBluetoothManager()
     };
 
     //activity on-calls
@@ -53,22 +44,22 @@ public class App implements TODS {
     }
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (requestCode == REQUEST_START_DISCOVERABLE){
-            new BluetoothManagerIntern().onActivityResult(resultCode, data);
+        for (GlobalTrigger aE:onAppTrigger){
+            aE.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     //global trigger calls
 
     private static void onAppStart(){
-        for(GlobalTrigger aE:onAppStartTrigger){
+        for(GlobalTrigger aE:onAppTrigger){
             aE.onAppStart();
         }
     }
 
     private static void onAppResume(){
         appActive = true;
-        for(GlobalTrigger aE:onAppResumeTrigger){
+        for(GlobalTrigger aE:onAppTrigger){
             aE.onAppResume();
         }
     }
@@ -76,7 +67,7 @@ public class App implements TODS {
 
     private static void onAppStop(){
         appActive = false;
-        for(GlobalTrigger aE:onAppStopTrigger){
+        for(GlobalTrigger aE:onAppTrigger){
             aE.onAppStop();
         }
     }

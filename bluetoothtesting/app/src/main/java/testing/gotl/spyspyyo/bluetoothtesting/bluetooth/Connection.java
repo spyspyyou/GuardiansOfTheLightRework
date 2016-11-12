@@ -1,49 +1,92 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
-/**
- * Created by Sandro on 11.09.2016.
- */
-public class Connection {
+import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
+
+public class Connection implements TODS {
+    private static final short MAX_EVENTS_PER_READ_EVENTS_CALL = 5;
+    private final byte INDEX;
     private final InputStream INPUT_STREAM;
     private final OutputStream OUTPUT_STREAM;
-    private final BluetoothDevice BLUETOOTH_DEVICE;
     private final BluetoothSocket BLUETOOTH_SOCKET;
+    private boolean active = true;
 
-    public Connection(BluetoothDevice pBluetoothDevice, BluetoothSocket pBluetoothSocket){
-        BLUETOOTH_DEVICE = pBluetoothDevice;
+    public Connection(BluetoothSocket pBluetoothSocket, byte index){
         BLUETOOTH_SOCKET = pBluetoothSocket;
+        INDEX = index;
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        try {
-            inputStream = pBluetoothSocket.getInputStream();
-            outputStream = pBluetoothSocket.getOutputStream();
-        } catch (IOException e) {
-            Log.e("Connection", "failed to get data streams");
-            e.printStackTrace();
+        if (BLUETOOTH_SOCKET == null)active = false;
+        else {
+            try {
+                inputStream = pBluetoothSocket.getInputStream();
+                outputStream = pBluetoothSocket.getOutputStream();
+            } catch (IOException e) {
+                Log.e("Connection", "failed to get data streams");
+                active = false;
+                e.printStackTrace();
+            }
         }
         INPUT_STREAM = inputStream;
         OUTPUT_STREAM = outputStream;
     }
 
-    public static Connection newServerConnection(BluetoothSocket sBluetoothSocket){
-        return new Connection(sBluetoothSocket.getRemoteDevice(), sBluetoothSocket);
+    /**
+     * this method reads from the connection's InputStream until it gets at most MAX_EVENTS_PER_READ_EVENTS_CALL Events or the stream has no more data
+     * @return events - a list of Events from the InputStream
+     */
+    public ArrayList<Event> readEvents(){
+        ArrayList<Event> events = new ArrayList<>();
+        String eventString = "";
+        char nextChar;
+        int numberOfEventsRead = 0;
+        try {
+            while ((INPUT_STREAM.available() > 0 || eventString != "")
+                    && numberOfEventsRead < MAX_EVENTS_PER_READ_EVENTS_CALL) {
+                nextChar = (char) INPUT_STREAM.read();
+                if (nextChar == EVENT_STRING_FINAL_CHAR){
+                    Log.i("Connection", "Event received: " + eventString);
+                    Event event = Event.fromEventString(eventString);
+                    eventString = "";
+                    ++numberOfEventsRead;
+                }else eventString += nextChar;
+            }
+        }catch (IOException e){
+            //todo: handle the broken connection;
+            active = false;
+            e.printStackTrace();
+        }
+        return events;
     }
 
-    public BluetoothDevice getBluetoothDevice(){
-        return BLUETOOTH_DEVICE;
+    public void disconnect(){
+        active = false;
+        try {
+            INPUT_STREAM.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            OUTPUT_STREAM.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            BLUETOOTH_SOCKET.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ConnectionManager.getConnections()[INDEX] = null;
     }
 
-    public boolean isHostingGame(){
-        String bluetoothName = BLUETOOTH_DEVICE.getName();
-        char c = bluetoothName.charAt(bluetoothName.indexOf('_'));
-        return (c!='0');
+    public boolean isActive(){
+        return active;
     }
 }

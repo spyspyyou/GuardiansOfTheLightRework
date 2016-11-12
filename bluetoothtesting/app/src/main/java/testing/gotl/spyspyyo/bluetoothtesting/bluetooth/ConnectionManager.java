@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,18 +12,25 @@ import java.util.UUID;
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
-
-/**
- * Created by Sandro on 08/09/2016.
- */
-public class ConnectionManager implements UUIDS{
-    private static ArrayList<Connection> connections;
-    private static ArrayList<ServerConnectionCreateThread> serverConnectionCreateThreads;
-    private static ConnectionManagementThread connectionManagementThread;
+public class ConnectionManager {
+    //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
+    private static final String UUID_STRING = "a810452d-2fda-4113-977e-3494579d3ee";
+    private static final byte MAX_CONNECTIONS = 7;
+    private static Connection[] connections = {
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+    };
+    private static ArrayList<AcceptConnectionThread> acceptConnectionThreads;
+    private static ConnectionManagementThread connectionManagementThread = null;
 
     private static void startConnectionManagementThread(){
         if (connectionManagementThread.running){
-            Log.w("ConnectionManager", "ConnectionManagementThread is already running.");
+            Log.i("ConnectionManager", "ConnectionManagementThread is already running.");
             return;
         }
         stopConnectionManagementThread();
@@ -33,8 +39,8 @@ public class ConnectionManager implements UUIDS{
     }
 
     private static void stopConnectionManagementThread(){
+        if (connectionManagementThread==null)return;
         try {
-            connectionManagementThread = null;
             connectionManagementThread.join();
         } catch (InterruptedException e) {
             Log.w("ConnectionManager", "ConnectionManagementThread was interrupted.");
@@ -43,42 +49,44 @@ public class ConnectionManager implements UUIDS{
         connectionManagementThread = null;
     }
 
-    protected static void addConnection(Connection pConnection){
-        connections.add(pConnection);
-    }
-
-    public static ArrayList<BluetoothDevice> getGameHostingDevices(){
-        ArrayList<BluetoothDevice> gameHostConnections = new ArrayList<>();
-        for (Connection connection:connections){
-            if (connection.isHostingGame())gameHostConnections.add(connection.getBluetoothDevice());
-        }
-        return gameHostConnections;
-    }
-
-
-    public static void setupServerAvailability(){
-        serverConnectionCreateThreads = new ArrayList<>();
-        for(UUID uuid:UUIDS){
-            serverConnectionCreateThreads.add(new ServerConnectionCreateThread(uuid));
+    public static void startServerAvailability(){
+        acceptConnectionThreads = new ArrayList<>();
+        for(byte i = 0; i < MAX_CONNECTIONS; ++i){
+            if (connections[i] == null) acceptConnectionThreads.add(new AcceptConnectionThread(i));
         }
     }
 
     public static void stopServerAvailability(){
-        while(!serverConnectionCreateThreads.isEmpty()){
-            serverConnectionCreateThreads.remove(0).cancelAvailability();
+        while(!acceptConnectionThreads.isEmpty()){
+            acceptConnectionThreads.remove(0).cancelAvailability();
         }
     }
 
+    public static boolean hasConnections(){
+        for (Connection c:connections){
+            if (c != null)return true;
+        }
+        return false;
+    }
+
+    private static UUID getUUID (int i){
+        return UUID.fromString(UUID_STRING + i);
+    }
+
+    public static Connection[] getConnections(){
+        return connections;
+    }
+
     public static class ConnectionManagementThread extends Thread{
-        private final int CONNECTION_CHECK_RATE = 5000;
+        private final static int CONNECTION_CHECK_RATE = 5000;
         private boolean running = true;
 
         @Override
         public void run() {
-            while(running&&!connections.isEmpty()){
+            while(hasConnections()){
                 try {
                     for (Connection connection:connections){
-                        //checkStatus
+                        //todo:handshake Event
                     }
                     sleep(CONNECTION_CHECK_RATE);
                 } catch (InterruptedException e) {
@@ -90,14 +98,14 @@ public class ConnectionManager implements UUIDS{
         }
     }
 
-    private class ClientConnectionCreateThread extends Thread implements UUIDS{
+    private class CreateConnectionThread extends Thread{
         private final BluetoothDevice BLUETOOTH_DEVICE;
 
         /**
          * This Thread is started automatically upon creation!
          * @param pBluetoothDevice - the remote device to connect to
          */
-        public ClientConnectionCreateThread(BluetoothDevice pBluetoothDevice){
+        public CreateConnectionThread(BluetoothDevice pBluetoothDevice){
             BLUETOOTH_DEVICE = pBluetoothDevice;
             start();
         }
@@ -105,9 +113,10 @@ public class ConnectionManager implements UUIDS{
         @Override
         public void run() {
             BluetoothSocket bluetoothSocket = null;
-            for (UUID uuid:UUIDS) {
+            byte index = 0;
+            for (; index < MAX_CONNECTIONS; ++index) {
                 try {
-                    bluetoothSocket = BLUETOOTH_DEVICE.createRfcommSocketToServiceRecord(uuid);
+                    bluetoothSocket = BLUETOOTH_DEVICE.createRfcommSocketToServiceRecord(getUUID(index));
                 } catch (IOException e) {
                     Log.e("Connection", "Failed to create BluetoothSocket");
                     e.printStackTrace();
@@ -117,60 +126,59 @@ public class ConnectionManager implements UUIDS{
                     bluetoothSocket.connect();
                     break;
                 } catch (IOException e) {
-                    Log.e("Connection", "Failed to connect the BluetoothSocket with uuid " + uuid.toString());
+                    Log.e("Connection", "Failed to connect the BluetoothSocket with uuid " + getUUID(index).toString());
                     e.printStackTrace();
-                    continue;
                 }
             }
-            if (bluetoothSocket.isConnected()){
-                addConnection(new Connection(BLUETOOTH_DEVICE, bluetoothSocket));
+            if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
+                Log.e("Connection", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ":" + BLUETOOTH_DEVICE.getAddress());
+            }else {
+                connections[index] = new Connection(bluetoothSocket, index);
                 Log.i("ClientCCThread", "Connection successful");
-            }else{
-                Toast.makeText(App.getContext(), "Failed to Create Connection", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private static class ServerConnectionCreateThread extends Thread implements TODS {
+    private static class AcceptConnectionThread extends Thread implements TODS {
         private BluetoothServerSocket bluetoothServerSocket = null;
-        private UUID uuid;
+        private final UUID UUID;
+        private final byte INDEX;
 
-        public ServerConnectionCreateThread(UUID sUuid){
-            uuid = sUuid;
+        public AcceptConnectionThread(byte i){
+            INDEX = i;
+            UUID = getUUID(i);
             start();
         }
 
         @Override
         public void run() {
-            BluetoothSocket bluetoothSocket = null;
-            try {
-                if (allowInsecureConnections)
-                    bluetoothServerSocket = BluetoothManagerIntern.getInsecureBluetoothServerSocket(uuid);
-                else bluetoothServerSocket = BluetoothManagerIntern.getBluetoothServerSocket(uuid);
-            }catch(IOException e){
-                e.printStackTrace();
-                App.toast("Could not open the bluetoothServerSocket with uuid " + uuid.toString());
+            while(connections[INDEX]==null) {
+                BluetoothSocket bluetoothSocket = null;
+                try {
+                    bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(UUID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    App.toast("Could not open the bluetoothServerSocket with uuid " + UUID.toString());
+                }
+
+                if (bluetoothServerSocket == null) {
+                    App.toast("Failed to get the bluetoothServerSocket with uuid " + UUID.toString());
+                    continue;
+                }
+
+                try {
+                    bluetoothSocket = bluetoothServerSocket.accept();
+                } catch (IOException e) {
+                    Log.e("ConnectionServerThread", "failed to accept the connection");
+                    e.printStackTrace();
+                }
+
+                if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
+                    Log.e("ConnectionServerThread", "failed to connect correctly");
+                    return;
+                }
+                connections[INDEX] = new Connection(bluetoothSocket, INDEX);
             }
-
-            if (bluetoothServerSocket == null){
-                App.toast("Failed to get the bluetoothServerSocket with uuid " + uuid.toString());
-            }else{
-
-            }
-
-            try {
-                bluetoothSocket = bluetoothServerSocket.accept();
-            } catch (IOException e) {
-                Log.e("ConnectionServerThread", "failed to accept the connection");
-                e.printStackTrace();
-            }
-
-            if (bluetoothSocket == null){
-                Log.e("ConnectionServerThread", "failed to connect correctly");
-                return;
-            }
-
-            addConnection(Connection.newServerConnection(bluetoothSocket));
             cancelAvailability();
         }
 
@@ -180,6 +188,7 @@ public class ConnectionManager implements UUIDS{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            acceptConnectionThreads.remove(this);
         }
     }
 }

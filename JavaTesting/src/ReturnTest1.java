@@ -1,9 +1,20 @@
 public class ReturnTest1 extends Thread{
-    static boolean a = false;
-    static boolean b = true;
+
+    Obiekt o = new Obiekt();
 
     public static void main(String args[]){
-        System.out.println(a!=(a=false));
-        System.out.println(b!=(b=false));
+        new ReturnTest1().ma();
     }
+
+    public void ma(){
+        o.a = 1;
+        new ObiThread().setReturnTest(this).start();
+        o = new Obiekt();
+        test();
+    }
+
+    public void test(){
+        System.out.print(o.a);
+    }
+
 }

@@ -1,8 +1,5 @@
 package testing.gotl.spyspyyo.bluetoothtesting.global;
 
-/**
- * Created by Sandro on 07/09/2016.
- */
 public interface TODS {
 
     // startActivityForResult codes
@@ -10,6 +7,7 @@ public interface TODS {
     String APP_IDENTIFIER = "GuardiansOfTheLight";
     String playerName = "spieler 1";
     String gameName = "Spiel 1";
+    char EVENT_STRING_FINAL_CHAR = '|';
 
 
     boolean startBluetoothOnAppEntering = true;
