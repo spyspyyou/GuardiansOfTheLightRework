@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.BluetoothConnectionManagementTestActivity;
+import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.GotLActivity;
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
@@ -33,6 +34,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     private static final char BLUETOOTH_NAME_GAMENAME_INDICATOR = '|';
 
     private static int bluetoothState = DISABLED;
+    private static String bluetoothName = APP_IDENTIFIER;
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver;
     private static ArrayList<BluetoothDevice> clients;
@@ -46,7 +48,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null)handleNonBluetoothDevice();
         if (startBluetoothOnAppEntering)enableBluetooth();
-        BluetoothBroadcastReceiver.setupReceiver();
+        startReceiving();
     }
 
     public void onAppResume(){
@@ -55,12 +57,12 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     public void onAppStop(){
         if (stopBluetoothOnAppLeaving)disableBluetooth();
-        unregisterReceiver();
+        stopReceiving();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == REQUEST_START_DISCOVERABLE && resultCode == Activity.RESULT_CANCELED){
-            App.toast("Bluetooth was not enabled.");
+            bluetoothDisabling();
         }
     }
 
@@ -68,12 +70,14 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     public static ArrayList<BluetoothDevice> getClientList(){
         bluetoothAdapter.startDiscovery();
+        Log.i("BtTest", "searching for Clients");
         clients = new ArrayList<>();
         return clients;
     }
 
     public static ArrayList<BluetoothDevice> getServerList(){
         bluetoothAdapter.startDiscovery();
+        Log.i("BtTest", "Searching for Hosts");
         servers = new ArrayList<>();
         return servers;
     }
@@ -100,10 +104,17 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     }
 
+    public static void serverRequirementChanged(boolean serverAvailabilityRequired){
+        if (serverAvailabilityRequired)ConnectionManager.startServerAvailability();
+        else ConnectionManager.stopServerAvailability();
+    }
     //Intern methods
 
     private static void enableBluetooth(){
-        if(bluetoothAdapter.isEnabled()&& bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)return;
+        if (bluetoothAdapter.isEnabled()){
+            setBluetoothName();
+            if(bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)return;
+        }
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
         App.accessActiveActivity(null).startActivityForResult(intent, REQUEST_START_DISCOVERABLE);
@@ -116,7 +127,20 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     private static void bluetoothDisabling(){
-        //todo:handle the problem
+        new AlertDialog.Builder(App.accessActiveActivity(null))
+                .setTitle("Stop Resisting!")
+                .setMessage("The App requires active and visible bluetooth. So If you'd be so kind and tried hitting the right button again :)")
+                .setPositiveButton("I will do my best!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        enableBluetooth();
+                    }
+                }).setNegativeButton("I am incorrigible.", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                App.accessActiveActivity(null).finish();
+            }
+        }).show();
     }
 
     private static void handleNonBluetoothDevice(){
@@ -132,17 +156,32 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
                 .show();
     }
 
-    private static void unregisterReceiver(){
+    private static void startReceiving(){
+        BluetoothBroadcastReceiver.setupReceiver();
+        new EventReceiverThread();
+        new EventSenderThread();
+        Log.e("BtTest", "started reception");
+    }
+
+    private static void stopReceiving(){
         App.accessActiveActivity(null).unregisterReceiver(bluetoothBroadcastReceiver);
+        ConnectionManager.disconnect();
+        ConnectionManager.stopServerAvailability();
+        Log.e("BtTest", "stopped reception");
     }
 
     //todo:adjust
     private static void setBluetoothName(){
-        bluetoothAdapter.setName(playerName + "_" + ((hostingGame)?"1-"+gameName:0));
+        bluetoothName = APP_IDENTIFIER + '_' + "";
+        bluetoothAdapter.setName(bluetoothName);
     }
 
     public static BluetoothServerSocket getBluetoothServerSocket(UUID uuid) throws IOException{
         return bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(APP_IDENTIFIER, uuid);
+    }
+
+    public static boolean isBluetoothEnabled() {
+        return bluetoothAdapter.isEnabled();
     }
 
     public static class BluetoothBroadcastReceiver extends BroadcastReceiver {
@@ -184,34 +223,38 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, INVALID_STATE);
             switch (extra){
                 case BluetoothAdapter.STATE_ON:
-                    if (bluetoothState!=DISCOVERABLE)bluetoothState = ENABLED;
+                    if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)bluetoothState = ENABLED;
                     setBluetoothName();
+                    enableBluetooth();
+                    if (GotLActivity.isActiveActivityRequiresServer())ConnectionManager.startServerAvailability();
                     break;
                 case BluetoothAdapter.STATE_OFF:
-                case BluetoothAdapter.STATE_TURNING_ON:
-                case BluetoothAdapter.STATE_TURNING_OFF:
                     bluetoothState = DISABLED;
+                    ConnectionManager.stopServerAvailability();
                     if (App.isActive())bluetoothDisabling();
                     break;
             }
         }
 
         private void onDiscoveryStart(Intent intent){
-
+            Log.e("BtTest", "starting discovery");
+            BluetoothConnectionManagementTestActivity.checkBox.setChecked(true);
         }
 
         private void onDiscoveryFinish(Intent intent){
-
+            Log.e("BtTest", "discovery finished");
+            BluetoothConnectionManagementTestActivity.checkBox.setChecked(false);
         }
 
         private void onNameChange(Intent intent){
             if (bluetoothState == DISABLED)return;
-            setBluetoothName();
+            if (!bluetoothAdapter.getName().equals(bluetoothName)) setBluetoothName();
         }
 
         private void onDeviceFound(Intent intent){
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             String deviceName = device.getName();
+            Log.e("BtTest", "Found a Device " + deviceName);
             if (!deviceName.startsWith(APP_IDENTIFIER))return;
             clients.add(device);
             if (deviceName.charAt(deviceName.indexOf(BLUETOOTH_NAME_GAMEHOSTING_INDICATOR)+1)=='1')

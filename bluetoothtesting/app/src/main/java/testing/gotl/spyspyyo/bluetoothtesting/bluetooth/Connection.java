@@ -86,7 +86,7 @@ public class Connection implements TODS {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ConnectionManager.getConnections()[INDEX] = null;
+        ConnectionManager.removeDisconnectedConnection(INDEX);
     }
 
     public BluetoothDevice getRemoteDevice(){
@@ -95,5 +95,9 @@ public class Connection implements TODS {
 
     public boolean isActive(){
         return active;
+    }
+
+    public byte getIndex(){
+        return INDEX;
     }
 }

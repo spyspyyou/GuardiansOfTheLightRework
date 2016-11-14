@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
 /*package*/ class ConnectionManager {
@@ -26,9 +25,13 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
             null,
             null
     };
-    private static ArrayList<AcceptConnectionThread> acceptConnectionThreads;
+
+    private static ArrayList<AcceptConnectionThread> acceptConnectionThreads = new ArrayList<>();
 
     public static void startServerAvailability(){
+        if (serverAvailable || !AppBluetoothManager.isBluetoothEnabled())return;
+        serverAvailable = true;
+        Log.e("ConnectionManager", "starting the Server");
         acceptConnectionThreads = new ArrayList<>();
         for(byte i = 0; i < MAX_CONNECTIONS; ++i){
             if (connections[i] == null) acceptConnectionThreads.add(new AcceptConnectionThread(i));
@@ -37,10 +40,20 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
     }
 
     public static void stopServerAvailability(){
+        if (serverAvailable = false)return;
+        Log.e("ConnectionManager", "stopping the Server");
         serverAvailable  = false;
         while(!acceptConnectionThreads.isEmpty()){
             acceptConnectionThreads.remove(0).cancelAvailability();
         }
+    }
+
+    protected static void addConnection(Connection connection){
+        if (!hasConnections()){
+            new EventSenderThread();
+            new EventReceiverThread();
+        }
+        connections[connection.getIndex()] = connection;
     }
 
     public static boolean hasConnections(){
@@ -60,6 +73,12 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         connection.disconnect();
     }
 
+    public static void disconnect(){
+        for (Connection connection:connections){
+            if (connection!=null)connection.disconnect();
+        }
+    }
+
     private static UUID getUUID (int i){
         return UUID.fromString(UUID_STRING + i);
     }
@@ -73,6 +92,11 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
     public static Connection[] getConnections(){
         return connections;
+    }
+
+    public static void removeDisconnectedConnection(byte index) {
+        connections[index] = null;
+        if (serverAvailable)acceptConnectionThreads.add(new AcceptConnectionThread(index));
     }
 
     private static class CreateConnectionThread extends Thread{
@@ -90,8 +114,10 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         @Override
         public void run() {
             BluetoothSocket bluetoothSocket = null;
+            Log.i("BtTest", "Started connection Thread for: " + BLUETOOTH_DEVICE.getName());
             byte index = 0;
             for (; index < MAX_CONNECTIONS; ++index) {
+                Log.i("BtTest", "Attempting connection with index " + index);
                 try {
                     bluetoothSocket = BLUETOOTH_DEVICE.createRfcommSocketToServiceRecord(getUUID(index));
                 } catch (IOException e) {
@@ -103,16 +129,16 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
                     bluetoothSocket.connect();
                     break;
                 } catch (IOException e) {
-                    Log.e("Connection", "Failed to connect the BluetoothSocket with uuid " + getUUID(index).toString());
+                    Log.e("BtTest", "Failed to connect with index " + index);
                     e.printStackTrace();
                 }
             }
             if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
-                Log.e("Connection", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ":" + BLUETOOTH_DEVICE.getAddress());
+                Log.e("BtTest", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ":" + BLUETOOTH_DEVICE.getAddress());
                 //todo: hanle failure, inform the issuer
             }else {
-                connections[index] = new Connection(bluetoothSocket, index);
-                Log.i("ClientCCThread", "Connection successful");
+                addConnection(new Connection(bluetoothSocket, index));
+                Log.i("BtTest", "Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
             }
         }
     }
@@ -130,39 +156,40 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
         @Override
         public void run() {
-            while(connections[INDEX]==null) {
+            while(serverAvailable && connections[INDEX]==null) {
                 BluetoothSocket bluetoothSocket = null;
                 try {
                     bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(UUID);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    App.toast("Could not open the bluetoothServerSocket with uuid " + UUID.toString());
+                    Log.i("BtTest", "Could not open the bluetoothServerSocket with uuid " + UUID.toString());
                 }
 
                 if (bluetoothServerSocket == null) {
-                    App.toast("Failed to get the bluetoothServerSocket with uuid " + UUID.toString());
+                    Log.i("BtTest", "Failed to get the bluetoothServerSocket with uuid " + UUID.toString());
                     continue;
                 }
 
                 try {
                     bluetoothSocket = bluetoothServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e("ConnectionServerThread", "failed to accept the connection");
+                    if (serverAvailable)Log.e("ConnectionServerThread", "failed to accept the connection");
                     e.printStackTrace();
+                    continue;
                 }
 
                 if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
                     Log.e("ConnectionServerThread", "failed to connect correctly");
-                    return;
+                    break;
                 }
-                connections[INDEX] = new Connection(bluetoothSocket, INDEX);
+                addConnection(new Connection(bluetoothSocket, INDEX));
             }
             cancelAvailability();
         }
 
         public void cancelAvailability(){
             try {
-                bluetoothServerSocket.close();
+               if (bluetoothServerSocket!=null)bluetoothServerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

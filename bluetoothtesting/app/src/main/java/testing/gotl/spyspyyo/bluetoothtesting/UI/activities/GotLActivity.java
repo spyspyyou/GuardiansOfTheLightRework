@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 
-public class GotLActivity extends AppCompatActivity {
+public abstract class GotLActivity extends AppCompatActivity {
+
+    protected static boolean activeActivityRequiresServer = false;
 
     @Override
     protected void onStart() {
@@ -31,10 +33,11 @@ public class GotLActivity extends AppCompatActivity {
         App.onActivityResult(requestCode, resultCode, data);
     }
 
+    //todo:add this to the game activity instead of here
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        /**
+        /*
         if (hasFocus) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -44,5 +47,9 @@ public class GotLActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
          */
+    }
+
+    public static boolean isActiveActivityRequiresServer(){
+        return activeActivityRequiresServer;
     }
 }

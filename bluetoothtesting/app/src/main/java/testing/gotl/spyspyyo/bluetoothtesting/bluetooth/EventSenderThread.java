@@ -4,19 +4,23 @@ package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 import android.util.Log;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 //this thread also regularly sends the HandshakeEvents
 /*package*/ class EventSenderThread extends Thread {
 
     private static final LinkedBlockingQueue<Event> events = new LinkedBlockingQueue<>();
+    private static final int MAXIMUM_WAIT_TIME = 500;
 
+    public EventSenderThread(){
+        start();
+    }
 
     @Override
     public void run() {
-        //todo:change while condition
-        while(true){
+        while(ConnectionManager.hasConnections()){
             try {
-                events.take().send();
+                events.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS).send();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

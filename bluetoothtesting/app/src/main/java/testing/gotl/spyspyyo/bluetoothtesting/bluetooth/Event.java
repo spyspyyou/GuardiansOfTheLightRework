@@ -11,6 +11,9 @@ public abstract class Event {
         RECEPTORS = receptors;
     }
 
+    /**
+     * has to be done quickly! otherwise it will block further reception
+     */
     public abstract void handle();
     public abstract void apply();
     public abstract String toString();

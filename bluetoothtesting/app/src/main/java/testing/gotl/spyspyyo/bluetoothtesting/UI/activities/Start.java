@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 
 import testing.gotl.spyspyyo.bluetoothtesting.R;
+import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.AppBluetoothManager;
 
 public class Start extends GotLActivity {
 
@@ -19,5 +20,12 @@ public class Start extends GotLActivity {
         a.setBackgroundDrawable(new ColorDrawable(0x20aaaaaa));
         a.setDisplayShowTitleEnabled(false);
         a.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        activeActivityRequiresServer = true;
+        AppBluetoothManager.serverRequirementChanged(true);
     }
 }
