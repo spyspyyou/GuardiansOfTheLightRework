@@ -12,10 +12,11 @@ import java.util.UUID;
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
-public class ConnectionManager {
+/*package*/ class ConnectionManager {
     //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
     private static final String UUID_STRING = "a810452d-2fda-4113-977e-3494579d3ee";
     private static final byte MAX_CONNECTIONS = 7;
+    private static boolean serverAvailable = false;
     private static Connection[] connections = {
             null,
             null,
@@ -26,37 +27,17 @@ public class ConnectionManager {
             null
     };
     private static ArrayList<AcceptConnectionThread> acceptConnectionThreads;
-    private static ConnectionManagementThread connectionManagementThread = null;
-
-    private static void startConnectionManagementThread(){
-        if (connectionManagementThread.running){
-            Log.i("ConnectionManager", "ConnectionManagementThread is already running.");
-            return;
-        }
-        stopConnectionManagementThread();
-        connectionManagementThread = new ConnectionManagementThread();
-        connectionManagementThread.start();
-    }
-
-    private static void stopConnectionManagementThread(){
-        if (connectionManagementThread==null)return;
-        try {
-            connectionManagementThread.join();
-        } catch (InterruptedException e) {
-            Log.w("ConnectionManager", "ConnectionManagementThread was interrupted.");
-            e.printStackTrace();
-        }
-        connectionManagementThread = null;
-    }
 
     public static void startServerAvailability(){
         acceptConnectionThreads = new ArrayList<>();
         for(byte i = 0; i < MAX_CONNECTIONS; ++i){
             if (connections[i] == null) acceptConnectionThreads.add(new AcceptConnectionThread(i));
         }
+        serverAvailable = true;
     }
 
     public static void stopServerAvailability(){
+        serverAvailable  = false;
         while(!acceptConnectionThreads.isEmpty()){
             acceptConnectionThreads.remove(0).cancelAvailability();
         }
@@ -69,36 +50,32 @@ public class ConnectionManager {
         return false;
     }
 
+    public static void connect(BluetoothDevice bluetoothDevice){
+        new CreateConnectionThread(bluetoothDevice).start();
+    }
+
+    public static void disconnect(BluetoothDevice bluetoothDevice){
+        Connection connection = getConnectionToDevice(bluetoothDevice);
+        if (connection==null)Log.w("ConnectionManager", "Can't disconnect from: " + bluetoothDevice.getAddress() + ", because it is not connected to the App.");
+        connection.disconnect();
+    }
+
     private static UUID getUUID (int i){
         return UUID.fromString(UUID_STRING + i);
+    }
+
+    private static Connection getConnectionToDevice(BluetoothDevice bluetoothDevice){
+        for (Connection connection:connections){
+            if (connection.getRemoteDevice()==bluetoothDevice)return connection;
+        }
+        return null;
     }
 
     public static Connection[] getConnections(){
         return connections;
     }
 
-    public static class ConnectionManagementThread extends Thread{
-        private final static int CONNECTION_CHECK_RATE = 5000;
-        private boolean running = true;
-
-        @Override
-        public void run() {
-            while(hasConnections()){
-                try {
-                    for (Connection connection:connections){
-                        //todo:handshake Event
-                    }
-                    sleep(CONNECTION_CHECK_RATE);
-                } catch (InterruptedException e) {
-                    Log.e("CMThread", "Thread was interrupted.");
-                    e.printStackTrace();
-                }
-            }
-            running = false;
-        }
-    }
-
-    private class CreateConnectionThread extends Thread{
+    private static class CreateConnectionThread extends Thread{
         private final BluetoothDevice BLUETOOTH_DEVICE;
 
         /**
@@ -132,6 +109,7 @@ public class ConnectionManager {
             }
             if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
                 Log.e("Connection", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ":" + BLUETOOTH_DEVICE.getAddress());
+                //todo: hanle failure, inform the issuer
             }else {
                 connections[index] = new Connection(bluetoothSocket, index);
                 Log.i("ClientCCThread", "Connection successful");

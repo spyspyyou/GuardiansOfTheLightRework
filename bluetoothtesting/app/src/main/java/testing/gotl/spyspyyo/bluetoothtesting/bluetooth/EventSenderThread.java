@@ -5,16 +5,18 @@ import android.util.Log;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class EventSenderThread extends Thread {
+//this thread also regularly sends the HandshakeEvents
+/*package*/ class EventSenderThread extends Thread {
 
     private static final LinkedBlockingQueue<Event> events = new LinkedBlockingQueue<>();
+
 
     @Override
     public void run() {
         //todo:change while condition
         while(true){
             try {
-                events.take();
+                events.take().send();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

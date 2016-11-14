@@ -13,8 +13,10 @@ import android.content.IntentFilter;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 
+import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.BluetoothConnectionManagementTestActivity;
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
@@ -26,9 +28,15 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     private static final short ENABLED = 1;
     private static final short DISCOVERABLE = 2;
 
+    private static final char BLUETOOTH_NAME_USERNAME_INDICATOR = '_';
+    private static final char BLUETOOTH_NAME_GAMEHOSTING_INDICATOR = '-';
+    private static final char BLUETOOTH_NAME_GAMENAME_INDICATOR = '|';
+
     private static int bluetoothState = DISABLED;
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver;
+    private static ArrayList<BluetoothDevice> clients;
+    private static ArrayList<BluetoothDevice> servers;
 
     // start of all the outside access method that the app has onto the bluetooth sector.
 
@@ -38,56 +46,50 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null)handleNonBluetoothDevice();
         if (startBluetoothOnAppEntering)enableBluetooth();
+        BluetoothBroadcastReceiver.setupReceiver();
     }
 
     public void onAppResume(){
-        if(bluetoothAdapter.isEnabled()){
-            BluetoothBroadcastReceiver.setupReceiver();
-            setBluetoothName();
-        }
+
     }
 
     public void onAppStop(){
         if (stopBluetoothOnAppLeaving)disableBluetooth();
-        else unregisterReceiver();
+        unregisterReceiver();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == REQUEST_START_DISCOVERABLE && resultCode == Activity.RESULT_CANCELED){
-            switch (bluetoothState){
-                case DISABLED:
-                    App.toast("Bluetooth was not enabled.");
-                    break;
-                case ENABLED:
-                    App.toast("Discoverable was not enabled.");
-                    break;
-                case DISCOVERABLE:
-                    App.toast("If this is displayed, I failed. ^^");
-                    break;
-            }
+            App.toast("Bluetooth was not enabled.");
         }
     }
 
     //public access methods
 
-    public static void getClientList(){
-
+    public static ArrayList<BluetoothDevice> getClientList(){
+        bluetoothAdapter.startDiscovery();
+        clients = new ArrayList<>();
+        return clients;
     }
 
-    public static void getServerLIst(){
-
+    public static ArrayList<BluetoothDevice> getServerList(){
+        bluetoothAdapter.startDiscovery();
+        servers = new ArrayList<>();
+        return servers;
     }
 
+    //todo:add when the friends sector is introduced
     public static void updateFriendsStatus(){
 
     }
 
-    public static void connectTo(){
-
+    public static void connectTo(BluetoothDevice bluetoothDevice){
+        enableBluetooth();
+        ConnectionManager.connect(bluetoothDevice);
     }
 
-    public static void disconnectFrom(){
-
+    public static void disconnectFrom(BluetoothDevice bluetoothDevice){
+        ConnectionManager.disconnect(bluetoothDevice);
     }
 
     public static void blackList(){
@@ -108,8 +110,9 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     private static void disableBluetooth(){
-        bluetoothAdapter.disable();
-        unregisterReceiver();
+        if (bluetoothAdapter.isEnabled()) {
+            bluetoothAdapter.disable();
+        }
     }
 
     private static void bluetoothDisabling(){
@@ -139,7 +142,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public static BluetoothServerSocket getBluetoothServerSocket(UUID uuid) throws IOException{
-        return bluetoothAdapter.listenUsingRfcommWithServiceRecord(APP_IDENTIFIER, uuid);
+        return bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(APP_IDENTIFIER, uuid);
     }
 
     public static class BluetoothBroadcastReceiver extends BroadcastReceiver {
@@ -208,7 +211,13 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
         private void onDeviceFound(Intent intent){
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            // give the device to the UI requesting the info
+            String deviceName = device.getName();
+            if (!deviceName.startsWith(APP_IDENTIFIER))return;
+            clients.add(device);
+            if (deviceName.charAt(deviceName.indexOf(BLUETOOTH_NAME_GAMEHOSTING_INDICATOR)+1)=='1')
+                servers.add(device);
+            //todo:adjust the receiver of the notification
+            BluetoothConnectionManagementTestActivity.notifyChange();
         }
 
         private static void setupReceiver(){

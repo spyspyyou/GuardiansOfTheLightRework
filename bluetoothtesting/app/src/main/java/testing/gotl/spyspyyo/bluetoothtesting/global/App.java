@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.AppBluetoothManager;
@@ -30,7 +31,7 @@ public class App implements TODS {
     //todo:apply to all activities
 
     public static void onActivityStarted(Activity newActivity){
-        newActivityStarted = true;
+        if (appActive)newActivityStarted = true;
         accessActiveActivity(newActivity);
         if (!appActive)onAppStart();
     }
@@ -41,6 +42,7 @@ public class App implements TODS {
 
     public static void onActivityStopped(){
         if (!newActivityStarted)onAppStop();
+        newActivityStarted = false;
     }
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -52,13 +54,14 @@ public class App implements TODS {
     //global trigger calls
 
     private static void onAppStart(){
+        Log.i("App", "App starting");
+        appActive = true;
         for(GlobalTrigger aE:onAppTrigger){
             aE.onAppStart();
         }
     }
 
     private static void onAppResume(){
-        appActive = true;
         for(GlobalTrigger aE:onAppTrigger){
             aE.onAppResume();
         }

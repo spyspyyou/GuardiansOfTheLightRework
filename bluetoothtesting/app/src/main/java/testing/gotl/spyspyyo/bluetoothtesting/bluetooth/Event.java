@@ -1,6 +1,8 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
 
+import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.events.BluetoothEvent;
+
 public abstract class Event {
 
     private final Connection[] RECEPTORS;
@@ -15,7 +17,11 @@ public abstract class Event {
     public abstract void onEventSendFailure(Connection[] connections);
 
     public static Event fromEventString(String eventString){
-        return null;
+        switch(eventString.charAt(0)){
+            case 'B':
+                return BluetoothEvent.fromEventString(eventString);
+            default: return null;
+        }
     }
 
     public void send(){

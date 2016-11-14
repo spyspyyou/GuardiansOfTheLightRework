@@ -1,5 +1,6 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
@@ -54,6 +55,8 @@ public class Connection implements TODS {
                 if (nextChar == EVENT_STRING_FINAL_CHAR){
                     Log.i("Connection", "Event received: " + eventString);
                     Event event = Event.fromEventString(eventString);
+                    if (event!=null)events.add(event);
+                    else Log.w("Connection", "Received an invalid Event: " + eventString);
                     eventString = "";
                     ++numberOfEventsRead;
                 }else eventString += nextChar;
@@ -84,6 +87,10 @@ public class Connection implements TODS {
             e.printStackTrace();
         }
         ConnectionManager.getConnections()[INDEX] = null;
+    }
+
+    public BluetoothDevice getRemoteDevice(){
+        return BLUETOOTH_SOCKET.getRemoteDevice();
     }
 
     public boolean isActive(){

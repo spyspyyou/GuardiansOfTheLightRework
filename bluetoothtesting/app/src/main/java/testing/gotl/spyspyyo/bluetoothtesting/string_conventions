@@ -1,0 +1,10 @@
+event String:
+    - no '|' in any EventString
+    - first Character meaning:
+        B - Bluetooth Event
+
+bluetooth name:
+    [app_name]_[user_name]-[0]|[ifhosting->gameName]
+
+user_name + game_name:
+    - none of these characters: '_', '-', '|'

@@ -1,6 +1,6 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
-public class EventReceiverThread extends Thread {
+/*package*/ class EventReceiverThread extends Thread {
     // the Events are stored in this ArrayList of Queues, so they can get processed in the same order they got received at the beginning of every loop of the GameThread
     public static boolean active = false;
 
