@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.BluetoothConnectionManagementTestActivity;
+import testing.gotl.spyspyyo.bluetoothtesting.teststuff.BluetoothConnectionManagementTestActivity;
 import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.GotLActivity;
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
-import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
+import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
 import static android.support.v4.app.ActivityCompat.shouldShowRequestPermissionRationale;
 
@@ -49,7 +49,8 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         if (bluetoothAdapter == null)handleNonBluetoothDevice();
         if (bluetoothAdapter.isEnabled())bluetoothOnWhenAppEntered=true;
         else bluetoothOnWhenAppEntered = false;
-        enableBluetooth();
+        //todo:enablebluetooth
+        //enableBluetooth();
         startReceiving();
     }
 
@@ -267,7 +268,6 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, INVALID_STATE);
             switch (extra){
                 case BluetoothAdapter.STATE_ON:
-                    enableBluetooth();
                     if (GotLActivity.isActiveActivityRequiresServer()){
                         ConnectionManager.startServerAvailability();
                     }

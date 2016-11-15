@@ -1,4 +1,4 @@
-package testing.gotl.spyspyyo.bluetoothtesting.UI.activities;
+package testing.gotl.spyspyyo.bluetoothtesting.teststuff;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
@@ -11,9 +11,10 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 
 import testing.gotl.spyspyyo.bluetoothtesting.R;
+import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.GotLActivity;
 import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.AppBluetoothManager;
 
-public class BluetoothConnectionManagementTestActivity extends GotLActivity{
+public class BluetoothConnectionManagementTestActivity extends GotLActivity {
 
     Button findServers, findClients;
     ListView listViewAv, listViewCon;
@@ -47,15 +48,12 @@ public class BluetoothConnectionManagementTestActivity extends GotLActivity{
                 AppBluetoothManager.connectTo((BluetoothDevice)listViewAv.getItemAtPosition(position));
             }
         });
-        listViewCon = (ListView) findViewById(R.id.listView1);
-        checkBox = (CheckBox) findViewById(R.id.checkBoxxxx);
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
         activeActivityRequiresServer = true;
-        AppBluetoothManager.serverRequirementChanged(true);
+        super.onResume();
     }
 
     public static void notifyChange(){

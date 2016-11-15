@@ -1,4 +1,4 @@
-package testing.gotl.spyspyyo.bluetoothtesting.global;
+package testing.gotl.spyspyyo.bluetoothtesting.teststuff;
 
 public interface TODS {
 

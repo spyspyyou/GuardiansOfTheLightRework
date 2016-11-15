@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.AppBluetoothManager;
+import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
 /**
  *
@@ -82,7 +83,11 @@ public class App implements TODS {
     }
 
     public static void toast(String text){
-        Toast.makeText(currentActivity, text, Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(currentActivity, text, Toast.LENGTH_SHORT).show();
+        }catch (RuntimeException e){
+            e.printStackTrace();
+        }
     }
 
     public static synchronized Activity  accessActiveActivity(@Nullable Activity newContext){

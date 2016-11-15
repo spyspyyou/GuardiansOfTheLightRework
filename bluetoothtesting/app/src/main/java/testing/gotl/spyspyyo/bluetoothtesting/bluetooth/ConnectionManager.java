@@ -3,6 +3,7 @@ package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.os.Looper;
 import android.util.Log;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
-import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
+import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
 /*package*/ class ConnectionManager {
     //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
@@ -114,6 +115,8 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
         @Override
         public void run() {
+            //todo:remove with toasts
+            Looper.prepare();
             BluetoothSocket bluetoothSocket = null;
             Log.i("BtTest", "Started connection Thread for: " + BLUETOOTH_DEVICE.getName());
             byte index = 0;
@@ -158,6 +161,8 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
         @Override
         public void run() {
+            //todo:remove with toasts
+            Looper.prepare();
             while(serverAvailable && connections[INDEX]==null) {
                 BluetoothSocket bluetoothSocket;
                 try {

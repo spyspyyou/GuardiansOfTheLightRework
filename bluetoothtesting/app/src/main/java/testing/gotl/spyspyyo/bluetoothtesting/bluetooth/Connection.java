@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
+import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
 public class Connection implements TODS {
     private static final short MAX_EVENTS_PER_READ_EVENTS_CALL = 5;

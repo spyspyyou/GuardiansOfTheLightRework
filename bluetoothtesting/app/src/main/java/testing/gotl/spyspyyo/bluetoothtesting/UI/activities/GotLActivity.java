@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.AppBluetoothManager;
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 
 public abstract class GotLActivity extends AppCompatActivity {
@@ -20,6 +21,7 @@ public abstract class GotLActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         App.onActivityResumed();
+        AppBluetoothManager.serverRequirementChanged(activeActivityRequiresServer);
     }
 
     @Override
