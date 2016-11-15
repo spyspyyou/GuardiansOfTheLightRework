@@ -1,8 +1,10 @@
 package testing.gotl.spyspyyo.bluetoothtesting.UI.activities;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -16,7 +18,7 @@ public class BluetoothConnectionManagementTestActivity extends GotLActivity{
     Button findServers, findClients;
     ListView listViewAv, listViewCon;
     public static CheckBox checkBox;
-    static ArrayAdapter adapter;
+    static ArrayAdapter<BluetoothDevice> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +40,14 @@ public class BluetoothConnectionManagementTestActivity extends GotLActivity{
                 listViewAv.setAdapter(adapter);
             }
         });
-        listViewAv = (ListView) findViewById(R.id.listView1);
-        listViewCon = (ListView) findViewById(R.id.listView2);
+        listViewAv = (ListView) findViewById(R.id.listView2);
+        listViewAv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                AppBluetoothManager.connectTo((BluetoothDevice)listViewAv.getItemAtPosition(position));
+            }
+        });
+        listViewCon = (ListView) findViewById(R.id.listView1);
         checkBox = (CheckBox) findViewById(R.id.checkBoxxxx);
     }
 

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
 /*package*/ class ConnectionManager {
@@ -31,7 +32,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
     /*package*/ static void startServerAvailability(){
         if (serverAvailable || !AppBluetoothManager.isBluetoothEnabled())return;
         serverAvailable = true;
-        Log.e("ConnectionManager", "starting the Server");
+        Log.i("ConnectionManager", "starting the Server");
         acceptConnectionThreads = new ArrayList<>();
         for(byte i = 0; i < MAX_CONNECTIONS; ++i){
             if (connections[i] == null) acceptConnectionThreads.add(new AcceptConnectionThread(i));
@@ -41,7 +42,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
     /*package*/ static void stopServerAvailability(){
         if (!serverAvailable)return;
-        Log.e("ConnectionManager", "stopping the Server");
+        Log.i("ConnectionManager", "stopping the Server");
         serverAvailable  = false;
         while(!acceptConnectionThreads.isEmpty()){
             acceptConnectionThreads.remove(0).cancelAvailability();
@@ -64,7 +65,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
     }
 
     /*package*/ static void connect(BluetoothDevice bluetoothDevice){
-        new CreateConnectionThread(bluetoothDevice).start();
+        new CreateConnectionThread(bluetoothDevice);
     }
 
     /*package*/ static void disconnect(BluetoothDevice bluetoothDevice){
@@ -129,7 +130,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
                     bluetoothSocket.connect();
                     break;
                 } catch (IOException e) {
-                    Log.e("BtTest", "Failed to connect with index " + index);
+                    Log.w("BtTest", "Failed to connect with index " + index);
                     e.printStackTrace();
                 }
             }
@@ -138,6 +139,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
                 //todo: handle failure, inform the issuer
             }else {
                 addConnection(new Connection(bluetoothSocket, index));
+                App.toast("Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
                 Log.i("BtTest", "Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
             }
         }
@@ -183,6 +185,8 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
                     Log.e("ConnectionServerThread", "failed to connect correctly");
                     break;
                 }
+                App.toast("Connected to " + bluetoothSocket.getRemoteDevice().getName());
+                Log.i("ConnectionServerThread", "Connected to " + bluetoothSocket.getRemoteDevice().getName());
                 addConnection(new Connection(bluetoothSocket, INDEX));
             }
             cancelAvailability();

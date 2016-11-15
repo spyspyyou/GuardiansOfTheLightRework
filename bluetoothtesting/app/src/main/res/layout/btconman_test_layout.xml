@@ -43,10 +43,10 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:id="@+id/textView7"
-        android:layout_toRightOf="@+id/button13"
-        android:layout_toEndOf="@+id/button13"
+        android:layout_toEndOf="@+id/textView6"
         android:textStyle="normal|bold"
-        android:textAllCaps="true"/>
+        android:textAllCaps="true"
+        android:layout_toRightOf="@+id/textView6"/>
 
     <ListView
         android:id="@+id/listView1"

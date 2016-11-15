@@ -178,7 +178,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     public static void onCoarseLocationPermissionRequestResult(boolean granted){
         if (granted){
-            //todo:using snackbar, adding a button to immediately start the discovery
+            activateDeviceDiscovery();
             App.toast("The permission was granted. The discovery feature can now be used.");
         }else{
             App.toast("No permission was granted. Discovery feature can't be used..");
