@@ -3,6 +3,8 @@ package testing.gotl.spyspyyo.bluetoothtesting.global;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -49,6 +51,10 @@ public class App implements TODS {
         for (GlobalTrigger aE:onAppTrigger){
             aE.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        if (requestCode == REQUEST_COARSE_LOCATION_PERMISSION&&grantResults.length>0)AppBluetoothManager.onCoarseLocationPermissionRequestResult(grantResults[0]== PackageManager.PERMISSION_GRANTED);
     }
 
     //global trigger calls

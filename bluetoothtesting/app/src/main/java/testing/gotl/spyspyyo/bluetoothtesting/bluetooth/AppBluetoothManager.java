@@ -1,5 +1,6 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -10,6 +11,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.IOException;
@@ -22,19 +26,15 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.App;
 import testing.gotl.spyspyyo.bluetoothtesting.global.GlobalTrigger;
 import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
+import static android.support.v4.app.ActivityCompat.shouldShowRequestPermissionRationale;
+
 public class AppBluetoothManager implements TODS, GlobalTrigger {
 
-    // bluetooth states
-    private static final short DISABLED = 0;
-    private static final short ENABLED = 1;
-    private static final short DISCOVERABLE = 2;
-
     private static final char BLUETOOTH_NAME_USERNAME_INDICATOR = '_';
-    private static final char BLUETOOTH_NAME_GAMEHOSTING_INDICATOR = '-';
+    private static final char BLUETOOTH_NAME_GAME_HOSTING_INDICATOR = '-';
     private static final char BLUETOOTH_NAME_GAMENAME_INDICATOR = '|';
 
-    private static int bluetoothState = DISABLED;
-    private static String bluetoothName = APP_IDENTIFIER;
+    private static boolean bluetoothOnWhenAppEntered = false;
     private static BluetoothAdapter bluetoothAdapter;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver;
     private static ArrayList<BluetoothDevice> clients;
@@ -47,7 +47,9 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     public void onAppStart(){
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null)handleNonBluetoothDevice();
-        if (startBluetoothOnAppEntering)enableBluetooth();
+        if (bluetoothAdapter.isEnabled())bluetoothOnWhenAppEntered=true;
+        else bluetoothOnWhenAppEntered = false;
+        enableBluetooth();
         startReceiving();
     }
 
@@ -56,7 +58,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public void onAppStop(){
-        if (stopBluetoothOnAppLeaving)disableBluetooth();
+        if (stopBluetoothOnAppLeaving||!bluetoothOnWhenAppEntered)disableBluetooth();
         stopReceiving();
     }
 
@@ -69,14 +71,14 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     //public access methods
 
     public static ArrayList<BluetoothDevice> getClientList(){
-        bluetoothAdapter.startDiscovery();
+        activateDeviceDiscovery();
         Log.i("BtTest", "searching for Clients");
         clients = new ArrayList<>();
         return clients;
     }
 
     public static ArrayList<BluetoothDevice> getServerList(){
-        bluetoothAdapter.startDiscovery();
+        activateDeviceDiscovery();
         Log.i("BtTest", "Searching for Hosts");
         servers = new ArrayList<>();
         return servers;
@@ -88,20 +90,11 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public static void connectTo(BluetoothDevice bluetoothDevice){
-        enableBluetooth();
         ConnectionManager.connect(bluetoothDevice);
     }
 
     public static void disconnectFrom(BluetoothDevice bluetoothDevice){
         ConnectionManager.disconnect(bluetoothDevice);
-    }
-
-    public static void blackList(){
-
-    }
-
-    public static void whiteList(){
-
     }
 
     public static void serverRequirementChanged(boolean serverAvailabilityRequired){
@@ -111,10 +104,8 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     //Intern methods
 
     private static void enableBluetooth(){
-        if (bluetoothAdapter.isEnabled()){
-            setBluetoothName();
-            if(bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)return;
-        }
+        if (bluetoothAdapter.isEnabled())setBluetoothName();
+        if(bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)return;
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
         App.accessActiveActivity(null).startActivityForResult(intent, REQUEST_START_DISCOVERABLE);
@@ -124,6 +115,48 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         if (bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.disable();
         }
+    }
+
+    private static void activateDeviceDiscovery(){
+        if (!assureCoarseLocationPermission()){
+            App.toast("Can't discover without the 'Coarse Location' permission.");
+            return;
+        }
+        if (bluetoothAdapter.isDiscovering())bluetoothAdapter.cancelDiscovery();
+        bluetoothAdapter.startDiscovery();
+    }
+
+    private static boolean assureCoarseLocationPermission(){
+        int permissionCheck = ContextCompat.checkSelfPermission(App.getContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+            boolean explain = shouldShowRequestPermissionRationale(App.accessActiveActivity(null), Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (explain) {
+                new AlertDialog.Builder(App.accessActiveActivity(null))
+                        .setTitle("Explanation")
+                        .setMessage("It's an Android thing that the BluetoothAdapter requires the location position to perform device discovery.Don't ask me why, I got no idea... (For privacy concerned people: this code is open source, see in options).")
+                        .setPositiveButton("Give me!", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        request();
+                                    }
+                                }
+                        ).setNegativeButton("Don't want it", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {}
+                }).show();
+            }else {
+                request();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private static void request(){
+        ActivityCompat.requestPermissions(App.accessActiveActivity(null),
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                REQUEST_COARSE_LOCATION_PERMISSION);
     }
 
     private static void bluetoothDisabling(){
@@ -143,10 +176,19 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         }).show();
     }
 
+    public static void onCoarseLocationPermissionRequestResult(boolean granted){
+        if (granted){
+            //todo:using snackbar, adding a button to immediately start the discovery
+            App.toast("The permission was granted. The discovery feature can now be used.");
+        }else{
+            App.toast("No permission was granted. Discovery feature can't be used..");
+        }
+    }
+
     private static void handleNonBluetoothDevice(){
         new AlertDialog.Builder(App.accessActiveActivity(null))
                 .setTitle("Bluetooth required")
-                .setMessage("Unfortunately our App does not work on devices without a Bluetooth Function.")
+                .setMessage("Unfortunately the App does not work on devices without a Bluetooth Function.")
                 .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -160,20 +202,22 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         BluetoothBroadcastReceiver.setupReceiver();
         new EventReceiverThread();
         new EventSenderThread();
-        Log.e("BtTest", "started reception");
+        Log.i("BtTest", "started reception");
     }
 
     private static void stopReceiving(){
         App.accessActiveActivity(null).unregisterReceiver(bluetoothBroadcastReceiver);
         ConnectionManager.disconnect();
         ConnectionManager.stopServerAvailability();
-        Log.e("BtTest", "stopped reception");
+        Log.i("BtTest", "stopped reception");
     }
 
     //todo:adjust
     private static void setBluetoothName(){
-        bluetoothName = APP_IDENTIFIER + '_' + "";
+        String bluetoothName = APP_IDENTIFIER + '_' + "";
+        if (!bluetoothAdapter.isEnabled() || bluetoothAdapter.getName().equals(bluetoothName))return;
         bluetoothAdapter.setName(bluetoothName);
+        Log.i("BtTest", "changed bluetooth name to: " + bluetoothName);
     }
 
     public static BluetoothServerSocket getBluetoothServerSocket(UUID uuid) throws IOException{
@@ -203,19 +247,19 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
                     onStateChanged(intent);
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
-                    onDiscoveryStart(intent);
+                    onDiscoveryStart();
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
-                    onDiscoveryFinish(intent);
+                    onDiscoveryFinish();
                     break;
                 case BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED:
-                    onNameChange(intent);
+                    onNameChange();
                     break;
                 case BluetoothDevice.ACTION_FOUND:
                     onDeviceFound(intent);
                     break;
                 default:
-                    Log.w("BBReceiver", "Received an unidentifiable Intent");
+                    Log.w("BtTest", "Received an unidentifiable Intent");
             }
         }
 
@@ -223,41 +267,44 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, INVALID_STATE);
             switch (extra){
                 case BluetoothAdapter.STATE_ON:
-                    if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)bluetoothState = ENABLED;
-                    setBluetoothName();
                     enableBluetooth();
-                    if (GotLActivity.isActiveActivityRequiresServer())ConnectionManager.startServerAvailability();
+                    if (GotLActivity.isActiveActivityRequiresServer()){
+                        ConnectionManager.startServerAvailability();
+                    }
                     break;
                 case BluetoothAdapter.STATE_OFF:
-                    bluetoothState = DISABLED;
                     ConnectionManager.stopServerAvailability();
                     if (App.isActive())bluetoothDisabling();
                     break;
             }
         }
 
-        private void onDiscoveryStart(Intent intent){
-            Log.e("BtTest", "starting discovery");
+        private void onDiscoveryStart(){
+            Log.i("BtTest", "starting discovery");
             BluetoothConnectionManagementTestActivity.checkBox.setChecked(true);
         }
 
-        private void onDiscoveryFinish(Intent intent){
-            Log.e("BtTest", "discovery finished");
+        private void onDiscoveryFinish(){
+            Log.i("BtTest", "discovery finished");
             BluetoothConnectionManagementTestActivity.checkBox.setChecked(false);
         }
 
-        private void onNameChange(Intent intent){
-            if (bluetoothState == DISABLED)return;
-            if (!bluetoothAdapter.getName().equals(bluetoothName)) setBluetoothName();
+        private void onNameChange(){
+            Log.i("BtTest", "onNameChange with name: " + bluetoothAdapter.getName());
+            setBluetoothName();
         }
 
         private void onDeviceFound(Intent intent){
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             String deviceName = device.getName();
-            Log.e("BtTest", "Found a Device " + deviceName);
+            if (deviceName == null){
+                Log.i("BtTest", "Found a Device with invalid name");
+                return;
+            }
+            Log.i("BtTest", "Found a Device " + deviceName);
             if (!deviceName.startsWith(APP_IDENTIFIER))return;
             clients.add(device);
-            if (deviceName.charAt(deviceName.indexOf(BLUETOOTH_NAME_GAMEHOSTING_INDICATOR)+1)=='1')
+            if (deviceName.charAt(deviceName.indexOf(BLUETOOTH_NAME_GAME_HOSTING_INDICATOR)+1)=='1')
                 servers.add(device);
             //todo:adjust the receiver of the notification
             BluetoothConnectionManagementTestActivity.notifyChange();

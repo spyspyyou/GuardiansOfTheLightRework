@@ -1,6 +1,7 @@
 package testing.gotl.spyspyyo.bluetoothtesting.UI.activities;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import testing.gotl.spyspyyo.bluetoothtesting.global.App;
@@ -31,6 +32,12 @@ public abstract class GotLActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         App.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        App.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     //todo:add this to the game activity instead of here

@@ -28,7 +28,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
 
     private static ArrayList<AcceptConnectionThread> acceptConnectionThreads = new ArrayList<>();
 
-    public static void startServerAvailability(){
+    /*package*/ static void startServerAvailability(){
         if (serverAvailable || !AppBluetoothManager.isBluetoothEnabled())return;
         serverAvailable = true;
         Log.e("ConnectionManager", "starting the Server");
@@ -39,8 +39,8 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         serverAvailable = true;
     }
 
-    public static void stopServerAvailability(){
-        if (serverAvailable = false)return;
+    /*package*/ static void stopServerAvailability(){
+        if (!serverAvailable)return;
         Log.e("ConnectionManager", "stopping the Server");
         serverAvailable  = false;
         while(!acceptConnectionThreads.isEmpty()){
@@ -48,7 +48,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         }
     }
 
-    protected static void addConnection(Connection connection){
+    private static void addConnection(Connection connection){
         if (!hasConnections()){
             new EventSenderThread();
             new EventReceiverThread();
@@ -56,24 +56,24 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         connections[connection.getIndex()] = connection;
     }
 
-    public static boolean hasConnections(){
+    /*package*/ static boolean hasConnections(){
         for (Connection c:connections){
             if (c != null)return true;
         }
         return false;
     }
 
-    public static void connect(BluetoothDevice bluetoothDevice){
+    /*package*/ static void connect(BluetoothDevice bluetoothDevice){
         new CreateConnectionThread(bluetoothDevice).start();
     }
 
-    public static void disconnect(BluetoothDevice bluetoothDevice){
+    /*package*/ static void disconnect(BluetoothDevice bluetoothDevice){
         Connection connection = getConnectionToDevice(bluetoothDevice);
         if (connection==null)Log.w("ConnectionManager", "Can't disconnect from: " + bluetoothDevice.getAddress() + ", because it is not connected to the App.");
-        connection.disconnect();
+        else connection.disconnect();
     }
 
-    public static void disconnect(){
+    /*package*/ static void disconnect(){
         for (Connection connection:connections){
             if (connection!=null)connection.disconnect();
         }
@@ -90,11 +90,11 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         return null;
     }
 
-    public static Connection[] getConnections(){
+    /*package*/ static Connection[] getConnections(){
         return connections;
     }
 
-    public static void removeDisconnectedConnection(byte index) {
+    /*package*/ static void removeDisconnectedConnection(byte index) {
         connections[index] = null;
         if (serverAvailable)acceptConnectionThreads.add(new AcceptConnectionThread(index));
     }
@@ -106,7 +106,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
          * This Thread is started automatically upon creation!
          * @param pBluetoothDevice - the remote device to connect to
          */
-        public CreateConnectionThread(BluetoothDevice pBluetoothDevice){
+        /*package*/ CreateConnectionThread(BluetoothDevice pBluetoothDevice){
             BLUETOOTH_DEVICE = pBluetoothDevice;
             start();
         }
@@ -119,7 +119,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
             for (; index < MAX_CONNECTIONS; ++index) {
                 Log.i("BtTest", "Attempting connection with index " + index);
                 try {
-                    bluetoothSocket = BLUETOOTH_DEVICE.createRfcommSocketToServiceRecord(getUUID(index));
+                    bluetoothSocket = BLUETOOTH_DEVICE.createInsecureRfcommSocketToServiceRecord(getUUID(index));
                 } catch (IOException e) {
                     Log.e("Connection", "Failed to create BluetoothSocket");
                     e.printStackTrace();
@@ -135,7 +135,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
             }
             if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
                 Log.e("BtTest", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ":" + BLUETOOTH_DEVICE.getAddress());
-                //todo: hanle failure, inform the issuer
+                //todo: handle failure, inform the issuer
             }else {
                 addConnection(new Connection(bluetoothSocket, index));
                 Log.i("BtTest", "Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
@@ -148,7 +148,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         private final UUID UUID;
         private final byte INDEX;
 
-        public AcceptConnectionThread(byte i){
+        /*package*/ AcceptConnectionThread(byte i){
             INDEX = i;
             UUID = getUUID(i);
             start();
@@ -157,12 +157,13 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
         @Override
         public void run() {
             while(serverAvailable && connections[INDEX]==null) {
-                BluetoothSocket bluetoothSocket = null;
+                BluetoothSocket bluetoothSocket;
                 try {
                     bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(UUID);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.i("BtTest", "Could not open the bluetoothServerSocket with uuid " + UUID.toString());
+                    continue;
                 }
 
                 if (bluetoothServerSocket == null) {
@@ -187,7 +188,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.global.TODS;
             cancelAvailability();
         }
 
-        public void cancelAvailability(){
+        /*package*/ void cancelAvailability(){
             try {
                if (bluetoothServerSocket!=null)bluetoothServerSocket.close();
             } catch (IOException e) {
