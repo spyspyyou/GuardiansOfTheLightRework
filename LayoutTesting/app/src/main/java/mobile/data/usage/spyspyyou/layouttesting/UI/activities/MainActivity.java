@@ -1,25 +1,42 @@
-package testing.gotl.spyspyyo.bluetoothtesting.UI.activities;
+package mobile.data.usage.spyspyyou.layouttesting.UI.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import testing.gotl.spyspyyo.bluetoothtesting.R;
-import testing.gotl.spyspyyo.bluetoothtesting.global.App;
-import testing.gotl.spyspyyo.bluetoothtesting.teststuff.BluetoothConnectionManagementTestActivity;
+import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.global.App;
 
 public class MainActivity extends GotLActivity {
 
+    DrawerLayout drawerLayout;
+    TextInputEditText textInputEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int i) {
 
+            }
+        });
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        textInputEditText = (TextInputEditText) findViewById(R.id.username_input);
+        textInputEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         myToolbar.setTitle("Guardians of the Light");
         setSupportActionBar(myToolbar);
         ActionBar a = getSupportActionBar();
@@ -38,10 +55,15 @@ public class MainActivity extends GotLActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_option){
             //todo:start the options activity
-            startActivity(new Intent(getBaseContext(), BluetoothConnectionManagementTestActivity.class));
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerVisible(Gravity.LEFT)) drawerLayout.closeDrawers();
+        else super.onBackPressed();
     }
 
     @Override

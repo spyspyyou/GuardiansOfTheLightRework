@@ -49,8 +49,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         if (bluetoothAdapter == null)handleNonBluetoothDevice();
         if (bluetoothAdapter.isEnabled())bluetoothOnWhenAppEntered=true;
         else bluetoothOnWhenAppEntered = false;
-        //todo:enablebluetooth
-        //enableBluetooth();
+        enableBluetooth();
         startReceiving();
     }
 
@@ -281,12 +280,10 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
         private void onDiscoveryStart(){
             Log.i("BtTest", "starting discovery");
-            BluetoothConnectionManagementTestActivity.checkBox.setChecked(true);
         }
 
         private void onDiscoveryFinish(){
             Log.i("BtTest", "discovery finished");
-            BluetoothConnectionManagementTestActivity.checkBox.setChecked(false);
         }
 
         private void onNameChange(){

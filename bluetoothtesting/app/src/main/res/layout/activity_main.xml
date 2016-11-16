@@ -6,24 +6,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
+    android:id="@+id/drawer_layout"
     tools:context=".UI.activities.MainActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/light_bulb_on">
+        >
 
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#00000000"
+            android:background="#20888888"
             android:theme="?attr/actionBarTheme"
             android:minHeight="?attr/actionBarSize"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:id="@+id/my_toolbar"
-            app:showAsAction="ifRoom"/>
+            android:id="@+id/my_toolbar"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,14 +33,31 @@
             android:paddingTop="@dimen/activity_vertical_margin"
             android:paddingRight="@dimen/activity_vertical_margin">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/light_bulb_on"
+                android:id="@+id/imageView2"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:alpha="0.7"
+                android:contentDescription="lightbulb"/>
+
             <Button
                 android:text="Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button"
                 android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"/>
+                android:layout_centerHorizontal="true"
+                android:id="@+id/button2"
+                android:textSize="36sp"/>
+
         </RelativeLayout>
+
     </android.support.design.widget.CoordinatorLayout>
 
     <RelativeLayout
@@ -79,16 +96,68 @@
                 android:maxLines="1"/>
         </android.support.design.widget.TextInputLayout>
 
-        <EditText
+        <TextView
+            android:text="TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="Name"
-            android:ems="10"
-            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/imageView"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:id="@+id/editText3"/>
+            android:id="@+id/textView"
+            tools:text="Favourite Character:"
+            android:paddingTop="15dp"
+            android:paddingLeft="15dp"
+            android:textStyle="normal|bold"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView3"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            tools:text="Favourite Character:"
+            android:paddingTop="15dp"
+            android:paddingLeft="15dp"
+            android:textStyle="normal|bold"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:id="@+id/textView3"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/btn_star_big_on"
+            android:id="@+id/imageView3"
+            android:layout_below="@+id/textView"
+            android:layout_alignRight="@+id/textView3"
+            android:layout_alignEnd="@+id/textView3"/>
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/imageView3"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_toEndOf="@+id/textView"
+            tools:text="Play Style:"
+            android:paddingTop="15dp"
+            android:paddingLeft="15dp"
+            android:textStyle="normal|bold"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:id="@+id/textView4"/>
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView"
+            android:layout_toRightOf="@+id/textView4"
+            android:layout_toEndOf="@+id/textView4"
+            android:layout_marginTop="16dp"
+            android:id="@+id/spinner2"/>
 
     </RelativeLayout>
 
