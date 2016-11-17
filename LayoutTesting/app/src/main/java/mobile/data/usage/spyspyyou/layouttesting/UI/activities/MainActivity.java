@@ -5,7 +5,9 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,10 +33,15 @@ public class MainActivity extends GotLActivity {
         });
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         textInputEditText = (TextInputEditText) findViewById(R.id.username_input);
-        textInputEditText.setOnClickListener(new View.OnClickListener() {
+        textInputEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public void onClick(View view) {
-
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+                    Log.i("MainActivity", "Enter geklickt");
+                    textInputEditText.clearFocus();
+                    return true;
+                }
+                return false;
             }
         });
         myToolbar.setTitle("Guardians of the Light");
