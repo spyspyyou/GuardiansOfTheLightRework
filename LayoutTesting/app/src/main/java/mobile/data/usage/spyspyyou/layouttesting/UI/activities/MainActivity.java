@@ -1,55 +1,38 @@
 package mobile.data.usage.spyspyyou.layouttesting.UI.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.global.App;
 
 public class MainActivity extends GotLActivity {
 
     DrawerLayout drawerLayout;
-    TextInputEditText textInputEditText;
+    ImageButton imageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        imageButton = (ImageButton) findViewById(R.id.imageButton3);
         drawerLayout.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int i) {
 
             }
         });
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        textInputEditText = (TextInputEditText) findViewById(R.id.username_input);
-        textInputEditText.setOnKeyListener(new View.OnKeyListener() {
+        imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER){
-                    Log.i("MainActivity", "Enter geklickt");
-                    textInputEditText.clearFocus();
-                    return true;
-                }
-                return false;
+            public void onClick(View view) {
+                drawerLayout.openDrawer(Gravity.LEFT);
             }
         });
-        myToolbar.setTitle("Guardians of the Light");
-        setSupportActionBar(myToolbar);
-        ActionBar a = getSupportActionBar();
-        if (a==null){
-            App.toast("damn it");
-        }
     }
 
     @Override
