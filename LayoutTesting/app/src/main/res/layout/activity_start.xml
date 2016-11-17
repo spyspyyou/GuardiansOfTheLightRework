@@ -27,7 +27,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:contentDescription="light bulb"
-            android:alpha="0.9"/>
+            android:alpha="0.8"/>
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -37,7 +37,8 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:id="@+id/imageButton"
-            android:background="@color/transparency"/>
+            android:background="@color/transparency"
+            android:contentDescription="settings"/>
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -47,9 +48,17 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:id="@+id/imageButton3"
-            android:background="@color/transparency"/>
+            android:background="@color/transparency"
+            android:contentDescription="profile"/>
 
-        <ImageButton
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/space"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+        <mobile.data.usage.spyspyyou.layouttesting.UI.views.FriendListImageButton
             app:srcCompat="@drawable/ic_group_black_48dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
@@ -57,27 +66,31 @@
             android:id="@+id/imageButton4"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_width="150dp"
-            android:layout_height="150dp"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/space"
+            android:layout_alignEnd="@+id/space"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
-        <ImageButton
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+        <mobile.data.usage.spyspyyou.layouttesting.UI.views.BluetoothImageButton
+            app:srcCompat="@drawable/ic_bluetooth_searching_black_48dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            app:srcCompat="@drawable/ic_bluetooth_searching_black_48dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:id="@+id/imageButton5"/>
+            android:id="@+id/imageButton5"
+            android:layout_toRightOf="@+id/space"
+            android:layout_toEndOf="@+id/space"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"/>
 
     </RelativeLayout>
 
