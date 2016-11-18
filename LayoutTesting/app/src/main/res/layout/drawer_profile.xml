@@ -27,7 +27,7 @@
         android:layout_alignParentTop="true"
         android:textAlignment="center"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/black"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -106,7 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/textView3"
-            android:background="@android:color/white"
+            android:background="@color/background_grey"
             tools:listitem="@android:layout/simple_list_item_checked"
             android:layout_marginTop="@dimen/activity_vertical_margin"/>
 
@@ -118,13 +118,13 @@
             android:layout_alignParentLeft="true"
             android:id="@+id/textView3"
             android:textSize="18sp"
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textStyle="normal|bold"/>
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_settings_white_24dp"
+            app:srcCompat="@drawable/ic_settings_black_24dp"
             android:id="@+id/imageButton2"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
