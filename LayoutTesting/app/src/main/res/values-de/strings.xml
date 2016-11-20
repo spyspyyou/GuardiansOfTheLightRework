@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LayoutTesten</string>
+    <string name="app_name">Layout Testen</string>
+    <string name="create_game">Spiel erstellen</string>
+    <string name="join_game">Spiel suchen</string>
+    <string name="light_bulb">Glühbirne</string>
+    <string name="profile">Profil</string>
+    <string name="profile_pic">Profilbild</string>
+    <string name="rand_info_text">Füllmaterial hoch 3</string>
+    <string name="settings">Optionen</string>
+    <string name="statistics">Statistik</string>
+    <string name="statistics_settings">Statistik Optionen</string>
+    <string name="username">Benutzername</string>
 </resources>

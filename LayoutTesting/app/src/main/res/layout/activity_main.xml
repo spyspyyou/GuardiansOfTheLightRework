@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keepScreenOn="true"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/drawer_profile"
     tools:context=".UI.activities.MainActivity">
 
-    <include layout="@layout/activity_start"/>
+    <include layout="@layout/activity_main_default"/>
 
     <include layout="@layout/drawer_profile"/>
 

@@ -3,82 +3,84 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/left_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="start"
     android:layout_marginLeft="-55dp"
+    android:layout_marginStart="-55dp"
     android:choiceMode="singleChoice"
     android:background="@android:color/white">
 
     <TextView
-        android:id="@+id/textView"
-        android:text="Profile"
+        android:id="@+id/textView_main_profile"
+        android:text="@string/profile"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:textSize="24sp"
         android:elevation="@dimen/elevation"
-        android:textStyle="normal|bold"
-        android:gravity="center_vertical"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:textAlignment="center"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@android:color/black"/>
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textStyle="normal|bold"
+        android:textSize="24sp"
+        android:gravity="center_vertical"/>
 
     <RelativeLayout
+        android:id="@+id/relativeLayout_main_userInfo"
         android:layout_width="match_parent"
-        android:id="@+id/relativeLayout2"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textView"
+        android:layout_below="@id/textView_main_profile"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="@color/colorPrimaryLight"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/activity_margin_normal"
+        android:layout_marginEnd="@dimen/activity_margin_normal"
+        android:layout_marginLeft="@dimen/activity_margin_normal"
+        android:layout_marginRight="@dimen/activity_margin_normal"
+        android:layout_marginStart="@dimen/activity_margin_normal"
         android:elevation="@dimen/elevation"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
+        android:padding="@dimen/activity_padding">
 
         <ImageView
+            android:id="@+id/imageView_main_profilePicture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@mipmap/ic_launcher"
-            android:id="@+id/imageView4"
             android:minHeight="100dp"
             android:minWidth="100dp"
             android:elevation="@dimen/elevation"
-            android:contentDescription="profile pic"
+            android:contentDescription="@string/profile_pic"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout"
+            android:id="@+id/inputLayout_main_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/imageView4"
-            android:layout_toEndOf="@+id/imageView4"
-            android:elevation="@dimen/elevation">
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/username_input"
+            android:layout_toRightOf="@id/imageView_main_profilePicture"
+            android:layout_toEndOf="@id/imageView_main_profilePicture">
+
+            <mobile.data.usage.spyspyyou.layouttesting.UI.views.FocusManagedEditText
+                android:id="@+id/editText_main_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Username"
+                android:hint="@string/username"
                 android:maxLines="1"
+                android:inputType="textImeMultiLine"
+                android:imeOptions="actionDone"
                 android:textSize="24sp"
                 android:textStyle="normal|bold"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
+                android:layout_alignParentStart="true"
+                android:focusable="false"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -87,55 +89,50 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/relativeLayout3"
-        android:layout_below="@id/relativeLayout2"
+        android:layout_below="@id/relativeLayout_main_userInfo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_margin="@dimen/activity_margin_normal"
         android:background="@color/colorPrimaryLight"
-        android:elevation="4dp"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
-
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/textView3"
-            android:background="@color/background_grey"
-            tools:listitem="@android:layout/simple_list_item_checked"
-            android:layout_marginTop="@dimen/activity_vertical_margin"/>
+        android:elevation="@dimen/elevation"
+        android:padding="@dimen/activity_padding">
 
         <TextView
-            android:text="Statistics"
+            android:id="@+id/textView_main_statistics"
+            android:text="@string/statistics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:id="@+id/textView3"
+            android:layout_alignParentStart="true"
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:textStyle="normal|bold"/>
 
+        <ListView
+            android:id="@+id/listView_main_stats"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/textView_main_statistics"
+            android:background="@color/background_grey"
+            tools:listitem="@layout/list_item_stats"
+            android:layout_marginTop="@dimen/activity_margin_normal"/>
+
         <ImageButton
+            android:id="@+id/imageButton_main_statistics_settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_settings_black_24dp"
-            android:id="@+id/imageButton2"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:contentDescription="settings button"
+            android:contentDescription="@string/statistics_settings"
             android:background="@color/transparency"/>
 
     </RelativeLayout>
 
     <View
-        style="@style/divider"
-        android:translationZ="@dimen/elevation"/>
+        style="@style/divider_horizontal"
+        android:elevation="@dimen/elevation"/>
 
 </RelativeLayout>
