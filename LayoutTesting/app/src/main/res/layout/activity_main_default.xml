@@ -2,14 +2,13 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coordinator_layout_main"
+    android:id="@+id/coordinatorLayout_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/activity_margin_normal"
         >
 
         <ImageView
@@ -35,7 +34,8 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:background="@color/transparency"
-            android:contentDescription="@string/settings"/>
+            android:contentDescription="@string/settings"
+            android:layout_margin="@dimen/activity_margin_normal"/>
 
         <ImageButton
             android:id="@+id/imageButton_main_profile"
@@ -46,7 +46,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:background="@color/transparency"
-            android:contentDescription="@string/profile"/>
+            android:contentDescription="@string/profile"
+            android:layout_margin="@dimen/activity_margin_normal"/>
 
         <Space
             android:id="@+id/space_main"
@@ -97,8 +98,10 @@
             android:layout_alignLeft="@id/imageButton_main_friend_list"
             android:layout_alignStart="@id/imageButton_main_friend_list"
             android:contentDescription="@string/create_game"
+            android:layout_toStartOf="@id/imageButton_main_settings"
             android:layout_toLeftOf="@id/imageButton_main_settings"
-            android:layout_toStartOf="@id/imageButton_main_settings"/>
+            android:layout_alignRight="@+id/imageButton_main_connections"
+            android:layout_alignEnd="@+id/imageButton_main_connections"/>
 
         <ImageButton
             android:id="@+id/imageButton_main_join"
@@ -114,7 +117,8 @@
             android:layout_alignStart="@id/imageButton_main_create"
             android:contentDescription="@string/join_game"
             android:layout_alignRight="@id/imageButton_main_connections"
-            android:layout_alignEnd="@id/imageButton_main_connections"/>
+            android:layout_alignEnd="@id/imageButton_main_connections"
+            android:scaleType="center"/>
 
         <TextView
             android:id="@+id/textView_main_info"
@@ -123,7 +127,6 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/activity_padding"
             android:layout_above="@id/imageButton_main_join"
-            android:layout_below="@id/imageButton_main_settings"
             android:layout_alignLeft="@id/imageButton_main_join"
             android:layout_alignStart="@id/imageButton_main_join"
             android:layout_alignParentLeft="true"
@@ -132,12 +135,12 @@
             android:layout_marginLeft="@dimen/activity_margin_big"
             android:layout_marginRight="@dimen/activity_margin_big"
             android:layout_marginStart="@dimen/activity_margin_big"
-            android:layout_marginTop="@dimen/activity_margin_big"
             android:background="@drawable/background_text"
             android:textAlignment="center"
             android:gravity="center_vertical"
             android:textSize="24sp"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/imageButton_main_settings"/>
 
     </RelativeLayout>
 

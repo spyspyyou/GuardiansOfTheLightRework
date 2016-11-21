@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <include layout="@layout/activity_join_default"/>
+
     <include layout="@layout/drawer_game_info"/>
 
 </android.support.v4.widget.DrawerLayout>

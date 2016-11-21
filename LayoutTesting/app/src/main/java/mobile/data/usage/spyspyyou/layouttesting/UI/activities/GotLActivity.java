@@ -56,8 +56,4 @@ public abstract class GotLActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
          */
     }
-
-    public static boolean isActiveActivityRequiresServer(){
-        return activeActivityRequiresServer;
-    }
 }

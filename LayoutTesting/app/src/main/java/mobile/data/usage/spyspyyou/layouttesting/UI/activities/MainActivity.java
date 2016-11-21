@@ -2,6 +2,7 @@ package mobile.data.usage.spyspyyou.layouttesting.UI.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Space;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.UI.views.FocusManagedEditText;
@@ -18,8 +20,10 @@ public class MainActivity extends GotLActivity {
     private DrawerLayout drawerLayout;
     private ImageButton imageButtonProfile, imageButtonSettings, imageButtonJoin, imageButtonCreate, imageButtonFriendList, imageButtonConnections, imageButtonStatisticsSettings;
     private ImageView imageViewProfilePicture;
+    private CoordinatorLayout coordinatorLayout;
     private FocusManagedEditText editTextUsername;
     private ListView listViewStatistics;
+    private Space space;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +61,8 @@ public class MainActivity extends GotLActivity {
             public void onClick(View view) {
                 startActivity(new Intent(getBaseContext(), JoinActivity.class));
             }
-        });
 
+        });
         imageButtonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,6 +92,8 @@ public class MainActivity extends GotLActivity {
     }
 
     private void initializeViewVariables(){
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_main);
+        space = (Space) findViewById(R.id.space_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_profile);
         imageButtonProfile = (ImageButton) findViewById(R.id.imageButton_main_profile);
         imageButtonSettings = (ImageButton) findViewById(R.id.imageButton_main_settings);

@@ -1,6 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:padding="@dimen/activity_padding"
+                android:layout_gravity="start"
+                android:layout_marginLeft="-55dp"
+                android:layout_marginStart="-55dp"
+                android:choiceMode="singleChoice"
+                android:background="@color/colorPrimaryLight">
+
+    <Button
+        android:text="Join"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_padding"
+        android:background="@color/colorPrimary"
+        android:layout_above="@+id/button"
+        android:layout_margin="@dimen/activity_margin_normal">
+
+        <TextView
+            android:text="Host: Boss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView3"
+            android:textSize="18sp"
+            android:paddingBottom="@dimen/activity_padding"
+            android:paddingEnd="@dimen/activity_padding"
+            android:paddingRight="@dimen/activity_padding"
+            android:paddingTop="@dimen/activity_padding"
+            android:paddingLeft="40dp"
+            android:paddingStart="40dp"/>
+
+        <TextView
+            android:text="Game Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView2"
+            android:textSize="24sp"
+            android:textStyle="normal|bold"
+            android:paddingLeft="@dimen/activity_padding"
+            android:paddingStart="@dimen/activity_padding"/>
+
+        <ImageView
+            app:srcCompat="@drawable/test_map_3"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

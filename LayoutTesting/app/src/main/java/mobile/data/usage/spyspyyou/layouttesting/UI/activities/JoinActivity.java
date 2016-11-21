@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
@@ -15,10 +16,10 @@ import mobile.data.usage.spyspyyou.layouttesting.R;
 
 public class JoinActivity extends GotLActivity {
 
+    private CoordinatorLayout coordinatorLayout;
     private ProgressBar progressBarSearching;
-    private ImageButton imageButtonRepeat;
+    private ImageButton imageButtonRepeat, imageButtonCancel;
     private TextView textViewInfo;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,18 +27,18 @@ public class JoinActivity extends GotLActivity {
         setContentView(R.layout.activity_join);
         progressBarSearching = (ProgressBar) findViewById(R.id.progressBar_join_searching);
         imageButtonRepeat = (ImageButton) findViewById(R.id.imageButton_join_repeat);
+        imageButtonCancel = (ImageButton) findViewById(R.id.imageButton_join_cancel);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_join);
         textViewInfo = (TextView) findViewById(R.id.textView_join_info);
 
-        imageButtonRepeat.setOnClickListener(
-                new View.OnClickListener() {
+        imageButtonRepeat.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         showSearching();
                     }
-                }
-        );
+                });
 
-        progressBarSearching.setOnClickListener(new View.OnClickListener() {
+        imageButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showInactive();
@@ -47,49 +48,54 @@ public class JoinActivity extends GotLActivity {
 
     private void showSearching(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int circleRadiusX = progressBarSearching.getWidth(), circleRadiusY = progressBarSearching.getHeight();
-            float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
-            Animator animatorRevealProgressBar, animatorHideRepeatButton;
-            animatorRevealProgressBar = ViewAnimationUtils.createCircularReveal(progressBarSearching, circleRadiusX, circleRadiusY, 0, finalRadius);
-            animatorHideRepeatButton = ViewAnimationUtils.createCircularReveal(imageButtonRepeat, circleRadiusX, circleRadiusY, finalRadius, 0);
-            animatorHideRepeatButton.addListener(new AnimatorListenerAdapter() {
+            final int circleRadiusX = imageButtonRepeat.getWidth()/2, circleRadiusY = imageButtonRepeat.getHeight()/2;
+            final float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
+            final Animator animatorHideRepeat, animatorRevealCancel;
+
+            animatorRevealCancel = ViewAnimationUtils.createCircularReveal(imageButtonCancel, circleRadiusX, circleRadiusY, 0, finalRadius);
+            animatorHideRepeat = ViewAnimationUtils.createCircularReveal(imageButtonRepeat, circleRadiusX, circleRadiusY, finalRadius, 0);
+            animatorHideRepeat.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     imageButtonRepeat.setVisibility(View.INVISIBLE);
+                    progressBarSearching.setVisibility(View.VISIBLE);
+                    imageButtonCancel.setVisibility(View.VISIBLE);
+                    animatorRevealCancel.start();
+                    textViewInfo.setText("Searching for games.");
                 }
-
             });
-            progressBarSearching.setVisibility(View.VISIBLE);
-            animatorRevealProgressBar.start();
-            animatorHideRepeatButton.start();
+
+            animatorHideRepeat.start();
         }
     }
 
     private void showInactive(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int circleRadiusX = progressBarSearching.getWidth(), circleRadiusY = progressBarSearching.getHeight();
-            float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
-            Animator animatorHideProgressBar, animatorRevealRepeatButton;
-            animatorRevealRepeatButton = ViewAnimationUtils.createCircularReveal(imageButtonRepeat, circleRadiusX, circleRadiusY, 0, finalRadius);
-            animatorHideProgressBar = ViewAnimationUtils.createCircularReveal(progressBarSearching, circleRadiusX, circleRadiusY, finalRadius, 0);
-            animatorHideProgressBar.addListener(new AnimatorListenerAdapter() {
+            final int circleRadiusX = progressBarSearching.getWidth()/2, circleRadiusY = progressBarSearching.getHeight()/2;
+            final float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
+            final Animator animatorRevealRepeat, animatorHideCancel;
+
+            animatorRevealRepeat = ViewAnimationUtils.createCircularReveal(imageButtonRepeat, circleRadiusX, circleRadiusY, 0, finalRadius);
+            animatorHideCancel = ViewAnimationUtils.createCircularReveal(imageButtonCancel, circleRadiusX, circleRadiusY, finalRadius, 0);
+            animatorHideCancel.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
-                    progressBarSearching.setVisibility(View.INVISIBLE);
+                    imageButtonCancel.setVisibility(View.INVISIBLE);
+                    imageButtonRepeat.setVisibility(View.VISIBLE);
+                    animatorRevealRepeat.start();
+                    textViewInfo.setText("Search finished.");
                 }
-
             });
-            imageButtonRepeat.setVisibility(View.VISIBLE);
-            animatorHideProgressBar.start();
-            animatorRevealRepeatButton.start();
+            progressBarSearching.setVisibility(View.INVISIBLE);
+            animatorHideCancel.start();
         }
     }
 
     @Override
     protected void onResume() {
-        activeActivityRequiresServer = true;
+        activeActivityRequiresServer = false;
         super.onResume();
     }
 }
