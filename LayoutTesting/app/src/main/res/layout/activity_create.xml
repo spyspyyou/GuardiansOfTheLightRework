@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout_create"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_create"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:theme="?attr/actionBarTheme"
+        android:minHeight="?attr/actionBarSize"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:padding="@dimen/activity_padding_normal">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_create"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText
+                android:id="@+id/editText_create_gameName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:hint="@string/game_name"
+                android:inputType="textImeMultiLine"
+                android:imeOptions="actionDone"
+                android:maxLines="1"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/relativeLayout_create_map"
+            android:layout_above="@+id/button_create"
+            android:background="@color/colorPrimaryLight"
+            android:padding="@dimen/activity_padding_normal"
+            android:elevation="@dimen/elevation">
+
+            <TextView
+                android:id="@+id/textView_create_stuff"
+                android:text="@string/stuff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textStyle="normal|bold"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"/>
+
+            <TextView
+                android:id="@+id/textView_create_allowedCharacters"
+                android:text="@string/allowed_characters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_padding_small"
+                android:layout_below="@id/textView_create_stuff"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+            <ImageButton
+                android:id="@+id/imageButton_create_fluffy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_sentiment_dissatisfied_black_36dp"
+                android:layout_below="@id/textView_create_allowedCharacters"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:contentDescription="@string/fluffy"/>
+
+            <ImageButton
+                android:id="@+id/imageButton_create_slime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_sentiment_neutral_black_36dp"
+                android:layout_below="@+id/textView_create_allowedCharacters"
+                android:layout_toRightOf="@id/imageButton_create_fluffy"
+                android:layout_toEndOf="@id/imageButton_create_fluffy"
+                android:contentDescription="@string/slime"/>
+
+            <ImageButton
+                android:id="@+id/imageButton_create_ghost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_sentiment_satisfied_black_36dp"
+                android:layout_below="@+id/textView_create_allowedCharacters"
+                android:layout_toRightOf="@+id/imageButton_create_slime"
+                android:layout_toEndOf="@+id/imageButton_create_slime"
+                android:contentDescription="@string/ghost"/>
+
+            <ImageButton
+                android:id="@+id/imageButton_create_nox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_whatshot_black_36dp"
+                android:layout_alignTop="@+id/imageButton_create_ghost"
+                android:layout_toRightOf="@+id/imageButton_create_ghost"
+                android:layout_toEndOf="@+id/imageButton_create_ghost"
+                android:contentDescription="@string/nox"/>
+
+            <TextView
+                android:id="@+id/textView_create_joinRights"
+                android:text="@string/join_rights"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_padding_small"
+                android:layout_below="@id/imageButton_create_fluffy"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+            <CheckBox
+                android:id="@+id/checkBox_create_public"
+                android:text="@string/mPublic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_create_joinRights"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"/>
+
+            <CheckBox
+                android:id="@+id/checkBox_create_friends"
+                android:text="@string/mFriends"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_create_joinRights"
+                android:layout_toRightOf="@id/checkBox_create_public"
+                android:layout_toEndOf="@id/checkBox_create_public"/>
+
+            <CheckBox
+                android:id="@+id/checkBox_create_private"
+                android:text="@string/mPrivate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_create_joinRights"
+                android:layout_toRightOf="@id/checkBox_create_friends"
+                android:layout_toEndOf="@id/checkBox_create_friends"/>
+
+            <ImageView
+                android:id="@+id/imageView_create_cross_fluffy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_close_black_36dp"
+                android:tint="@android:color/holo_red_dark"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignTop="@+id/imageButton_create_fluffy"
+                android:layout_alignLeft="@+id/imageButton_create_fluffy"
+                android:layout_alignStart="@+id/imageButton_create_fluffy"
+                android:layout_alignBottom="@+id/imageButton_create_fluffy"
+                android:layout_alignEnd="@+id/imageButton_create_fluffy"
+                android:layout_alignRight="@+id/imageButton_create_fluffy"
+                android:contentDescription="@string/cross"/>
+
+            <ImageView
+                android:id="@+id/imageView_create_cross_slime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_close_black_36dp"
+                android:tint="@android:color/holo_red_dark"
+                android:layout_alignTop="@+id/imageButton_create_slime"
+                android:layout_alignLeft="@+id/imageButton_create_slime"
+                android:layout_alignStart="@+id/imageButton_create_slime"
+                android:layout_alignBottom="@+id/imageButton_create_slime"
+                android:layout_alignEnd="@+id/imageButton_create_slime"
+                android:layout_alignRight="@+id/imageButton_create_slime"
+                android:contentDescription="@string/cross"/>
+
+            <ImageView
+                android:id="@+id/imageView_create_cross_ghost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_close_black_36dp"
+                android:tint="@android:color/holo_red_dark"
+                android:layout_alignTop="@+id/imageButton_create_ghost"
+                android:layout_alignLeft="@+id/imageButton_create_ghost"
+                android:layout_alignStart="@+id/imageButton_create_ghost"
+                android:layout_alignBottom="@+id/imageButton_create_ghost"
+                android:layout_alignEnd="@+id/imageButton_create_ghost"
+                android:layout_alignRight="@+id/imageButton_create_ghost"
+                android:contentDescription="@string/cross"/>
+
+            <ImageView
+                android:id="@+id/imageView_create_cross_nox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_close_black_36dp"
+                android:tint="@android:color/holo_red_dark"
+                android:layout_alignTop="@+id/imageButton_create_nox"
+                android:layout_alignLeft="@+id/imageButton_create_nox"
+                android:layout_alignStart="@+id/imageButton_create_nox"
+                android:layout_alignBottom="@+id/imageButton_create_nox"
+                android:layout_alignEnd="@+id/imageButton_create_nox"
+                android:layout_alignRight="@+id/imageButton_create_nox"
+                android:contentDescription="@string/cross"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout_create_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_padding_normal"
+            android:background="@color/colorPrimaryLight"
+            android:layout_below="@+id/textInputLayout_create"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="@dimen/activity_margin_normal"
+            android:elevation="@dimen/elevation">
+
+            <TextView
+                android:id="@+id/textView_create_map"
+                android:text="@string/map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:textStyle="normal|bold"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"/>
+
+            <TextView
+                android:id="@+id/textView_create_width"
+                android:text="@string/width"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_create_map"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:padding="@dimen/activity_padding_small"/>
+
+            <SeekBar
+                android:id="@+id/seekBar_create_width"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_create_width"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/imageView_create_map"
+                android:layout_toStartOf="@+id/imageView_create_map"/>
+
+            <TextView
+                android:id="@+id/textView_create_height"
+                android:text="@string/height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/seekBar_create_width"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:padding="@dimen/activity_padding_small"/>
+
+            <SeekBar
+                android:id="@+id/seekBar_create_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView_create_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/imageView_create_map"
+                android:layout_toStartOf="@+id/imageView_create_map"/>
+
+            <ImageView
+                android:id="@+id/imageView_create_map"
+                app:srcCompat="@drawable/test_map_3"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:elevation="@dimen/elevation"
+                android:layout_width="120dp"
+                android:layout_height="120dp"/>
+
+            <TextView
+                android:id="@+id/textView_create_width_data"
+                android:text="10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/textView_create_width"
+                android:layout_toRightOf="@+id/textView_create_width"
+                android:layout_toEndOf="@+id/textView_create_width"
+                android:padding="@dimen/activity_padding_small"/>
+
+            <TextView
+                android:id="@+id/textView_create_height_data"
+                android:text="10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/textView_create_height"
+                android:layout_toRightOf="@+id/textView_create_height"
+                android:layout_toEndOf="@+id/textView_create_height"
+                android:padding="@dimen/activity_padding_small"/>
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/button_create"
+            android:text="@string/create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_margin_normal"/>
+
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

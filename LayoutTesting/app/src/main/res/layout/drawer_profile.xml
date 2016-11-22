@@ -43,7 +43,7 @@
         android:layout_marginRight="@dimen/activity_margin_normal"
         android:layout_marginStart="@dimen/activity_margin_normal"
         android:elevation="@dimen/elevation"
-        android:padding="@dimen/activity_padding">
+        android:padding="@dimen/activity_padding_normal">
 
         <ImageView
             android:id="@+id/imageView_main_profilePicture"
@@ -68,7 +68,7 @@
             android:layout_toRightOf="@id/imageView_main_profilePicture"
             android:layout_toEndOf="@id/imageView_main_profilePicture">
 
-            <mobile.data.usage.spyspyyou.layouttesting.UI.views.FocusManagedEditText
+            <mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText
                 android:id="@+id/editText_main_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
         android:layout_margin="@dimen/activity_margin_normal"
         android:background="@color/colorPrimary"
         android:elevation="@dimen/elevation"
-        android:padding="@dimen/activity_padding">
+        android:padding="@dimen/activity_padding_normal">
 
         <TextView
             android:id="@+id/textView_main_statistics"

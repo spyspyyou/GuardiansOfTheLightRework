@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.UI.activities;
+package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.Space;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.UI.views.FocusManagedEditText;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
 
 public class MainActivity extends GotLActivity {
 
@@ -51,22 +51,17 @@ public class MainActivity extends GotLActivity {
 
         imageButtonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //todo:open settings
-            }
-        });
+            public void onClick(View view) {startActivity(new Intent(getBaseContext(), SettingsActivity.class));}});
 
         imageButtonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), JoinActivity.class));
+            public void onClick(View view) {startActivity(new Intent(getBaseContext(), JoinActivity.class));
             }
 
         });
         imageButtonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //todo:open Create Activity
+            public void onClick(View view) {startActivity(new Intent(getBaseContext(), CreateActivity.class));
             }
         });
 

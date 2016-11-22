@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.UI.views;
+package mobile.data.usage.spyspyyou.layouttesting.ui.views;
 
 import android.app.Activity;
 import android.content.Context;

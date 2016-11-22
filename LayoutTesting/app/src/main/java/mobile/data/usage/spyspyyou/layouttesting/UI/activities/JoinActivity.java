@@ -1,25 +1,28 @@
-package mobile.data.usage.spyspyyou.layouttesting.UI.activities;
+package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 
 public class JoinActivity extends GotLActivity {
 
-    private CoordinatorLayout coordinatorLayout;
     private ProgressBar progressBarSearching;
     private ImageButton imageButtonRepeat, imageButtonCancel;
     private TextView textViewInfo;
+    private Toolbar toolbar;
+    private ActionBar actionBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,8 +31,13 @@ public class JoinActivity extends GotLActivity {
         progressBarSearching = (ProgressBar) findViewById(R.id.progressBar_join_searching);
         imageButtonRepeat = (ImageButton) findViewById(R.id.imageButton_join_repeat);
         imageButtonCancel = (ImageButton) findViewById(R.id.imageButton_join_cancel);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_join);
         textViewInfo = (TextView) findViewById(R.id.textView_join_info);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_join);
+
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        if (actionBar == null)Log.i("LTest", "Action Bar is null");
+        else actionBar.setDisplayHomeAsUpEnabled(true);
 
         imageButtonRepeat.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -95,7 +103,7 @@ public class JoinActivity extends GotLActivity {
 
     @Override
     protected void onResume() {
-        activeActivityRequiresServer = false;
+        activeActivityRequiresServer = true;
         super.onResume();
     }
 }

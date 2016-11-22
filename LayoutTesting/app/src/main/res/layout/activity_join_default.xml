@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:padding="@dimen/activity_padding">
+        android:padding="@dimen/activity_padding_normal">
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
@@ -54,7 +54,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:gravity="center"
-                android:padding="@dimen/activity_padding"
+                android:padding="@dimen/activity_padding_normal"
                 android:textSize="18sp"/>
 
             <ImageButton
