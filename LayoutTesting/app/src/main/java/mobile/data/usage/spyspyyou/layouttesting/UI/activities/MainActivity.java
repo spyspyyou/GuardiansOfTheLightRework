@@ -10,7 +10,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Space;
+import android.widget.TextView;
+
+import java.util.Random;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
@@ -23,7 +25,14 @@ public class MainActivity extends GotLActivity {
     private CoordinatorLayout coordinatorLayout;
     private FocusManagedEditText editTextUsername;
     private ListView listViewStatistics;
-    private Space space;
+    private TextView textViewRandInfo;
+
+    private int[]randInfoStrings = {
+            R.string.about,
+            R.string.allowed_characters,
+            R.string.game_map,
+            R.string.join
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +60,7 @@ public class MainActivity extends GotLActivity {
 
         imageButtonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {startActivity(new Intent(getBaseContext(), SettingsActivity.class));}});
+            public void onClick(View view) {startActivity(new Intent(getBaseContext(), CreateActivity.class));}});
 
         imageButtonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +97,6 @@ public class MainActivity extends GotLActivity {
 
     private void initializeViewVariables(){
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_main);
-        space = (Space) findViewById(R.id.space_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_profile);
         imageButtonProfile = (ImageButton) findViewById(R.id.imageButton_main_profile);
         imageButtonSettings = (ImageButton) findViewById(R.id.imageButton_main_settings);
@@ -100,6 +108,7 @@ public class MainActivity extends GotLActivity {
         imageViewProfilePicture = (ImageView) findViewById(R.id.imageView_main_profilePicture);
         editTextUsername = (FocusManagedEditText) findViewById(R.id.editText_main_username);
         listViewStatistics = (ListView) findViewById(R.id.listView_main_stats);
+        textViewRandInfo = (TextView) findViewById(R.id.textView_main_info);
     }
 
     //todo: finish stats list items, using the stats
@@ -115,5 +124,16 @@ public class MainActivity extends GotLActivity {
     protected void onResume() {
         activeActivityRequiresServer = true;
         super.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setRandText();
+    }
+
+    private void setRandText(){
+        int rand = new Random().nextInt(randInfoStrings.length);
+        textViewRandInfo.setText(getResources().getString(randInfoStrings[rand]));
     }
 }

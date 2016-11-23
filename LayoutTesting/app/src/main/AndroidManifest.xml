@@ -46,7 +46,7 @@
                 android:value=".ui.activities.MainActivity"/>
         </activity>
         <activity
-            android:name=".ui.activities.SettingsActivity"
+            android:name=".ui.activities.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.activities.MainActivity">
             <meta-data

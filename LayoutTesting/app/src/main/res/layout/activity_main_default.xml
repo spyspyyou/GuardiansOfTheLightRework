@@ -122,7 +122,7 @@
 
         <TextView
             android:id="@+id/textView_main_info"
-            android:text="@string/rand_info_text"
+            android:text=""
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/activity_padding_normal"

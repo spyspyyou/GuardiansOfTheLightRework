@@ -2,9 +2,9 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/coordinatorLayout_join"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/coordinatorLayout_join">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_join"
@@ -31,12 +31,11 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:elevation="@dimen/elevation"
-            android:layout_margin="@dimen/activity_margin_normal"
-            >
+            android:layout_margin="@dimen/activity_margin_normal">
 
             <ProgressBar
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
                 android:id="@+id/progressBar_join_searching"
-                style="?android:attr/progressBarStyleLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -61,7 +60,7 @@
                 android:id="@+id/imageButton_join_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_autorenew_black_48dp"
+                app:srcCompat="@drawable/ic_refresh_black_48dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
@@ -97,9 +96,9 @@
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignTop="@+id/relativeLayout2"
-                android:layout_alignLeft="@+id/relativeLayout2"
-                android:layout_alignStart="@+id/relativeLayout2"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:background="@color/background_grey"/>
         </RelativeLayout>
 

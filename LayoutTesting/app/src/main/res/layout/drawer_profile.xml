@@ -9,7 +9,7 @@
     android:layout_marginLeft="-55dp"
     android:layout_marginStart="-55dp"
     android:choiceMode="singleChoice"
-    android:background="@color/colorPrimaryLight">
+    android:background="@android:color/white">
 
     <TextView
         android:id="@+id/textView_main_profile"
@@ -36,7 +36,7 @@
         android:layout_below="@id/textView_main_profile"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryLight"
         android:layout_marginTop="@dimen/activity_margin_normal"
         android:layout_marginEnd="@dimen/activity_margin_normal"
         android:layout_marginLeft="@dimen/activity_margin_normal"
@@ -93,7 +93,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_margin="@dimen/activity_margin_normal"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryLight"
         android:elevation="@dimen/elevation"
         android:padding="@dimen/activity_padding_normal">
 
