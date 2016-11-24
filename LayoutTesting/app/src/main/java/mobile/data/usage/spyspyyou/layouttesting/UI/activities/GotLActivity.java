@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 
 public abstract class GotLActivity extends AppCompatActivity {
@@ -20,7 +21,7 @@ public abstract class GotLActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         App.onActivityResumed();
-        //AppBluetoothManager.serverRequirementChanged(activeActivityRequiresServer);
+        AppBluetoothManager.serverRequirementChanged(activeActivityRequiresServer);
     }
 
     @Override
@@ -55,5 +56,9 @@ public abstract class GotLActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
          */
+    }
+
+    public static boolean isActiveActivityRequiresServer(){
+        return activeActivityRequiresServer;
     }
 }

@@ -2,9 +2,6 @@ package mobile.data.usage.spyspyyou.layouttesting.global;
 
 import android.content.Intent;
 
-/**
- * Created by Sandro on 08/09/2016.
- */
 public interface GlobalTrigger {
 
     void onAppStart();

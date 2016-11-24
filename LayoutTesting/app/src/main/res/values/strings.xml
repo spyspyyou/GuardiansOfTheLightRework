@@ -115,4 +115,5 @@
     <string name="language">Language</string>
     <string name="help">Help</string>
     <string name="about">About</string>
+    <string name="profile_picture">Profile Picture</string>
 </resources>

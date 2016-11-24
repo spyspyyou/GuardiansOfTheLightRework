@@ -1,15 +1,20 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Random;
@@ -26,6 +31,13 @@ public class MainActivity extends GotLActivity {
     private FocusManagedEditText editTextUsername;
     private ListView listViewStatistics;
     private TextView textViewRandInfo;
+    private RelativeLayout relativeLayoutProfilePictureSelection, relativeLayoutUserInfo;
+    private Button buttonCancelSelection;
+    private LinearLayout linearLayout;
+    private SharedPreferences sharedPreferences;
+
+    private String profilePictureIdString = "profilePictureId", userNameIdString = "userNameId";
+    private int profilePictureId = -1;
 
     private int[]randInfoStrings = {
             R.string.about,
@@ -44,23 +56,50 @@ public class MainActivity extends GotLActivity {
         drawerLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (view.getId() != R.id.editText_main_username){
-                    editTextUsername.releaseFocus();
-                }
+                if (view.getId() != R.id.editText_main_username)editTextUsername.releaseFocus();
                 return false;
             }
         });
 
+        editTextUsername.on
+
+        initializeButtons();
+
+        sharedPreferences = getPreferences(MODE_PRIVATE);
+        profilePictureId = sharedPreferences.getInt(profilePictureIdString, -1);
+
+        initializeProfile();
+        setProfileButtonAction();
+
+        //todo: set to the chose profile pic imageViewProfilePicture.setImageDrawable();
+
+        //todo: set to the chosen username editTextUsername.setText();
+
+        //todo: add the items to the list listViewStatistics.setAdapter();
+    }
+
+    private void initializeButtons(){
         imageButtonProfile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        drawerLayout.openDrawer(Gravity.LEFT);
-                    }
-                });
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(Gravity.LEFT);
+            }
+        });
 
         imageButtonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {startActivity(new Intent(getBaseContext(), CreateActivity.class));}});
+            public void onClick(View view) {
+                //todo:add settings link
+                // startActivity(new Intent(getBaseContext(), CreateActivity.class))
+            }
+        });
+
+        imageButtonStatisticsSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo:add stats settings link
+            }
+        });
 
         imageButtonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,9 +107,17 @@ public class MainActivity extends GotLActivity {
             }
 
         });
+
         imageButtonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {startActivity(new Intent(getBaseContext(), CreateActivity.class));
+            }
+        });
+
+        imageViewProfilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSelection();
             }
         });
 
@@ -88,11 +135,12 @@ public class MainActivity extends GotLActivity {
             }
         });
 
-        //todo: set to the chose profile pic imageViewProfilePicture.setImageDrawable();
-
-        //todo: set to the chosen username editTextUsername.setText();
-
-        //todo: add the items to the list listViewStatistics.setAdapter();
+        buttonCancelSelection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeSelection();
+            }
+        });
     }
 
     private void initializeViewVariables(){
@@ -109,10 +157,23 @@ public class MainActivity extends GotLActivity {
         editTextUsername = (FocusManagedEditText) findViewById(R.id.editText_main_username);
         listViewStatistics = (ListView) findViewById(R.id.listView_main_stats);
         textViewRandInfo = (TextView) findViewById(R.id.textView_main_info);
+        relativeLayoutProfilePictureSelection = (RelativeLayout) findViewById(R.id.relativeLayout_profilePicture_selection);
+        buttonCancelSelection = (Button) findViewById(R.id.button_main_cancel);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout_profilePicture_options);
+        relativeLayoutUserInfo = (RelativeLayout) findViewById(R.id.relativeLayout_main_userInfo);
+    }
+
+    private void initializeProfile(){
+        if (profilePictureId != -1) {
+            final Object object = linearLayout.getChildAt(profilePictureId);
+            if (!(object instanceof ImageButton)) return;
+            final ImageButton imageButton = (ImageButton) object;
+            changeProfilePicture(imageButton.getDrawable(), profilePictureId);
+        }
+        editTextUsername.setText(sharedPreferences.getString(userNameIdString, ""));
     }
 
     //todo: finish stats list items, using the stats
-    //todo: make v21+ layouts
 
     @Override
     public void onBackPressed() {
@@ -133,7 +194,39 @@ public class MainActivity extends GotLActivity {
     }
 
     private void setRandText(){
-        int rand = new Random().nextInt(randInfoStrings.length);
+        int rand = new Random().nextInt(randInfoStrings.length-1);
         textViewRandInfo.setText(getResources().getString(randInfoStrings[rand]));
+    }
+
+    private void openSelection(){
+        relativeLayoutProfilePictureSelection.setVisibility(View.VISIBLE);
+    }
+
+    private void closeSelection(){
+        relativeLayoutProfilePictureSelection.setVisibility(View.GONE);
+    }
+
+    private void changeProfilePicture(Drawable drawable, int picID){
+        imageViewProfilePicture.setImageDrawable(drawable);
+        profilePictureId = picID;
+        sharedPreferences.edit().putInt(profilePictureIdString, picID).apply();
+    }
+
+    private void setProfileButtonAction(){
+        for (int i = 0; i < linearLayout.getChildCount(); ++i){
+            final Object object = linearLayout.getChildAt(i);
+            final int y = i;
+            if (!(object instanceof ImageButton)){
+                continue;
+            }
+            final ImageButton imageButton = (ImageButton) object;
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    changeProfilePicture(imageButton.getDrawable(), y);
+                    closeSelection();
+                }
+            });
+        }
     }
 }

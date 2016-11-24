@@ -3,11 +3,13 @@ package mobile.data.usage.spyspyyou.layouttesting.global;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
 /**
@@ -25,7 +27,7 @@ public class App implements TODS {
 
     //lists with the places to be noticed on big App Events
     private static GlobalTrigger[] onAppTrigger = {
-            //new AppBluetoothManager()
+            new AppBluetoothManager()
     };
 
     //activity on-calls
@@ -53,7 +55,7 @@ public class App implements TODS {
     }
 
     public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        //if (requestCode == REQUEST_COARSE_LOCATION_PERMISSION&&grantResults.length>0)AppBluetoothManager.onCoarseLocationPermissionRequestResult(grantResults[0]== PackageManager.PERMISSION_GRANTED);
+        if (requestCode == REQUEST_COARSE_LOCATION_PERMISSION&&grantResults.length>0)AppBluetoothManager.onCoarseLocationPermissionRequestResult(grantResults[0]== PackageManager.PERMISSION_GRANTED);
     }
 
     //global trigger calls

@@ -9,7 +9,7 @@
     android:layout_marginLeft="-55dp"
     android:layout_marginStart="-55dp"
     android:choiceMode="singleChoice"
-    android:background="@android:color/white">
+    android:background="@android:color/holo_orange_light">
 
     <TextView
         android:id="@+id/textView_main_profile"
@@ -52,11 +52,11 @@
             app:srcCompat="@mipmap/ic_launcher"
             android:minHeight="100dp"
             android:minWidth="100dp"
-            android:elevation="@dimen/elevation"
             android:contentDescription="@string/profile_pic"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_alignParentStart="true"
+            />
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/inputLayout_main_username"
@@ -134,5 +134,141 @@
     <View
         style="@style/divider_horizontal"
         android:elevation="@dimen/elevation"/>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout_profilePicture_selection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="@dimen/elevation"
+        android:background="@drawable/background_profile_picture_selection"
+        android:layout_marginBottom="@dimen/activity_margin_big"
+        android:layout_marginEnd="@dimen/activity_margin_big"
+        android:layout_marginLeft="@dimen/activity_margin_big"
+        android:layout_marginRight="@dimen/activity_margin_big"
+        android:layout_marginStart="@dimen/activity_margin_big"
+        android:layout_marginTop="70dp"
+        android:visibility="gone">
+
+        <TextView
+            android:text="@string/profile_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView6"
+            android:textAlignment="center"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="18sp"
+            android:textStyle="normal|bold"
+            android:textColor="@android:color/black"
+            android:padding="@dimen/activity_padding_normal"
+            android:layout_marginTop="@dimen/activity_margin_normal"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/activity_margin_normal"
+            android:layout_marginRight="@dimen/activity_margin_normal"
+            android:layout_above="@+id/button_main_cancel"
+            android:layout_below="@+id/textView6">
+
+            <LinearLayout
+                android:id="@+id/linearLayout_profilePicture_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/imageButton15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_volume_off_black_36dp"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_fingerprint_black_36dp"
+                    android:id="@+id/imageButton14"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_whatshot_black_36dp"
+                    android:id="@+id/imageButton12"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_warning_black_36dp"
+                    android:id="@+id/imageButton11"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_settings_black_36dp"
+                    android:id="@+id/imageButton10"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_sentiment_satisfied_black_36dp"
+                    android:id="@+id/imageButton9"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_sentiment_neutral_black_36dp"
+                    android:id="@+id/imageButton8"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_sentiment_dissatisfied_black_36dp"
+                    android:id="@+id/imageButton7"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_close_black_36dp"
+                    android:id="@+id/imageButton6"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_notifications_none_black_36dp"
+                    android:id="@+id/imageButton3"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_language_black_36dp"
+                    android:id="@+id/imageButton2"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_share_black_36dp"
+                    android:id="@+id/imageButton"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_volume_up_black_36dp"
+                    android:id="@+id/imageButton13"/>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/button_main_cancel"
+            android:text="@string/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="@dimen/activity_margin_normal"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

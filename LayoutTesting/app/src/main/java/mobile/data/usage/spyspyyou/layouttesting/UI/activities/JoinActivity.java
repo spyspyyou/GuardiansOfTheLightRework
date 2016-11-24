@@ -2,6 +2,7 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,19 +11,24 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 
+import java.util.ArrayList;
+
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.layouttesting.utils.DeviceAdapter;
 
 public class JoinActivity extends GotLActivity {
 
     private ProgressBar progressBarSearching;
     private ImageButton imageButtonRepeat, imageButtonCancel;
     private TextView textViewInfo;
-    private Toolbar toolbar;
-    private ActionBar actionBar;
+    private ListView listView;
+    private DeviceAdapter deviceAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,10 +38,11 @@ public class JoinActivity extends GotLActivity {
         imageButtonRepeat = (ImageButton) findViewById(R.id.imageButton_join_repeat);
         imageButtonCancel = (ImageButton) findViewById(R.id.imageButton_join_cancel);
         textViewInfo = (TextView) findViewById(R.id.textView_join_info);
-        toolbar = (Toolbar) findViewById(R.id.toolbar_join);
+        listView = (ListView) findViewById(R.id.listView_join_clients );
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_join);
 
         setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar == null)Log.i("LTest", "Action Bar is null");
         else actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -52,6 +59,10 @@ public class JoinActivity extends GotLActivity {
                 showInactive();
             }
         });
+
+        ArrayList<BluetoothDevice> arrayList = AppBluetoothManager.getClientList();
+        deviceAdapter = new DeviceAdapter(this, arrayList);
+        listView.setAdapter(deviceAdapter);
     }
 
     private void showSearching(){

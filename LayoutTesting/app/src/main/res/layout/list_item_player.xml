@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_padding_normal">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@mipmap/ic_launcher"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/imageView_listItemPlayer_ProfilePicture"/>
+
+    <TextView
+        android:text="@string/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_listItemPlayer"
+        android:layout_alignBottom="@+id/imageView_listItemPlayer_ProfilePicture"
+        android:layout_toRightOf="@+id/imageView_listItemPlayer_ProfilePicture"
+        android:layout_toEndOf="@+id/imageView_listItemPlayer_ProfilePicture"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/activity_margin_normal"
+        android:layout_marginStart="@dimen/activity_margin_normal"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_create_black_18dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/imageView_listItemPlayer_status"
+        android:visibility="gone"/>
+</RelativeLayout>
