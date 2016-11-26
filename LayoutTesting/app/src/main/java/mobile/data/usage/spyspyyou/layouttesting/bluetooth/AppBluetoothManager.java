@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.global.GlobalTrigger;
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
@@ -35,6 +36,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver;
     private static ArrayList<BluetoothDevice> clients;
     private static ArrayList<BluetoothDevice> servers;
+    private static DeviceFoundNotificator notificator;
 
     // start of all the outside access method that the app has onto the bluetooth sector.
 
@@ -54,7 +56,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public void onAppStop(){
-        if (stopBluetoothOnAppLeaving||!bluetoothOnWhenAppEntered)disableBluetooth();
+        if (stopBluetoothOnAppLeaving&&!bluetoothOnWhenAppEntered)disableBluetooth();
         stopReceiving();
     }
 
@@ -66,18 +68,26 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     //public access methods
 
-    public static ArrayList<BluetoothDevice> getClientList(){
+    public static ArrayList<BluetoothDevice> getClientList(DeviceFoundNotificator deviceFoundNotificator){
         activateDeviceDiscovery();
         Log.i("BtTest", "searching for Clients");
         clients = new ArrayList<>();
+        notificator = deviceFoundNotificator;
         return clients;
     }
 
-    public static ArrayList<BluetoothDevice> getServerList(){
+    public static ArrayList<BluetoothDevice> getServerList(DeviceFoundNotificator deviceFoundNotificator){
         activateDeviceDiscovery();
         Log.i("BtTest", "Searching for Hosts");
         servers = new ArrayList<>();
+        notificator = deviceFoundNotificator;
         return servers;
+    }
+
+    public static void updateBluetoothName(){
+        if (isBluetoothEnabled()) {
+            setBluetoothName();
+        }
     }
 
     //todo:add when the friends sector is introduced
@@ -129,15 +139,15 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
             boolean explain = shouldShowRequestPermissionRationale(App.accessActiveActivity(null), Manifest.permission.ACCESS_COARSE_LOCATION);
             if (explain) {
                 new AlertDialog.Builder(App.accessActiveActivity(null))
-                        .setTitle("Explanation")
-                        .setMessage("It's an Android thing that the BluetoothAdapter requires the location position to perform device discovery.Don't ask me why, I got no idea... (For privacy concerned people: this code is open source, see in options).")
-                        .setPositiveButton("Give me!", new DialogInterface.OnClickListener() {
+                        .setTitle(R.string.explanation)
+                        .setMessage(R.string.explanation_text)
+                        .setPositiveButton(R.string.give_me, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         request();
                                     }
                                 }
-                        ).setNegativeButton("Don't want it", new DialogInterface.OnClickListener() {
+                        ).setNegativeButton(R.string.expl_refuse, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {}
                 }).show();
@@ -202,7 +212,11 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     private static void stopReceiving(){
-        App.accessActiveActivity(null).unregisterReceiver(bluetoothBroadcastReceiver);
+        try {
+            App.accessActiveActivity(null).unregisterReceiver(bluetoothBroadcastReceiver);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         ConnectionManager.disconnect();
         ConnectionManager.stopServerAvailability();
         Log.i("BtTest", "stopped reception");
@@ -210,7 +224,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     //todo:adjust
     private static void setBluetoothName(){
-        String bluetoothName = BluetoothDeviceNameHandling.getBluetoothNameFromData();
+        String bluetoothName = BluetoothDeviceNameHandling.getBluetoothName();
         if (!bluetoothAdapter.isEnabled() || bluetoothAdapter.getName().equals(bluetoothName))return;
         bluetoothAdapter.setName(bluetoothName);
         Log.i("BtTest", "changed bluetooth name to: " + bluetoothName);
@@ -221,6 +235,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public static boolean isBluetoothEnabled() {
+        if (bluetoothAdapter == null)return false;
         return bluetoothAdapter.isEnabled();
     }
 
@@ -297,10 +312,10 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
             Log.i("BtTest", "Found a Device " + deviceName);
             if (!BluetoothDeviceNameHandling.isAppDevice(device))return;
             clients.add(device);
-            if (BluetoothDeviceNameHandling.isHosting(device))
+            //todo:remove ! after the testing
+            if (!BluetoothDeviceNameHandling.isHosting(device))
                 servers.add(device);
-            //todo:adjust the receiver of the notification
-            BluetoothConnectionManagementTestActivity.notifyChange();
+            notificator.notifyChange();
         }
 
         private static void setupReceiver(){

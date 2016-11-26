@@ -11,10 +11,7 @@ import android.widget.Toast;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
-
-/**
- *
- */
+import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 
 //todo:professionalize the strings;
 //todo:exchange toast with Snackbar
@@ -27,6 +24,7 @@ public class App implements TODS {
 
     //lists with the places to be noticed on big App Events
     private static GlobalTrigger[] onAppTrigger = {
+            new DataCenter(),
             new AppBluetoothManager()
     };
 

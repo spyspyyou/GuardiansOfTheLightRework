@@ -116,4 +116,10 @@
     <string name="help">Help</string>
     <string name="about">About</string>
     <string name="profile_picture">Profile Picture</string>
+    <string name="explanation_text">It\'s an Android thing that the BluetoothAdapter requires the location permission to perform device discovery. Don\'t ask me why, I got no idea... (For privacy concerned people: this code is open source, see in options).</string>
+    <string name="explanation">Explanation</string>
+    <string name="give_me">Give me!</string>
+    <string name="expl_refuse">Don\'t want it</string>
+    <string name="game_searching_info">Searching for games.</string>
+    <string name="search_finished_info">Search finished.</string>
 </resources>

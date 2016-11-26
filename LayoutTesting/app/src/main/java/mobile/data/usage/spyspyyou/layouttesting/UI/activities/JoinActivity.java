@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -14,15 +15,15 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.DeviceFoundNotificator;
 import mobile.data.usage.spyspyyou.layouttesting.utils.DeviceAdapter;
 
-public class JoinActivity extends GotLActivity {
+public class JoinActivity extends GotLActivity implements DeviceFoundNotificator{
 
     private ProgressBar progressBarSearching;
     private ImageButton imageButtonRepeat, imageButtonCancel;
@@ -49,23 +50,28 @@ public class JoinActivity extends GotLActivity {
         imageButtonRepeat.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        showSearching();
+                        search();
                     }
                 });
 
         imageButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInactive();
+                cancel();
             }
         });
 
-        ArrayList<BluetoothDevice> arrayList = AppBluetoothManager.getClientList();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ArrayList<BluetoothDevice> arrayList = AppBluetoothManager.getServerList(this);
         deviceAdapter = new DeviceAdapter(this, arrayList);
         listView.setAdapter(deviceAdapter);
     }
 
-    private void showSearching(){
+    private void search(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final int circleRadiusX = imageButtonRepeat.getWidth()/2, circleRadiusY = imageButtonRepeat.getHeight()/2;
             final float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
@@ -81,15 +87,23 @@ public class JoinActivity extends GotLActivity {
                     progressBarSearching.setVisibility(View.VISIBLE);
                     imageButtonCancel.setVisibility(View.VISIBLE);
                     animatorRevealCancel.start();
-                    textViewInfo.setText("Searching for games.");
+                    textViewInfo.setText(R.string.game_searching_info);
                 }
             });
 
             animatorHideRepeat.start();
+        }else {
+            imageButtonRepeat.setVisibility(View.INVISIBLE);
+            progressBarSearching.setVisibility(View.VISIBLE);
+            imageButtonCancel.setVisibility(View.VISIBLE);
+            textViewInfo.setText(R.string.game_searching_info);
         }
+        ArrayList<BluetoothDevice> arrayList = AppBluetoothManager.getServerList(this);
+        DeviceAdapter deviceAdapter = new DeviceAdapter(this, arrayList);
+        listView.setAdapter(deviceAdapter);
     }
 
-    private void showInactive(){
+    private void cancel(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final int circleRadiusX = progressBarSearching.getWidth()/2, circleRadiusY = progressBarSearching.getHeight()/2;
             final float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
@@ -104,11 +118,15 @@ public class JoinActivity extends GotLActivity {
                     imageButtonCancel.setVisibility(View.INVISIBLE);
                     imageButtonRepeat.setVisibility(View.VISIBLE);
                     animatorRevealRepeat.start();
-                    textViewInfo.setText("Search finished.");
+                    textViewInfo.setText(R.string.search_finished_info);
                 }
             });
             progressBarSearching.setVisibility(View.INVISIBLE);
             animatorHideCancel.start();
+        }else{
+            imageButtonCancel.setVisibility(View.INVISIBLE);
+            imageButtonRepeat.setVisibility(View.VISIBLE);
+            textViewInfo.setText(R.string.search_finished_info);
         }
     }
 
@@ -116,5 +134,10 @@ public class JoinActivity extends GotLActivity {
     protected void onResume() {
         activeActivityRequiresServer = true;
         super.onResume();
+    }
+
+    @Override
+    public void notifyChange() {
+        deviceAdapter.notifyDataSetChanged();
     }
 }

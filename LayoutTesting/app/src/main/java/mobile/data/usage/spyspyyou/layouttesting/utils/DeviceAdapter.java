@@ -20,7 +20,7 @@ public class DeviceAdapter extends BaseAdapter {
     private static LayoutInflater inflater = null;
     private Activity activity;
 
-    public DeviceAdapter(Activity activity, ArrayList data) {
+    public DeviceAdapter(Activity activity, ArrayList<BluetoothDevice> data) {
         this.data=data;
         this.activity = activity;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -44,12 +44,12 @@ public class DeviceAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
-        if(convertView == null) view = inflater.inflate(R.layout.list_item_player, null);
+        if(convertView == null) view = inflater.inflate(R.layout.list_item_player, parent);
 
         TextView username = (TextView)view.findViewById(R.id.textView_listItemPlayer);
         ImageView profilePicture = (ImageView) view.findViewById(R.id.imageView_listItemPlayer_ProfilePicture);
 
-        username.setText(BluetoothDeviceNameHandling.getName(data.get(position)));
+        username.setText(BluetoothDeviceNameHandling.getUsername(data.get(position)));
         profilePicture.setImageDrawable(activity.getResources().getDrawable(BluetoothDeviceNameHandling.getPictureId(data.get(position))));
         return view;
     }

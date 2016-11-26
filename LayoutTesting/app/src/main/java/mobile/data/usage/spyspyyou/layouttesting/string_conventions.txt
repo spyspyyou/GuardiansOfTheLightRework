@@ -1,0 +1,22 @@
+event String:
+    - no '|' in any EventString
+    - first Character meaning:
+        B - Bluetooth Event
+
+bluetooth name:
+    [app_name]_[user_name]-[picture_id],[status].[game_name]
+    app_name = APP_IDENTIFIER
+    user_name = name chosen by the user in the main activity
+    picture_id = id of the picture chosen by the user in the main activity\0\0
+    status = 'd' default, 'h' hosting, 'g' in game
+    game_name = name of the game hosted, if there is one, else ""
+
+
+user_name + game_name:
+    - none of these characters {
+        '_',
+        '-',
+        '|',
+        ',',
+        '.'
+    }

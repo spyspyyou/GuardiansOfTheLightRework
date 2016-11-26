@@ -1,7 +1,6 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -20,30 +19,37 @@ import android.widget.TextView;
 import java.util.Random;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
 
 public class MainActivity extends GotLActivity {
 
     private DrawerLayout drawerLayout;
-    private ImageButton imageButtonProfile, imageButtonSettings, imageButtonJoin, imageButtonCreate, imageButtonFriendList, imageButtonConnections, imageButtonStatisticsSettings;
+    private ImageButton
+            imageButtonProfile,
+            imageButtonSettings,
+            imageButtonJoin,
+            imageButtonCreate,
+            imageButtonFriendList,
+            imageButtonConnections,
+            imageButtonStatisticsSettings;
     private ImageView imageViewProfilePicture;
     private CoordinatorLayout coordinatorLayout;
     private FocusManagedEditText editTextUsername;
     private ListView listViewStatistics;
     private TextView textViewRandInfo;
-    private RelativeLayout relativeLayoutProfilePictureSelection, relativeLayoutUserInfo;
+    private RelativeLayout
+            relativeLayoutProfilePictureSelection,
+            relativeLayoutUserInfo;
     private Button buttonCancelSelection;
     private LinearLayout linearLayout;
-    private SharedPreferences sharedPreferences;
-
-    private String profilePictureIdString = "profilePictureId", userNameIdString = "userNameId";
-    private int profilePictureId = -1;
 
     private int[]randInfoStrings = {
             R.string.about,
             R.string.allowed_characters,
             R.string.game_map,
-            R.string.join
+            R.string.join,
+            R.string.app_name
     };
 
     @Override
@@ -61,21 +67,30 @@ public class MainActivity extends GotLActivity {
             }
         });
 
-        editTextUsername.on
-
         initializeButtons();
-
-        sharedPreferences = getPreferences(MODE_PRIVATE);
-        profilePictureId = sharedPreferences.getInt(profilePictureIdString, -1);
-
-        initializeProfile();
         setProfileButtonAction();
 
-        //todo: set to the chose profile pic imageViewProfilePicture.setImageDrawable();
-
-        //todo: set to the chosen username editTextUsername.setText();
-
+        //todo: finish stats list items, using the stats
         //todo: add the items to the list listViewStatistics.setAdapter();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerVisible(Gravity.LEFT)) drawerLayout.closeDrawers();
+        else super.onBackPressed();
+    }
+
+    @Override
+    protected void onResume() {
+        activeActivityRequiresServer = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setRandText();
+        initializeProfile();
     }
 
     private void initializeButtons(){
@@ -164,33 +179,14 @@ public class MainActivity extends GotLActivity {
     }
 
     private void initializeProfile(){
+        byte profilePictureId = DataCenter.getPictureId();
         if (profilePictureId != -1) {
             final Object object = linearLayout.getChildAt(profilePictureId);
             if (!(object instanceof ImageButton)) return;
             final ImageButton imageButton = (ImageButton) object;
             changeProfilePicture(imageButton.getDrawable(), profilePictureId);
         }
-        editTextUsername.setText(sharedPreferences.getString(userNameIdString, ""));
-    }
-
-    //todo: finish stats list items, using the stats
-
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerVisible(Gravity.LEFT)) drawerLayout.closeDrawers();
-        else super.onBackPressed();
-    }
-
-    @Override
-    protected void onResume() {
-        activeActivityRequiresServer = true;
-        super.onResume();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        setRandText();
+        editTextUsername.setText(DataCenter.getUserName());
     }
 
     private void setRandText(){
@@ -200,22 +196,22 @@ public class MainActivity extends GotLActivity {
 
     private void openSelection(){
         relativeLayoutProfilePictureSelection.setVisibility(View.VISIBLE);
+        relativeLayoutProfilePictureSelection.bringToFront();
     }
 
     private void closeSelection(){
         relativeLayoutProfilePictureSelection.setVisibility(View.GONE);
     }
 
-    private void changeProfilePicture(Drawable drawable, int picID){
+    private void changeProfilePicture(Drawable drawable, byte picID){
         imageViewProfilePicture.setImageDrawable(drawable);
-        profilePictureId = picID;
-        sharedPreferences.edit().putInt(profilePictureIdString, picID).apply();
+        DataCenter.setPictureId(picID);
     }
 
     private void setProfileButtonAction(){
-        for (int i = 0; i < linearLayout.getChildCount(); ++i){
+        for (byte i = 0; i < linearLayout.getChildCount(); ++i){
             final Object object = linearLayout.getChildAt(i);
-            final int y = i;
+            final byte y = i;
             if (!(object instanceof ImageButton)){
                 continue;
             }
