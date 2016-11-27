@@ -122,4 +122,5 @@
     <string name="expl_refuse">Don\'t want it</string>
     <string name="game_searching_info">Searching for games.</string>
     <string name="search_finished_info">Search finished.</string>
+    <string name="empty_textView">-</string>
 </resources>

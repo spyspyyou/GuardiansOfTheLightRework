@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.utils.GameInformation;
 
 public class LobbyActivity extends GotLActivity {
 
@@ -52,5 +53,10 @@ public class LobbyActivity extends GotLActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.game_lobby_join, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    //todo:make it real
+    public GameInformation getGameInformation(){
+        return new GameInformation("testname", "testhost", "testadress", 10, 20, 8, new boolean[]{true, true, false, true});
     }
 }

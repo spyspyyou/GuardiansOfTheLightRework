@@ -12,26 +12,24 @@ import java.util.ArrayList;
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
 public class Connection implements TODS {
+    private static final char EVENT_STRING_FINAL_CHAR = '|';
     private static final short MAX_EVENTS_PER_READ_EVENTS_CALL = 5;
     private final byte INDEX;
     private final InputStream INPUT_STREAM;
     private final OutputStream OUTPUT_STREAM;
     private final BluetoothSocket BLUETOOTH_SOCKET;
-    private boolean active = true;
 
-    public Connection(BluetoothSocket pBluetoothSocket, byte index){
+    /*package*/ Connection(BluetoothSocket pBluetoothSocket, byte index){
         BLUETOOTH_SOCKET = pBluetoothSocket;
         INDEX = index;
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        if (BLUETOOTH_SOCKET == null)active = false;
-        else {
+        if (BLUETOOTH_SOCKET != null){
             try {
                 inputStream = pBluetoothSocket.getInputStream();
                 outputStream = pBluetoothSocket.getOutputStream();
             } catch (IOException e) {
                 Log.e("Connection", "failed to get data streams");
-                active = false;
                 e.printStackTrace();
             }
         }
@@ -43,13 +41,13 @@ public class Connection implements TODS {
      * this method reads from the connection's InputStream until it gets at most MAX_EVENTS_PER_READ_EVENTS_CALL Events or the stream has no more data
      * @return events - a list of Events from the InputStream
      */
-    public ArrayList<Event> readEvents(){
+    /*package*/ ArrayList<Event> readEvents(){
         ArrayList<Event> events = new ArrayList<>();
         String eventString = "";
         char nextChar;
         int numberOfEventsRead = 0;
         try {
-            while ((INPUT_STREAM.available() > 0 || eventString != "")
+            while ((INPUT_STREAM.available() > 0 || eventString.equals(""))
                     && numberOfEventsRead < MAX_EVENTS_PER_READ_EVENTS_CALL) {
                 nextChar = (char) INPUT_STREAM.read();
                 if (nextChar == EVENT_STRING_FINAL_CHAR){
@@ -63,14 +61,24 @@ public class Connection implements TODS {
             }
         }catch (IOException e){
             //todo: handle the broken connection;
-            active = false;
             e.printStackTrace();
         }
         return events;
     }
 
-    public void disconnect(){
-        active = false;
+    /*package*/ boolean send(byte[]data){
+        try {
+            OUTPUT_STREAM.write(data);
+            OUTPUT_STREAM.write(EVENT_STRING_FINAL_CHAR);
+            return true;
+        } catch (IOException e) {
+            //todo:handle the failure, reconnect?
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /*package*/ void disconnect(){
         try {
             INPUT_STREAM.close();
         } catch (IOException e) {
@@ -89,15 +97,12 @@ public class Connection implements TODS {
         ConnectionManager.removeDisconnectedConnection(INDEX);
     }
 
-    public BluetoothDevice getRemoteDevice(){
+    /*package*/ BluetoothDevice getRemoteDevice(){
         return BLUETOOTH_SOCKET.getRemoteDevice();
     }
 
-    public boolean isActive(){
-        return active;
-    }
 
-    public byte getIndex(){
+    /*package*/ byte getIndex(){
         return INDEX;
     }
 }

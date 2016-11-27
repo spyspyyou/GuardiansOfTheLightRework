@@ -12,22 +12,28 @@ import java.util.concurrent.TimeUnit;
     private static final LinkedBlockingQueue<Event> events = new LinkedBlockingQueue<>();
     private static final int MAXIMUM_WAIT_TIME = 500;
 
-    public EventSenderThread(){
+    /*package*/ EventSenderThread(){
         start();
     }
 
     @Override
     public void run() {
+        Event event = null;
         while(ConnectionManager.hasConnections()){
             try {
-                events.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS).send();
+                event = events.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+            if (event != null){
+                for (Connection connection:event.getReceptors()){
+                    if (!connection.send(event.toString().getBytes()))event.onEventSendFailure(connection);
+                }
             }
         }
     }
 
-    public static void send(Event event){
+    /*package*/ static void send(Event event){
         if (!events.offer(event)) {
             event.onEventSendFailure(event.getReceptors());
             Log.w("ESThread", "Event queue is full. Event dumped.");

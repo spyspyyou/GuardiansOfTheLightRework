@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.global.GlobalTrigger;
@@ -17,6 +18,22 @@ public class DataCenter implements GlobalTrigger{
             PICTURE_ID = "profilePicture",
             USER_NAME = "userName",
             GAME_NAME = "gameName";
+
+    public static final int[] PROFILE_PICTURES = {
+            R.drawable.ic_volume_mute_black_36dp,
+            R.drawable.ic_fingerprint_black_36dp,
+            R.drawable.ic_whatshot_black_36dp,
+            R.drawable.ic_warning_black_36dp,
+            R.drawable.ic_settings_black_36dp,
+            R.drawable.ic_sentiment_satisfied_black_36dp,
+            R.drawable.ic_sentiment_neutral_black_36dp,
+            R.drawable.ic_sentiment_dissatisfied_black_36dp,
+            R.drawable.ic_close_black_36dp,
+            R.drawable.ic_notifications_none_black_36dp,
+            R.drawable.ic_language_black_36dp,
+            R.drawable.ic_share_black_36dp,
+            R.drawable.ic_volume_up_black_36dp
+    };
 
     private static SharedPreferences sharedPreferences;
 
@@ -59,7 +76,7 @@ public class DataCenter implements GlobalTrigger{
     }
 
     private static void saveData(){
-        if (sharedPreferences==null)return;
+        if (sharedPreferences == null)return;
         Log.i("DataCenter", "saving data");
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(PICTURE_ID, pictureId);

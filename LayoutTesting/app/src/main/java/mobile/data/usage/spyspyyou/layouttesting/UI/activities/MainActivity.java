@@ -5,7 +5,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -68,7 +70,7 @@ public class MainActivity extends GotLActivity {
         });
 
         initializeButtons();
-        setProfileButtonAction();
+        initializeProfilePicButtons();
 
         //todo: finish stats list items, using the stats
         //todo: add the items to the list listViewStatistics.setAdapter();
@@ -180,13 +182,29 @@ public class MainActivity extends GotLActivity {
 
     private void initializeProfile(){
         byte profilePictureId = DataCenter.getPictureId();
+        Log.i("MainAc", "profile pic id is: " + profilePictureId);
         if (profilePictureId != -1) {
-            final Object object = linearLayout.getChildAt(profilePictureId);
-            if (!(object instanceof ImageButton)) return;
-            final ImageButton imageButton = (ImageButton) object;
-            changeProfilePicture(imageButton.getDrawable(), profilePictureId);
+            changeProfilePicture(getResources().getDrawable(DataCenter.PROFILE_PICTURES[profilePictureId]), profilePictureId);
         }
         editTextUsername.setText(DataCenter.getUserName());
+    }
+
+    private void initializeProfilePicButtons(){
+        for (byte i = 0; i < DataCenter.PROFILE_PICTURES.length; ++i){
+            final byte y = i;
+            LinearLayout buttonParent = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.button_profile_pic_selection, null);
+            final ImageButton imageButton = (ImageButton) buttonParent.findViewById(R.id.imageButton_selectProfilePic);
+            imageButton.setImageDrawable(getResources().getDrawable(DataCenter.PROFILE_PICTURES[i]));
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("MainAc", "chosen Pb with id: " + y);
+                    changeProfilePicture(imageButton.getDrawable(), y);
+                    closeSelection();
+                }
+            });
+            linearLayout.addView(buttonParent);
+        }
     }
 
     private void setRandText(){
@@ -206,23 +224,5 @@ public class MainActivity extends GotLActivity {
     private void changeProfilePicture(Drawable drawable, byte picID){
         imageViewProfilePicture.setImageDrawable(drawable);
         DataCenter.setPictureId(picID);
-    }
-
-    private void setProfileButtonAction(){
-        for (byte i = 0; i < linearLayout.getChildCount(); ++i){
-            final Object object = linearLayout.getChildAt(i);
-            final byte y = i;
-            if (!(object instanceof ImageButton)){
-                continue;
-            }
-            final ImageButton imageButton = (ImageButton) object;
-            imageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    changeProfilePicture(imageButton.getDrawable(), y);
-                    closeSelection();
-                }
-            });
-        }
     }
 }

@@ -34,7 +34,9 @@ public class App implements TODS {
     public static void onActivityStarted(Activity newActivity){
         if (appActive)newActivityStarted = true;
         accessActiveActivity(newActivity);
-        if (!appActive)onAppStart();
+        if (!appActive){
+            onAppStart();
+        }
     }
 
     public static void onActivityResumed(){
@@ -74,6 +76,7 @@ public class App implements TODS {
 
 
     private static void onAppStop(){
+        Log.i("App", "App stopped");
         appActive = false;
         for(GlobalTrigger aE:onAppTrigger){
             aE.onAppStop();
@@ -88,8 +91,8 @@ public class App implements TODS {
         }
     }
 
-    public static synchronized Activity accessActiveActivity(@Nullable Activity newContext){
-        if (newContext!=null)currentActivity=newContext;
+    public static synchronized Activity accessActiveActivity(@Nullable Activity newActivity){
+        if (newActivity!=null)currentActivity=newActivity;
         return currentActivity;
     }
 

@@ -12,7 +12,7 @@ public class BluetoothDeviceNameHandling implements TODS{
     private static final char USERNAME = '_';
     private static final char PICTURE_ID = '-';
     private static final char STATUS = ',';
-    private static final char GAME_NAME = '.';
+    private static final char GAMENAME = '.';
     private static final char DEFAULT = 'd';
     private static final char HOSTING = 'h';
     private static final char IN_GAME = 'g';
@@ -21,13 +21,20 @@ public class BluetoothDeviceNameHandling implements TODS{
             USERNAME,
             PICTURE_ID,
             STATUS,
-            GAME_NAME
+            GAMENAME
     };
 
 
-    public static String getUsername(BluetoothDevice bluetoothDevice){
+    /*package*/ static String getUsername(BluetoothDevice bluetoothDevice){
         String name = bluetoothDevice.getName();
-        return name.substring(name.charAt(USERNAME), name.charAt(USERNAME)+1);
+        return name.substring(name.indexOf(USERNAME)+1, name.indexOf(PICTURE_ID));
+    }
+
+    /*package*/ static String getGamename(BluetoothDevice bluetoothDevice){
+        String name = bluetoothDevice.getName();
+        name = name.substring(name.indexOf(GAMENAME)+1);
+        if (name.length() == 0) return "-";
+        return name;
     }
 
     public static boolean isAppDevice(BluetoothDevice bluetoothDevice){
@@ -44,9 +51,9 @@ public class BluetoothDeviceNameHandling implements TODS{
         return name.charAt(name.indexOf(STATUS)+1)== HOSTING;
     }
 
-    public static int getPictureId(BluetoothDevice bluetoothDevice){
+    /*package*/ static int getPictureId(BluetoothDevice bluetoothDevice){
         String name = bluetoothDevice.getName();
-        return Integer.getInteger(name.substring(name.indexOf(PICTURE_ID)+1, name.indexOf(STATUS)));
+        return Integer.parseInt(name.substring(name.indexOf(PICTURE_ID)+1, name.indexOf(STATUS)));
     }
 
     private static char getStatusChar(byte status){
@@ -70,7 +77,7 @@ public class BluetoothDeviceNameHandling implements TODS{
                 + DataCenter.getPictureId()
                 + STATUS
                 + getStatusChar(DataCenter.getAppStatus())
-                + GAME_NAME
+                + GAMENAME
                 + DataCenter.getGameName();
 
     }

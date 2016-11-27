@@ -1,7 +1,10 @@
 event String:
     - no '|' in any EventString
-    - first Character meaning:
-        B - Bluetooth Event
+    - Event identification:
+        B - BluetoothEvent
+        U - UIEvent
+            A - GameInformationAnswerEvent
+            R - GameInformationRequestEvent
 
 bluetooth name:
     [app_name]_[user_name]-[picture_id],[status].[game_name]

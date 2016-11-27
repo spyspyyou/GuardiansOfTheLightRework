@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -50,6 +51,28 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
         }
     }
 
+    /*package*/ static boolean hasConnection(BluetoothDevice bluetoothDevice){
+        return getConnectionToDevice(bluetoothDevice) != null;
+    }
+
+    @Nullable
+    /*package*/ static Connection getConnectionToAddress(String address){
+        for (Connection connection:connections){
+            if (connection.getRemoteDevice().getAddress().equals(address)){
+                return connection;
+            }
+        }
+        return null;
+    }
+
+    /*package*/ static Connection getConnectionToDevice(BluetoothDevice bluetoothDevice){
+        for (Connection connection:connections){
+            if (connection.getRemoteDevice()==bluetoothDevice)return connection;
+        }
+        return null;
+    }
+
+
     private static void addConnection(Connection connection){
         if (!hasConnections()){
             new EventSenderThread();
@@ -65,14 +88,21 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
         return false;
     }
 
-    /*package*/ static void connect(BluetoothDevice bluetoothDevice){
-        new CreateConnectionThread(bluetoothDevice);
+    /*package*/ static void connect(BluetoothDevice bluetoothDevice, DeviceFoundNotificator deviceFoundNotificator){
+        new CreateConnectionThread(bluetoothDevice, deviceFoundNotificator);
     }
 
     /*package*/ static void disconnect(BluetoothDevice bluetoothDevice){
         Connection connection = getConnectionToDevice(bluetoothDevice);
         if (connection==null)Log.w("ConnectionManager", "Can't disconnect from: " + bluetoothDevice.getAddress() + ", because it is not connected to the App.");
         else connection.disconnect();
+    }
+
+    /*package*/ static void disconnectExcept(BluetoothDevice bluetoothDevice){
+        Connection connection = getConnectionToDevice(bluetoothDevice);
+        for (Connection mConnection:connections){
+            if (mConnection != null && mConnection != connection)connection.disconnect();
+        }
     }
 
     /*package*/ static void disconnect(){
@@ -83,13 +113,6 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
     private static UUID getUUID (int i){
         return UUID.fromString(UUID_STRING + i);
-    }
-
-    private static Connection getConnectionToDevice(BluetoothDevice bluetoothDevice){
-        for (Connection connection:connections){
-            if (connection.getRemoteDevice()==bluetoothDevice)return connection;
-        }
-        return null;
     }
 
     /*package*/ static Connection[] getConnections(){
@@ -103,20 +126,23 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
     private static class CreateConnectionThread extends Thread{
         private final BluetoothDevice BLUETOOTH_DEVICE;
+        private final DeviceFoundNotificator DEVICE_FOUND_NOTIFICATOR;
 
         /**
          * This Thread is started automatically upon creation!
          * @param pBluetoothDevice - the remote device to connect to
          */
-        /*package*/ CreateConnectionThread(BluetoothDevice pBluetoothDevice){
+        /*package*/ CreateConnectionThread(BluetoothDevice pBluetoothDevice, DeviceFoundNotificator deviceFoundNotificator){
             BLUETOOTH_DEVICE = pBluetoothDevice;
+            DEVICE_FOUND_NOTIFICATOR = deviceFoundNotificator;
             start();
         }
 
         @Override
         public void run() {
-            //todo:remove with toasts
+            //todo:remove prepare statement with toasts
             Looper.prepare();
+            AppBluetoothManager.cancelSearch();
             BluetoothSocket bluetoothSocket = null;
             Log.i("BtTest", "Started connection Thread for: " + BLUETOOTH_DEVICE.getName());
             byte index = 0;
@@ -142,6 +168,7 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
                 //todo: handle failure, inform the issuer
             }else {
                 addConnection(new Connection(bluetoothSocket, index));
+                if (DEVICE_FOUND_NOTIFICATOR != null)DEVICE_FOUND_NOTIFICATOR.connectionRequestResult(connections[index]);
                 App.toast("Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
                 Log.i("BtTest", "Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
             }
