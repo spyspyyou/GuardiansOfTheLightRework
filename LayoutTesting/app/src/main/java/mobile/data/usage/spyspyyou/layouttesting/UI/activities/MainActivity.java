@@ -21,8 +21,10 @@ import android.widget.TextView;
 import java.util.Random;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
+import mobile.data.usage.spyspyyou.layouttesting.utils.EditTextTextWatcher;
 
 public class MainActivity extends GotLActivity {
 
@@ -69,11 +71,12 @@ public class MainActivity extends GotLActivity {
             }
         });
 
+        editTextUsername.addTextChangedListener(new EditTextTextWatcher(editTextUsername, EditTextTextWatcher.USERNAME));
+
         initializeButtons();
         initializeProfilePicButtons();
 
         //todo: finish stats list items, using the stats
-        //todo: add the items to the list listViewStatistics.setAdapter();
     }
 
     @Override
@@ -84,13 +87,17 @@ public class MainActivity extends GotLActivity {
 
     @Override
     protected void onResume() {
-        activeActivityRequiresServer = true;
+        activeActivityRequiresServer = false;
         super.onResume();
     }
 
     @Override
+    public void onConnectionLost() {}
+
+    @Override
     protected void onStart() {
         super.onStart();
+        AppBluetoothManager.checkBluetoothOn();
         setRandText();
         initializeProfile();
     }

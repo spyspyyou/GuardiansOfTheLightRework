@@ -41,7 +41,16 @@
                 android:value=".ui.activities.MainActivity"/>
         </activity>
         <activity
-            android:name=".ui.activities.LobbyActivity"
+            android:name=".ui.activities.LobbyClientActivity"
+            android:parentActivityName=".ui.activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".ui.activities.LobbyHostActivity"
             android:parentActivityName=".ui.activities.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan">

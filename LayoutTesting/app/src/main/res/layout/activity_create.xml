@@ -47,7 +47,6 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/relativeLayout_create_map"
-            android:layout_above="@+id/button_create"
             android:background="@color/colorPrimaryLight"
             android:padding="@dimen/activity_padding_normal"
             android:elevation="@dimen/elevation">
@@ -152,7 +151,7 @@
                 android:layout_toEndOf="@id/checkBox_create_friends"/>
 
             <ImageView
-                android:id="@+id/imageView_create_cross_fluffy"
+                android:id="@+id/imageView_create_crossFluffy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_close_black_36dp"
@@ -168,7 +167,7 @@
                 android:contentDescription="@string/cross"/>
 
             <ImageView
-                android:id="@+id/imageView_create_cross_slime"
+                android:id="@+id/imageView_create_crossSlime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_close_black_36dp"
@@ -182,7 +181,7 @@
                 android:contentDescription="@string/cross"/>
 
             <ImageView
-                android:id="@+id/imageView_create_cross_ghost"
+                android:id="@+id/imageView_create_crossGhost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_close_black_36dp"
@@ -196,7 +195,7 @@
                 android:contentDescription="@string/cross"/>
 
             <ImageView
-                android:id="@+id/imageView_create_cross_nox"
+                android:id="@+id/imageView_create_crossNox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_close_black_36dp"
@@ -277,7 +276,7 @@
 
             <ImageView
                 android:id="@+id/imageView_create_map"
-                app:srcCompat="@drawable/test_map_3"
+                app:srcCompat="@mipmap/ic_launcher"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:elevation="@dimen/elevation"
@@ -285,7 +284,7 @@
                 android:layout_height="120dp"/>
 
             <TextView
-                android:id="@+id/textView_create_width_data"
+                android:id="@+id/textView_create_widthData"
                 android:text="10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -295,7 +294,7 @@
                 android:padding="@dimen/activity_padding_small"/>
 
             <TextView
-                android:id="@+id/textView_create_height_data"
+                android:id="@+id/textView_create_heightData"
                 android:text="10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

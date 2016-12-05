@@ -34,34 +34,24 @@
         android:textColor="@android:color/black"
         android:textSize="18sp"/>
 
-    <TextView
-        android:id="@+id/textView_gameInfo_playerCount"
-        android:text="@string/player_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_gameInfo_height"
-        android:paddingBottom="@dimen/activity_padding_small"
-        android:paddingEnd="@dimen/activity_padding_small"
-        android:paddingLeft="@dimen/activity_padding_small"
-        android:paddingRight="@dimen/activity_padding_small"/>
-
     <ImageView
         android:id="@+id/imageView_gameInfo_fluffyIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_create_black_18dp"
-        android:layout_below="@+id/textView_gameInfo_playerCount"
+        android:layout_below="@+id/textView_gameInfo_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="@dimen/activity_padding_normal"
-        android:layout_marginStart="@dimen/activity_padding_normal"/>
+        android:layout_marginStart="@dimen/activity_padding_normal"
+        android:layout_marginTop="@dimen/activity_margin_normal"/>
 
     <ImageView
         android:id="@+id/imageView_gameInfo_slimeIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_create_black_18dp"
-        android:layout_below="@+id/textView_gameInfo_playerCount"
+        android:layout_alignTop="@+id/imageView_gameInfo_fluffyIcon"
         android:layout_toRightOf="@+id/imageView_gameInfo_fluffyIcon"
         android:layout_toEndOf="@+id/imageView_gameInfo_fluffyIcon"
         android:layout_marginLeft="@dimen/activity_margin_normal"
@@ -72,7 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_create_black_18dp"
-        android:layout_below="@+id/textView_gameInfo_playerCount"
+        android:layout_alignTop="@+id/imageView_gameInfo_fluffyIcon"
         android:layout_toRightOf="@+id/imageView_gameInfo_slimeIcon"
         android:layout_toEndOf="@+id/imageView_gameInfo_slimeIcon"
         android:layout_marginLeft="@dimen/activity_margin_normal"
@@ -83,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_create_black_18dp"
-        android:layout_below="@+id/textView_gameInfo_playerCount"
+        android:layout_alignTop="@+id/imageView_gameInfo_fluffyIcon"
         android:layout_toRightOf="@+id/imageView_gameInfo_ghostIcon"
         android:layout_toEndOf="@+id/imageView_gameInfo_ghostIcon"
         android:layout_marginLeft="@dimen/activity_margin_normal"
@@ -146,19 +136,34 @@
         android:visibility="invisible"/>
 
     <TextView
+        android:id="@+id/textView_gameInfo_width"
+        android:text="@string/width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView_gameInfo_host"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingBottom="@dimen/activity_padding_small"
+        android:paddingEnd="@dimen/activity_padding_small"
+        android:paddingLeft="@dimen/activity_padding_small"
+        android:paddingRight="@dimen/activity_padding_small"
+        android:paddingStart="@dimen/activity_padding_small"
+        android:layout_marginTop="@dimen/activity_margin_normal"/>
+
+    <TextView
         android:id="@+id/textView_gameInfo_height"
         android:text="@string/height"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/textView_gameInfo_width"
         android:paddingBottom="@dimen/activity_padding_small"
         android:paddingEnd="@dimen/activity_padding_small"
-        android:paddingLeft="@dimen/activity_padding_normal"
         android:paddingRight="@dimen/activity_padding_small"
-        android:paddingStart="@dimen/activity_padding_normal"
-        android:layout_alignBaseline="@+id/textView_gameInfo_widthData"
-        android:layout_alignBottom="@+id/textView_gameInfo_widthData"
-        android:layout_toRightOf="@+id/textView_gameInfo_widthData"
-        android:layout_toEndOf="@+id/textView_gameInfo_widthData"/>
+        android:layout_marginTop="@dimen/activity_margin_normal"
+        android:paddingLeft="@dimen/activity_padding_small"
+        android:paddingStart="@dimen/activity_padding_small"/>
 
     <TextView
         android:id="@+id/textView_gameInfo_heightData"
@@ -169,18 +174,6 @@
         android:layout_alignBottom="@+id/textView_gameInfo_height"
         android:layout_toRightOf="@+id/textView_gameInfo_height"
         android:layout_toEndOf="@+id/textView_gameInfo_height"
-        android:layout_marginLeft="@dimen/activity_margin_normal"
-        android:layout_marginStart="@dimen/activity_margin_normal"/>
-
-    <TextView
-        android:id="@+id/textView_gameInfo_playerCountData"
-        android:text="@string/empty_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView_gameInfo_playerCount"
-        android:layout_alignBottom="@+id/textView_gameInfo_playerCount"
-        android:layout_toRightOf="@+id/textView_gameInfo_playerCount"
-        android:layout_toEndOf="@+id/textView_gameInfo_playerCount"
         android:layout_marginLeft="@dimen/activity_margin_normal"
         android:layout_marginStart="@dimen/activity_margin_normal"/>
 
@@ -205,20 +198,6 @@
         android:layout_alignParentStart="true"
         android:id="@+id/textView_gameInfo_host"
         android:padding="@dimen/activity_padding_small"/>
-
-    <TextView
-        android:id="@+id/textView_gameInfo_width"
-        android:text="@string/width"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_gameInfo_host"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:paddingBottom="@dimen/activity_padding_small"
-        android:paddingEnd="@dimen/activity_padding_small"
-        android:paddingLeft="@dimen/activity_padding_small"
-        android:paddingRight="@dimen/activity_padding_small"
-        android:paddingStart="@dimen/activity_padding_small"/>
 
     <TextView
         android:text="@string/empty_textView"

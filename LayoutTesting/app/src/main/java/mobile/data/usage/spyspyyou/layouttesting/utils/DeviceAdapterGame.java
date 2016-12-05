@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHandling;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 
@@ -55,7 +56,7 @@ public class DeviceAdapterGame extends BaseAdapter {
         TextView gameName = (TextView)view.findViewById(R.id.textView_listItemGame_gameName);
         ImageView profilePicture = (ImageView) view.findViewById(R.id.imageView_listItemGame_picture);
 
-        gameName.setText(BluetoothDeviceNameHandling.getGamename(data.get(position)));
+        gameName.setText(BluetoothDeviceNameHandling.getGameName(data.get(position)));
         username.setText(BluetoothDeviceNameHandling.getUsername(data.get(position)));
 
         int picId = BluetoothDeviceNameHandling.getPictureId(data.get(position));

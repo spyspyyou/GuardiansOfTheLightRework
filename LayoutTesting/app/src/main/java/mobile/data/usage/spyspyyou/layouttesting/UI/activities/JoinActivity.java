@@ -11,14 +11,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -27,14 +28,16 @@ import java.util.Map;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
-import mobile.data.usage.spyspyyou.layouttesting.bluetooth.Connection;
-import mobile.data.usage.spyspyyou.layouttesting.bluetooth.DeviceFoundNotificator;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.Notificator;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
+import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.GameInformationRequestEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinRequestEvent;
 import mobile.data.usage.spyspyyou.layouttesting.utils.DeviceAdapterGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.GameInformation;
+import mobile.data.usage.spyspyyou.layouttesting.utils.ViewDataSetters;
 
-public class JoinActivity extends GotLActivity implements DeviceFoundNotificator{
+public class JoinActivity extends GotLActivity implements Notificator, TODS {
 
     private ProgressBar progressBarSearching, progressBarGameInfoStatus;
 
@@ -44,21 +47,13 @@ public class JoinActivity extends GotLActivity implements DeviceFoundNotificator
 
     private TextView
             textViewInfo,
-            textViewGameInfoStatus,
-            textViewGameName,
-            textViewUsername,
-            textViewWidth,
-            textViewHeight,
-            textViewPlayerCount;
+            textViewGameInfoStatus;
 
-    private ImageView
-            imageViewCrossFluffy,
-            imageViewCrossSlime,
-            imageViewCrossGhost,
-            imageViewCrossNox;
+    private static GameInformation currentGameInformation;
 
     private ListView listView;
-    DrawerLayout drawerLayout;
+    private DrawerLayout drawerLayout;
+    private RelativeLayout gameInfoLayout;
     private static Map<String, GameInformation> gameInformationMap;
     private DeviceAdapterGame deviceAdapter;
     private String currentlyDisplayedGame = "";
@@ -103,6 +98,18 @@ public class JoinActivity extends GotLActivity implements DeviceFoundNotificator
                 drawerLayout.closeDrawers();
             }
         });
+        buttonJoin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buttonJoin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                new JoinRequestEvent(new String []{currentlyDisplayedGame}).send();
+            }
+        });
     }
 
     private void initializeViewVariables(){
@@ -114,15 +121,7 @@ public class JoinActivity extends GotLActivity implements DeviceFoundNotificator
         textViewGameInfoStatus = (TextView) findViewById(R.id.textView_join_statusInfoGameData);
         listView = (ListView) findViewById(R.id.listView_join_clients );
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_gameInfo);
-        textViewGameName = (TextView) findViewById(R.id.textView_gameInfo_gameName);
-        textViewUsername = (TextView) findViewById(R.id.textView_gameInfo_hostData);
-        textViewWidth = (TextView) findViewById(R.id.textView_gameInfo_widthData);
-        textViewHeight = (TextView) findViewById(R.id.textView_gameInfo_heightData);
-        textViewPlayerCount = (TextView) findViewById(R.id.textView_gameInfo_playerCountData);
-        imageViewCrossFluffy = (ImageView) findViewById(R.id.imageButton_gameInfo_crossFluffy);
-        imageViewCrossSlime = (ImageView) findViewById(R.id.imageButton_gameInfo_crossSlime);
-        imageViewCrossGhost = (ImageView) findViewById(R.id.imageButton_gameInfo_crossGhost);
-        imageViewCrossNox = (ImageView) findViewById(R.id.imageButton_gameInfo_crossNox);
+        gameInfoLayout = (RelativeLayout) findViewById(R.id.relativeLayout_gameInfo);
         buttonCancel = (Button) findViewById(R.id.button_gameInfo_cancel);
         buttonJoin = (Button) findViewById(R.id.button_gameInfo_join);
     }
@@ -171,42 +170,46 @@ public class JoinActivity extends GotLActivity implements DeviceFoundNotificator
     private void showGameInfo(BluetoothDevice bluetoothDevice){
         currentlyDisplayedGame = bluetoothDevice.getAddress();
         drawerLayout.openDrawer(GravityCompat.START);
-        Connection connection = AppBluetoothManager.connectTo(bluetoothDevice, this);
-        if (connection != null){
-            new GameInformationRequestEvent(new  Connection[]{connection}).send();
-        }
-        GameInformation gameInformation = gameInformationMap.get(bluetoothDevice.getAddress());
-        if (gameInformation != null){
-            setDrawerGameInfo(gameInformation);
-        }
+        textViewGameInfoStatus.setText("Connecting to the game Host.");
+        if (AppBluetoothManager.connectTo(bluetoothDevice, this)){
+            textViewGameInfoStatus.setText("Already connected. Requesting up-to-date gameInfo.");
+            new GameInformationRequestEvent(new String[]{currentlyDisplayedGame}).send();
+            GameInformation gameInformation = gameInformationMap.get(bluetoothDevice.getAddress());
+            if (gameInformation != null){
+                ViewDataSetters.setGameInfo(gameInformation, gameInfoLayout);
+            } else showGameInfoLoading();
+        } else showGameInfoLoading();
     }
 
-    public void setDrawerGameInfo(final GameInformation gameInfo){
-        if (gameInfo.GAME_ADDRESS.equals(currentlyDisplayedGame)){
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressBarGameInfoStatus.setVisibility(View.INVISIBLE);
-                    textViewGameInfoStatus.setVisibility(View.INVISIBLE);
-                    textViewGameName.setText(gameInfo.GAME_NAME);
-                    textViewUsername.setText(gameInfo.GAME_HOST);
-                    textViewWidth.setText(gameInfo.WIDTH);
-                    textViewHeight.setText(gameInfo.HEIGHT);
-                    textViewPlayerCount.setText(gameInfo.PLAYER_COUNT);
+    private void showGameInfoLoading(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBarGameInfoStatus.setVisibility(View.VISIBLE);
+                textViewGameInfoStatus.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
-                    boolean[]b = gameInfo.PLAYER_TYPES;
-                    if(b[0])imageViewCrossFluffy.setVisibility(View.VISIBLE);
-                    else imageViewCrossFluffy.setVisibility(View.INVISIBLE);
-                    if(b[1])imageViewCrossSlime.setVisibility(View.VISIBLE);
-                    else imageViewCrossSlime.setVisibility(View.INVISIBLE);
-                    if(b[2])imageViewCrossGhost.setVisibility(View.VISIBLE);
-                    else imageViewCrossGhost.setVisibility(View.INVISIBLE);
-                    if(b[3])imageViewCrossNox.setVisibility(View.VISIBLE);
-                    else imageViewCrossNox.setVisibility(View.INVISIBLE);
-                }
-            });
+    public void setDrawerGameInfo(GameInformation gameInfo) {
+        if (gameInfo.getGAME_ADDRESS().equals(currentlyDisplayedGame)) {
+            ViewDataSetters.setGameInfo(gameInfo, gameInfoLayout);
         }
-        gameInformationMap.put(gameInfo.GAME_ADDRESS, gameInfo);
+        gameInformationMap.put(gameInfo.getGAME_ADDRESS(), gameInfo);
+        currentGameInformation = gameInfo;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBarGameInfoStatus.setVisibility(View.INVISIBLE);
+                textViewGameInfoStatus.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerVisible(Gravity.LEFT)) drawerLayout.closeDrawers();
+        else super.onBackPressed();
     }
 
     private void cancel(){
@@ -244,6 +247,23 @@ public class JoinActivity extends GotLActivity implements DeviceFoundNotificator
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        drawerLayout.closeDrawers();
+        cancel();
+        if (App.accessActiveActivity(null) instanceof LobbyClientActivity) {
+            AppBluetoothManager.disconnectExcept(currentlyDisplayedGame);
+        }else{
+            AppBluetoothManager.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnectionLost() {
+
+    }
+
+    @Override
     public void notifyChange() {
         deviceAdapter.notifyDataSetChanged();
     }
@@ -254,7 +274,25 @@ public class JoinActivity extends GotLActivity implements DeviceFoundNotificator
     }
 
     @Override
-    public void connectionRequestResult(Connection connection) {
-        if (App.accessActiveActivity(null) == this)new GameInformationRequestEvent(new  Connection[]{connection}).send();
+    public void connectionRequestResult(BluetoothDevice bluetoothDevice) {
+        if (App.accessActiveActivity(null) == this){
+            if(bluetoothDevice == null){
+                //todo:snackbar info
+            }else {
+                new GameInformationRequestEvent(new String[]{bluetoothDevice.getAddress()}).send();
+                if (bluetoothDevice.getAddress().equals(currentlyDisplayedGame)) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            textViewGameInfoStatus.setText("Connected to device. Requesting up-to-date gameInfo.");
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    public static GameInformation getCurrentGameInformation(){
+        return currentGameInformation;
     }
 }

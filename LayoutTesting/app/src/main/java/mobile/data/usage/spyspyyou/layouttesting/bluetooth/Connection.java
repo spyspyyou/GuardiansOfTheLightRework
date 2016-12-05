@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
-public class Connection implements TODS {
+/*package*/ class Connection implements TODS {
     private static final char EVENT_STRING_FINAL_CHAR = '|';
     private static final short MAX_EVENTS_PER_READ_EVENTS_CALL = 5;
     private final byte INDEX;
@@ -47,7 +47,7 @@ public class Connection implements TODS {
         char nextChar;
         int numberOfEventsRead = 0;
         try {
-            while ((INPUT_STREAM.available() > 0 || eventString.equals(""))
+            while ((INPUT_STREAM.available() > 0 || !eventString.equals(""))
                     && numberOfEventsRead < MAX_EVENTS_PER_READ_EVENTS_CALL) {
                 nextChar = (char) INPUT_STREAM.read();
                 if (nextChar == EVENT_STRING_FINAL_CHAR){
@@ -60,7 +60,8 @@ public class Connection implements TODS {
                 }else eventString += nextChar;
             }
         }catch (IOException e){
-            //todo: handle the broken connection;
+            disconnect();
+            Log.e("Connection", "read failed");
             e.printStackTrace();
         }
         return events;
@@ -72,13 +73,15 @@ public class Connection implements TODS {
             OUTPUT_STREAM.write(EVENT_STRING_FINAL_CHAR);
             return true;
         } catch (IOException e) {
-            //todo:handle the failure, reconnect?
+            Log.i("Connection", "failed sending data");
             e.printStackTrace();
+            disconnect();
         }
         return false;
     }
 
     /*package*/ void disconnect(){
+        Log.i("Connection", "disconnected " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
         try {
             INPUT_STREAM.close();
         } catch (IOException e) {
@@ -94,7 +97,7 @@ public class Connection implements TODS {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ConnectionManager.removeDisconnectedConnection(INDEX);
+        ConnectionManager.removeDeadConnection(INDEX);
     }
 
     /*package*/ BluetoothDevice getRemoteDevice(){
@@ -104,5 +107,9 @@ public class Connection implements TODS {
 
     /*package*/ byte getIndex(){
         return INDEX;
+    }
+
+    /*package*/ String getAddress(){
+        return BLUETOOTH_SOCKET.getRemoteDevice().getAddress();
     }
 }

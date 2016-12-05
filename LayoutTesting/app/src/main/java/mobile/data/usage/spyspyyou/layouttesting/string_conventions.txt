@@ -2,9 +2,17 @@ event String:
     - no '|' in any EventString
     - Event identification:
         B - BluetoothEvent
+            H - HandshakeEvent
         U - UIEvent
             A - GameInformationAnswerEvent
+            B - KickPlayerEvent
+            C - TeamRequestEvent
+            D - TeamAnswerEvent
+            J - JoinRequestEvent
+            K - JoinAnswerEvent
             R - GameInformationRequestEvent
+            S - JoinSuccessful
+            T - TeamChangedEvent
 
 bluetooth name:
     [app_name]_[user_name]-[picture_id],[status].[game_name]

@@ -34,6 +34,7 @@ public class App implements TODS {
     public static void onActivityStarted(Activity newActivity){
         if (appActive)newActivityStarted = true;
         accessActiveActivity(newActivity);
+        Log.i("App", "started activity: " + newActivity.toString());
         if (!appActive){
             onAppStart();
         }

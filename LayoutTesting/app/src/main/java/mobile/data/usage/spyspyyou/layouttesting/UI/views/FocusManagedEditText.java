@@ -3,8 +3,6 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.views;
 import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.TextInputEditText;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -15,14 +13,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
-import mobile.data.usage.spyspyyou.layouttesting.utils.BluetoothDeviceNameHandling;
 
 public class FocusManagedEditText extends TextInputEditText {
 
     public FocusManagedEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        final FocusManagedEditText editTextThis = this;
         setOnEditorActionListener(new OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -31,34 +26,6 @@ public class FocusManagedEditText extends TextInputEditText {
                     releaseFocus();
                 }
                 return false;
-            }
-        });
-        addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String text = s.toString();
-                DataCenter.setUserName(editTextThis);
-                if (text.length()>BluetoothDeviceNameHandling.MAX_NAME_LENGTH){
-                    editTextThis.setError("Too long.");
-                    return;
-                }
-                for (char c: BluetoothDeviceNameHandling.FORBIDDEN_CHARS){
-                    if (text.indexOf(c)!=-1){
-                        editTextThis.setError("Don't use '_' '-' '|' ',' '.'");
-                        return;
-                    }
-                }
-                editTextThis.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
             }
         });
     }
@@ -81,12 +48,6 @@ public class FocusManagedEditText extends TextInputEditText {
     }
 
     public String getStringText(){
-        String text = getText().toString();
-        int maxLength = BluetoothDeviceNameHandling.MAX_NAME_LENGTH;
-        if (text.length()>maxLength) text = text.substring(0, maxLength);
-        for(char c:BluetoothDeviceNameHandling.FORBIDDEN_CHARS){
-            text = text.replace(c, '?');
-        }
-        return text;
+        return getText().toString();
     }
 }

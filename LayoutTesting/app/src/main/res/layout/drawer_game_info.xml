@@ -53,7 +53,9 @@
         android:layout_below="@+id/progressBar_join_statusGameData"
         android:layout_centerHorizontal="true"
         android:id="@+id/textView_join_statusInfoGameData"
-        android:textSize="24sp"/>
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:visibility="invisible"/>
 
     <include layout="@layout/game_info_fragment"
              android:layout_alignParentTop="true"

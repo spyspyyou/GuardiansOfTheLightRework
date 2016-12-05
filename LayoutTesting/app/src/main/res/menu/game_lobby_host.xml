@@ -4,14 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_close"
-        android:icon="@drawable/ic_close_black_36dp"
-        android:title="@string/leave_game"
+        android:id="@+id/action_startGame"
+        android:icon="@drawable/ic_done_black_36dp"
+        android:title="@string/start_game"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_startGame"
-        android:icon="@drawable/ic_done_black_36dp"
-        android:title="@string/leave_game"
+        android:id="@+id/action_swapTeam"
+        android:icon="@drawable/ic_swap_horiz_black_36dp"
+        android:title="@string/start_game"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_close"
+        android:icon="@drawable/ic_close_black_36dp"
+        android:title="@string/leave_game"
+        app:showAsAction="always"/>
+
 </menu>

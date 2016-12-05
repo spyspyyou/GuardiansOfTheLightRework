@@ -6,11 +6,16 @@ import android.util.Log;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.events.HandshakeEvent;
+
 //this thread also regularly sends the HandshakeEvents
 /*package*/ class EventSenderThread extends Thread {
 
     private static final LinkedBlockingQueue<Event> events = new LinkedBlockingQueue<>();
     private static final int MAXIMUM_WAIT_TIME = 500;
+    //todo:lower the number
+    private static final int HANDSHAKE_RATE = 10000;
+    private static boolean running = false;
 
     /*package*/ EventSenderThread(){
         start();
@@ -18,22 +23,35 @@ import java.util.concurrent.TimeUnit;
 
     @Override
     public void run() {
+        if (running) return;
+        running = true;
+        Log.i("ESThread", "started");
         Event event = null;
-        while(ConnectionManager.hasConnections()){
+        long lastTime = System.currentTimeMillis();
+        while (ConnectionManager.hasConnections()) {
             try {
                 event = events.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (event != null){
-                for (Connection connection:event.getReceptors()){
-                    if (!connection.send(event.toString().getBytes()))event.onEventSendFailure(connection);
+            if (event != null) {
+                for (String address:event.getReceptors()) {
+                    if (!ConnectionManager.send(address, event.toString().getBytes())) event.onEventSendFailure(address);
+                    else Log.i("ESThread", "sent Event: " + event.toString());
+                }
+                if (event instanceof OnPostEventSending){
+                    ((OnPostEventSending) event).onPostSending();
                 }
             }
+            if (System.currentTimeMillis() - lastTime >= HANDSHAKE_RATE) {
+                new HandshakeEvent(ConnectionManager.getAddresses()).send();
+                lastTime = System.currentTimeMillis();
+            }
         }
+        running = false;
     }
 
-    /*package*/ static void send(Event event){
+    /*package*/ static void send(Event event) {
         if (!events.offer(event)) {
             event.onEventSendFailure(event.getReceptors());
             Log.w("ESThread", "Event queue is full. Event dumped.");

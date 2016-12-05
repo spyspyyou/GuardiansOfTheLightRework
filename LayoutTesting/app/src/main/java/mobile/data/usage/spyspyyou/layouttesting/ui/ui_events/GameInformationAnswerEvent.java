@@ -1,8 +1,8 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.ui_events;
 
 import android.app.Activity;
+import android.util.Log;
 
-import mobile.data.usage.spyspyyou.layouttesting.bluetooth.Connection;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.JoinActivity;
 import mobile.data.usage.spyspyyou.layouttesting.utils.GameInformation;
@@ -16,8 +16,10 @@ public class GameInformationAnswerEvent extends UIEvent {
         GAME_INFO = gameInformation;
     }
 
-    public GameInformationAnswerEvent(String eventString){
+    /*package*/ GameInformationAnswerEvent(String eventString){
         super(eventString);
+        Log.i("Event", "Reading GameInformationAnswerEvent");
+        eventString = eventString.substring(eventString.indexOf(ADDRESS_STOP_INDICATOR)+2);
         GAME_INFO = GameInformation.fromString(eventString, SENDER_ADDRESS);
     }
 
@@ -31,11 +33,11 @@ public class GameInformationAnswerEvent extends UIEvent {
 
     @Override
     public String toString() {
-        return null;
+        return super.toString() + 'A' + GAME_INFO.toString();
     }
 
     @Override
-    public void onEventSendFailure(Connection[] connections) {
+    public void onEventSendFailure(String[] addresses) {
 
     }
 }
