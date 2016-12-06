@@ -1,50 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryLight"
+    android:layout_marginLeft="-20dp"
+    android:layout_marginStart="-20dp"
     android:padding="@dimen/activity_padding_normal"
-    android:layout_gravity="end">
+    android:layout_gravity="left">
 
     <Button
-        android:text="Send"
+        android:text="@string/send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/button"/>
+        android:id="@+id/button_chat_send"
+        android:layout_alignTop="@+id/textInputLayout_chat"/>
 
     <TextView
-        android:id="@+id/textView4"
-        android:text="@string/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/editTex_chatDrawer_text"
-        android:layout_alignLeft="@+id/editTex_chatDrawer_text"
-        android:layout_alignStart="@+id/editTex_chatDrawer_text"
-        android:layout_alignBottom="@+id/editTex_chatDrawer_text"
-        android:textSize="18sp"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/activity_padding_small"
-        android:paddingStart="@dimen/activity_padding_small"/>
-
-    <EditText
-        android:id="@+id/editTex_chatDrawer_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/button"
-        android:layout_toStartOf="@+id/button"/>
-
-    <TextView
-        android:text="Game Chat"
+        android:text="@string/lobby_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView5"
@@ -62,14 +39,39 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textView5"
-        android:layout_above="@+id/button">
+        android:layout_above="@+id/textInputLayout_chat"
+        android:id="@+id/scrollView_chat">
 
         <LinearLayout
+            android:id="@+id/linearLayout_chat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_padding_normal">
 
         </LinearLayout>
     </ScrollView>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/button_chat_send"
+        android:layout_toStartOf="@+id/button_chat_send"
+        android:layout_marginTop="@dimen/activity_margin_normal"
+        android:inputType="textImeMultiLine"
+        android:imeOptions="actionSend">
+
+        <mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText
+            android:id="@+id/editText_chat_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/type_a_message"
+            android:focusableInTouchMode="true"/>
+
+    </android.support.design.widget.TextInputLayout>
 
 </RelativeLayout>

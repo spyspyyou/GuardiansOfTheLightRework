@@ -2,10 +2,12 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.ui_events;
 
 import android.content.Intent;
 
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.OnPostEventSending;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.MainActivity;
 
-public class GameCanceledEvent extends UIEvent {
+public class GameCanceledEvent extends UIEvent implements OnPostEventSending{
 
     public GameCanceledEvent(String[] receptors) {
         super(receptors);
@@ -29,5 +31,11 @@ public class GameCanceledEvent extends UIEvent {
     @Override
     public void onEventSendFailure(String[] addresses) {
 
+    }
+
+    @Override
+    public void onPostSending() {
+        AppBluetoothManager.disconnect();
+        App.accessActiveActivity(null).startActivity(new Intent(App.getContext(), MainActivity.class));
     }
 }

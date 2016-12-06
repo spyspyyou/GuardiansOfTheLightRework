@@ -3,7 +3,6 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -38,13 +36,10 @@ public class MainActivity extends GotLActivity {
             imageButtonConnections,
             imageButtonStatisticsSettings;
     private ImageView imageViewProfilePicture;
-    private CoordinatorLayout coordinatorLayout;
     private FocusManagedEditText editTextUsername;
-    private ListView listViewStatistics;
     private TextView textViewRandInfo;
     private RelativeLayout
-            relativeLayoutProfilePictureSelection,
-            relativeLayoutUserInfo;
+            relativeLayoutProfilePictureSelection;
     private Button buttonCancelSelection;
     private LinearLayout linearLayout;
 
@@ -168,7 +163,6 @@ public class MainActivity extends GotLActivity {
     }
 
     private void initializeViewVariables(){
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_profile);
         imageButtonProfile = (ImageButton) findViewById(R.id.imageButton_main_profile);
         imageButtonSettings = (ImageButton) findViewById(R.id.imageButton_main_settings);
@@ -179,12 +173,10 @@ public class MainActivity extends GotLActivity {
         imageButtonStatisticsSettings = (ImageButton) findViewById(R.id.imageButton_main_statistics_settings);
         imageViewProfilePicture = (ImageView) findViewById(R.id.imageView_main_profilePicture);
         editTextUsername = (FocusManagedEditText) findViewById(R.id.editText_main_username);
-        listViewStatistics = (ListView) findViewById(R.id.listView_main_stats);
         textViewRandInfo = (TextView) findViewById(R.id.textView_main_info);
         relativeLayoutProfilePictureSelection = (RelativeLayout) findViewById(R.id.relativeLayout_profilePicture_selection);
         buttonCancelSelection = (Button) findViewById(R.id.button_main_cancel);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout_profilePicture_options);
-        relativeLayoutUserInfo = (RelativeLayout) findViewById(R.id.relativeLayout_main_userInfo);
     }
 
     private void initializeProfile(){
@@ -201,7 +193,11 @@ public class MainActivity extends GotLActivity {
             final byte y = i;
             LinearLayout buttonParent = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.button_profile_pic_selection, null);
             final ImageButton imageButton = (ImageButton) buttonParent.findViewById(R.id.imageButton_selectProfilePic);
-            imageButton.setImageDrawable(getResources().getDrawable(DataCenter.PROFILE_PICTURES[i]));
+            try {
+                imageButton.setImageDrawable(getResources().getDrawable(DataCenter.PROFILE_PICTURES[i]));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -3,10 +3,13 @@ package mobile.data.usage.spyspyyou.layouttesting.bluetooth;
 
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.events.HandshakeEvent;
+
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.textEncoding;
 
 //this thread also regularly sends the HandshakeEvents
 /*package*/ class EventSenderThread extends Thread {
@@ -36,8 +39,13 @@ import mobile.data.usage.spyspyyou.layouttesting.bluetooth.events.HandshakeEvent
             }
             if (event != null) {
                 for (String address:event.getReceptors()) {
-                    if (!ConnectionManager.send(address, event.toString().getBytes())) event.onEventSendFailure(address);
-                    else Log.i("ESThread", "sent Event: " + event.toString());
+                    try {
+                        if (!ConnectionManager.send(address, event.toString().getBytes(textEncoding))) event.onEventSendFailure(address);
+                        else Log.i("ESThread", "sent Event: " + event.toString());
+                    } catch (UnsupportedEncodingException e) {
+                        Log.e("ESThread", "encoding not supported");
+                        e.printStackTrace();
+                    }
                 }
                 if (event instanceof OnPostEventSending){
                     ((OnPostEventSending) event).onPostSending();

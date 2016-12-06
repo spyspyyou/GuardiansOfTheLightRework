@@ -3,13 +3,17 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.ChatEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinSuccessfulEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.LobbyLeftEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.TeamRequestEvent;
@@ -40,7 +44,26 @@ public class LobbyClientActivity extends LobbyActivity {
             if (hostAddress.equals(NO_HOST_ADDRESS))Log.e("LCActivity", "no host connection");
         }
         ViewDataSetters.setGameInfo(gameInformation, relativeLayoutGameInfo);
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (inputEditTextChat.getText().length() <= 0)return;
+                new ChatEvent(new String[]{hostAddress}, DataCenter.matchTextToStandards(inputEditTextChat.getText().toString())).send();
+                inputEditTextChat.setText("");
+            }
+        });
     }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerVisible(GravityCompat.START)) drawerLayout.closeDrawers();
+        else {
+            startActivity(new Intent(getBaseContext(), MainActivity.class));
+            new LobbyLeftEvent(new String[]{hostAddress}).send();
+            super.onBackPressed();
+        }
+    }
+
 
     @Override
     protected void onStart() {
@@ -69,6 +92,11 @@ public class LobbyClientActivity extends LobbyActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         activeActivityRequiresServer = false;
         super.onResume();
@@ -90,5 +118,9 @@ public class LobbyClientActivity extends LobbyActivity {
 
     public void setTeam(byte mTeam){
         team = mTeam;
+    }
+
+    public String getHostAddress(){
+        return hostAddress;
     }
 }

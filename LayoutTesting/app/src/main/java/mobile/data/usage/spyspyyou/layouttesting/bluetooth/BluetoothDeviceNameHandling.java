@@ -10,11 +10,14 @@ import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 public class BluetoothDeviceNameHandling implements TODS{
 
     public static final byte MAX_NAME_LENGTH = 16;
+    public static final int MAX_TEXT_LENGTH = 256;
+
     private static final char
             USERNAME = '_',
             PICTURE_ID = '-',
             STATUS = ',',
             GAME_NAME = '.',
+            ENTER = '\n',
             DEFAULT = 'd',
             HOSTING = 'h',
             IN_GAME = 'g';
@@ -23,7 +26,8 @@ public class BluetoothDeviceNameHandling implements TODS{
             USERNAME,
             PICTURE_ID,
             STATUS,
-            GAME_NAME
+            GAME_NAME,
+            ENTER
     };
 
     public static String getUsername(String address){

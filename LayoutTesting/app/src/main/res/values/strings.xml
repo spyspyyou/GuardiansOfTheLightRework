@@ -124,4 +124,7 @@
     <string name="search_finished_info">Search finished.</string>
     <string name="empty_textView">-</string>
     <string name="start_game">Start Game</string>
+    <string name="send">Send</string>
+    <string name="lobby_chat">Lobby Chat</string>
+    <string name="type_a_message">Type a message</string>
 </resources>

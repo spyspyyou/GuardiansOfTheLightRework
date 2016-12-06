@@ -28,9 +28,11 @@ public abstract class UIEvent extends Event {
             case 'B': return new KickPlayerEvent(eventString);
             case 'C': return new TeamRequestEvent(eventString);
             case 'D': return new TeamAnswerEvent(eventString);
+            case 'G': return new GameCanceledEvent(eventString);
             case 'J': return new JoinRequestEvent(eventString);
             case 'K': return new JoinAnswerEvent(eventString);
             case 'L': return new LobbyLeftEvent(eventString);
+            case 'M': return new ChatEvent(eventString);
             case 'R': return new GameInformationRequestEvent(eventString);
             case 'S': return new JoinSuccessfulEvent(eventString);
             case 'T': return new TeamChangedEvent(eventString);

@@ -3,13 +3,17 @@ event String:
     - Event identification:
         B - BluetoothEvent
             H - HandshakeEvent
+            D - DisconnectEvent
         U - UIEvent
             A - GameInformationAnswerEvent
             B - KickPlayerEvent
             C - TeamRequestEvent
             D - TeamAnswerEvent
+            G - GameCancelledEvent
             J - JoinRequestEvent
             K - JoinAnswerEvent
+            L - LobbyLeftEvent
+            M - ChatEvent
             R - GameInformationRequestEvent
             S - JoinSuccessful
             T - TeamChangedEvent

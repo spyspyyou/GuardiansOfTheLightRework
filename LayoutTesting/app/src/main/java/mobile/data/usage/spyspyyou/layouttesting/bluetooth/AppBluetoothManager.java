@@ -114,6 +114,10 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         return false;
     }
 
+    public static boolean hasConenction(String address){
+        return ConnectionManager.hasConnection(address);
+    }
+
     public static void checkBluetoothOn(){
         if (isBluetoothEnabled())return;
         enableBluetooth();
@@ -132,7 +136,13 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public static BluetoothDevice getBluetoothDevice(String address){
-        return ConnectionManager.getBluetoothDevice(address);
+        BluetoothDevice bluetoothDevice = ConnectionManager.getBluetoothDevice(address);
+        if (bluetoothDevice == null && BluetoothAdapter.checkBluetoothAddress(address))bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
+        return bluetoothDevice;
+    }
+
+    public static String getAddress(){
+        return android.provider.Settings.Secure.getString(App.getContext().getContentResolver(), "bluetooth_address");
     }
 
     //Intern methods
@@ -143,10 +153,6 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
 
     /*package*/ static boolean isBluetoothEnabled() {
         return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
-    }
-
-    /*package*/ static String getAddress(){
-        return android.provider.Settings.Secure.getString(App.getContext().getContentResolver(), "bluetooth_address");
     }
 
     private static void enableBluetooth(){

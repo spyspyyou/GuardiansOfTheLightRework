@@ -33,8 +33,6 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
     private static ArrayList<AcceptConnectionThread> acceptConnectionThreads = new ArrayList<>();
 
-
-
     /*package*/ static void startServerAvailability(){
         if (serverAvailable || !AppBluetoothManager.isBluetoothEnabled())return;
         serverAvailable = true;
@@ -95,7 +93,9 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
     /*package*/ static void disconnect(){
         for (Connection connection:connections){
-            if (connection!=null)connection.disconnect();
+            if (connection!=null){
+                connection.disconnect();
+            }
         }
     }
 
@@ -123,6 +123,12 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
     /*package*/ static void removeDeadConnection(int index){
         if (index >= connections.length ||index < 0)Log.w("ConnectionManager", "connection with index out of bounds: " + index);
         connections[index] = null;
+    }
+
+    /*package*/ static void reconnect(Connection connection){
+        Log.i("ConnectionManager", "reconnecting: " + connection.getRemoteDevice().getName());
+        connection.disconnect();
+        connect(connection.getRemoteDevice(), null);
     }
 
     @Nullable
@@ -199,9 +205,8 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
                 }
             }
             if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
-                Log.e("CCThread", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ": " + BLUETOOTH_DEVICE.getAddress());
-                DEVICE_FOUND_NOTIFICATOR.connectionRequestResult(null);
-                //todo: handle failure, inform the issuer
+                Log.e("CCThread", "Failed to connect " + BLUETOOTH_DEVICE.getName() + ": " + BLUETOOTH_DEVICE.getAddress());
+                if (DEVICE_FOUND_NOTIFICATOR != null) DEVICE_FOUND_NOTIFICATOR.connectionRequestResult(null);
             } else {
                 Log.i("CCThread", "Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
                 addConnection(new Connection(bluetoothSocket, index));

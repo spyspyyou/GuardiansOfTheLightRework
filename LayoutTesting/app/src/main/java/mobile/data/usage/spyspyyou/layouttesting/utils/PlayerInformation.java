@@ -2,6 +2,7 @@ package mobile.data.usage.spyspyyou.layouttesting.utils;
 
 import android.util.Log;
 
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHandling;
 import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 
@@ -22,14 +23,14 @@ public class PlayerInformation {
 
     private PlayerInformation(String name, int picId) {
         PLAYER_NAME = name;
-        ADDRESS = null;
+        ADDRESS = "";
         PICTURE_ID = picId;
     }
 
     //for the this user, all remote users need the other constructor
     public PlayerInformation() {
         PLAYER_NAME = DataCenter.getUserName();
-        ADDRESS = null;
+        ADDRESS = AppBluetoothManager.getAddress();
         PICTURE_ID = DataCenter.getPictureId();
     }
 

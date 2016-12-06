@@ -2,9 +2,10 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.ChatEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.GameCanceledEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinAnswerEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.KickPlayerEvent;
@@ -41,7 +43,7 @@ public class LobbyHostActivity extends LobbyActivity {
         blueTeamList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                if (teamBlue.get(position).getADDRESS() == null)return;
+                if (teamBlue.get(position).getADDRESS().equals(AppBluetoothManager.getAddress()))return;
                 new AlertDialog.Builder(App.accessActiveActivity(null))
                         .setTitle("Kick Player")
                         .setMessage("Would you like to just kick( or also block {not yet available})the player?")
@@ -62,7 +64,7 @@ public class LobbyHostActivity extends LobbyActivity {
         greenTeamList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                if (teamGreen.get(position).getADDRESS() == null)return;
+                if (teamGreen.get(position).getADDRESS().equals(AppBluetoothManager.getAddress()))return;
                 new AlertDialog.Builder(App.accessActiveActivity(null))
                         .setTitle("Kick Player")
                         .setMessage("Would you like to just kick( or also block {not yet available})the player?")
@@ -80,6 +82,17 @@ public class LobbyHostActivity extends LobbyActivity {
                 ).show();
             }
         });
+
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (inputEditTextChat.getText().length() <= 0)return;
+                String text = DataCenter.matchTextToStandards(inputEditTextChat.getText().toString());
+                new ChatEvent(getAddresses(), text).send();
+                addMessage(DataCenter.getUserName(), text, AppBluetoothManager.getAddress());
+                inputEditTextChat.setText("");
+            }
+        });
     }
 
     @Override
@@ -95,6 +108,15 @@ public class LobbyHostActivity extends LobbyActivity {
         if (App.accessActiveActivity(null) instanceof MainActivity) {
             DataCenter.setAppStatus(DataCenter.DEFAULT);
             AppBluetoothManager.disconnect();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerVisible(GravityCompat.START)) drawerLayout.closeDrawers();
+        else {
+            new GameCanceledEvent(getAddresses()).send();
+            super.onBackPressed();
         }
     }
 
@@ -156,17 +178,15 @@ public class LobbyHostActivity extends LobbyActivity {
     @Nullable
     private PlayerInformation findPlayerInformation(String address){
         for (PlayerInformation playerInformation:teamBlue){
-            if (playerInformation.getADDRESS() == null)continue;
             if (playerInformation.getADDRESS().equals(address))return playerInformation;
         }
         for (PlayerInformation playerInformation:teamGreen){
-            if (playerInformation.getADDRESS() == null)continue;
             if (playerInformation.getADDRESS().equals(address))return playerInformation;
         }
         return null;
     }
 
-    private String[] getAddresses(){
+    public String[] getAddresses(){
         String[] connections = new String[teamBlue.size() + teamGreen.size()];
 
         // no exception to worry much but if the sizes of the array change during the reading process it causes an exception
@@ -185,12 +205,13 @@ public class LobbyHostActivity extends LobbyActivity {
     }
 
     private void sendTeamChangedEvent(){
+        String ownAddress = AppBluetoothManager.getAddress();
         for (PlayerInformation playerInformation:teamBlue){
-            if (playerInformation.getADDRESS() == null)continue;
+            if (playerInformation.getADDRESS().equals(ownAddress))continue;
             new TeamChangedEvent(playerInformation.getADDRESS(), teamBlue, teamGreen, TEAM_BLUE).send();
         }
         for (PlayerInformation playerInformation:teamGreen){
-            if (playerInformation.getADDRESS() == null)continue;
+            if (playerInformation.getADDRESS().equals(ownAddress))continue;
             new TeamChangedEvent(playerInformation.getADDRESS(), teamBlue, teamGreen, TEAM_GREEN).send();
         }
     }
@@ -199,17 +220,20 @@ public class LobbyHostActivity extends LobbyActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_close:
-                new GameCanceledEvent(getAddresses());
-                startActivity(new Intent(getBaseContext(), MainActivity.class));
+                Log.i("LHActivity", "action_close");
+                new GameCanceledEvent(getAddresses()).send();
                 break;
             case R.id.action_swapTeam:
+                PlayerInformation playerInformation = findPlayerInformation(AppBluetoothManager.getAddress());
                 if (team == TEAM_BLUE && teamGreen.size() < 4){
-                    teamBlue.remove(findPlayerInformation(null));
-                    teamGreen.add(findPlayerInformation(null));
+                    teamBlue.remove(playerInformation);
+                    teamGreen.add(playerInformation);
+                    team = TEAM_GREEN;
                     //todo:snackBar information
                 }else if (team == TEAM_GREEN && teamBlue.size() < 4){
-                    teamGreen.remove(findPlayerInformation(null));
-                    teamBlue.add(findPlayerInformation(null));
+                    teamGreen.remove(playerInformation);
+                    teamBlue.add(playerInformation);
+                    team = TEAM_BLUE;
                     //todo:snackBar information
                 }
                 updateListViews();
@@ -234,11 +258,9 @@ public class LobbyHostActivity extends LobbyActivity {
 
     public void onPlayerLeft(String address){
         for (PlayerInformation playerInformation:teamBlue){
-            if (playerInformation.getADDRESS() == null)continue;
             if (playerInformation.getADDRESS().equals(address))onPlayerLeft(playerInformation);
         }
         for (PlayerInformation playerInformation:teamGreen){
-            if (playerInformation.getADDRESS() == null)continue;
             if (playerInformation.getADDRESS().equals(address))onPlayerLeft(playerInformation);
         }
     }

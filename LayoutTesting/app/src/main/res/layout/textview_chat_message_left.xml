@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout_chat_message"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingEnd="@dimen/activity_margin_normal"
+    android:paddingLeft="@dimen/activity_margin_normal"
+    android:paddingRight="@dimen/activity_margin_normal"
+    android:paddingStart="@dimen/activity_margin_normal"
+    android:paddingTop="@dimen/activity_margin_normal">
+
+    <TextView
+        android:id="@+id/textView_chat_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_padding_normal"
+        android:background="@drawable/background_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="18sp"/>
+
+
+</RelativeLayout>

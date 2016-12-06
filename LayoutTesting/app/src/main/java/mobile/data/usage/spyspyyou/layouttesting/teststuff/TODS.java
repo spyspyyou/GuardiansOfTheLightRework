@@ -13,11 +13,10 @@ public interface TODS {
     int MIN_MAP_LENGTH = 20;
     int MAX_MAP_LENGTH = 100;
 
+    String textEncoding = "UTF-8";
+
 
 
     boolean stopBluetoothOnAppLeaving = false;
     boolean makeBluetoothLikeBeforeAppStart = true;
-    boolean alertBluetoothTurnedOff = true;
-    boolean hostingGame = true;
-    boolean allowInsecureConnections = true;
 }

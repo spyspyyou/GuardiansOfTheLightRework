@@ -4,13 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.EditText;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHandling;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.global.GlobalTrigger;
-import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
-import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHandling;
 
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.MAX_MAP_LENGTH;
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.MIN_MAP_LENGTH;
@@ -141,18 +141,32 @@ public class DataCenter implements GlobalTrigger{
         return matchNameToStandards(userName);
     }
 
+    private static String removeInvalidCharacters(String string){
+        for(char c:BluetoothDeviceNameHandling.FORBIDDEN_CHARS){
+            string = string.replace(""+c, "");
+        }
+        if (string.equals(""))string = "string";
+        return string;
+    }
+
+    public static String matchTextToStandards(String text){
+        if (text == null) text = "text";
+        int maxLength = BluetoothDeviceNameHandling.MAX_TEXT_LENGTH;
+        if (text.length() > maxLength) text = text.substring(0, maxLength);
+        text = removeInvalidCharacters(text);
+        return text;
+    }
+
     private static String matchNameToStandards(String name){
+        if (name == null)name = "name";
         int maxLength = BluetoothDeviceNameHandling.MAX_NAME_LENGTH;
         if (name.length()>maxLength) name = name.substring(0, maxLength);
-        for(char c:BluetoothDeviceNameHandling.FORBIDDEN_CHARS){
-            name = name.replace(""+c, "");
-        }
-        if (name.equals(""))name = "name";
+        name = removeInvalidCharacters(name);
         return name;
     }
 
-    public static void setUserName(FocusManagedEditText editText) {
-        userName = editText.getStringText();
+    public static void setUserName(EditText editText) {
+        userName = editText.getText().toString();
         AppBluetoothManager.updateBluetoothName();
         saveData();
     }
@@ -179,8 +193,8 @@ public class DataCenter implements GlobalTrigger{
         return pictureId;
     }
 
-    public static void setGameName(FocusManagedEditText editText) {
-        gameName = editText.getStringText();
+    public static void setGameName(EditText editText) {
+        gameName = editText.getText().toString();
         AppBluetoothManager.updateBluetoothName();
         saveData();
     }

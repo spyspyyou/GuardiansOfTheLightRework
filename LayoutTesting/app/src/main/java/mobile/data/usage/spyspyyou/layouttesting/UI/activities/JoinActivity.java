@@ -101,13 +101,10 @@ public class JoinActivity extends GotLActivity implements Notificator, TODS {
         buttonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonJoin.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-                new JoinRequestEvent(new String []{currentlyDisplayedGame}).send();
+                if (!AppBluetoothManager.hasConenction(currentlyDisplayedGame)){
+                    //todo:snackbar tell that it is not yet connected
+                    showGameInfo(AppBluetoothManager.getBluetoothDevice(currentlyDisplayedGame));
+                }else new JoinRequestEvent(new String []{currentlyDisplayedGame}).send();
             }
         });
     }
@@ -135,7 +132,7 @@ public class JoinActivity extends GotLActivity implements Notificator, TODS {
         gameInformationMap = new HashMap<>();
     }
 
-    private void search(){
+    public void search(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final int circleRadiusX = imageButtonRepeat.getWidth()/2, circleRadiusY = imageButtonRepeat.getHeight()/2;
             final float finalRadius = (float) Math.hypot(circleRadiusX, circleRadiusY);
@@ -165,6 +162,7 @@ public class JoinActivity extends GotLActivity implements Notificator, TODS {
         ArrayList<BluetoothDevice> arrayList = AppBluetoothManager.getServerList(this);
         deviceAdapter = new DeviceAdapterGame(this, arrayList);
         listView.setAdapter(deviceAdapter);
+        drawerLayout.closeDrawers();
     }
 
     private void showGameInfo(BluetoothDevice bluetoothDevice){
@@ -278,6 +276,8 @@ public class JoinActivity extends GotLActivity implements Notificator, TODS {
         if (App.accessActiveActivity(null) == this){
             if(bluetoothDevice == null){
                 //todo:snackbar info
+                drawerLayout.closeDrawers();
+                App.toast("failed to connect.");
             }else {
                 new GameInformationRequestEvent(new String[]{bluetoothDevice.getAddress()}).send();
                 if (bluetoothDevice.getAddress().equals(currentlyDisplayedGame)) {
