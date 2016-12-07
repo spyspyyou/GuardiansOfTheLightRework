@@ -15,7 +15,6 @@ import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.ChatEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.GameCanceledEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinAnswerEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.KickPlayerEvent;
@@ -82,17 +81,6 @@ public class LobbyHostActivity extends LobbyActivity {
                 ).show();
             }
         });
-
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (inputEditTextChat.getText().length() <= 0)return;
-                String text = DataCenter.matchTextToStandards(inputEditTextChat.getText().toString());
-                new ChatEvent(getAddresses(), text).send();
-                addMessage(DataCenter.getUserName(), text, AppBluetoothManager.getAddress());
-                inputEditTextChat.setText("");
-            }
-        });
     }
 
     @Override
@@ -115,7 +103,7 @@ public class LobbyHostActivity extends LobbyActivity {
     public void onBackPressed() {
         if (drawerLayout.isDrawerVisible(GravityCompat.START)) drawerLayout.closeDrawers();
         else {
-            new GameCanceledEvent(getAddresses()).send();
+            cancelGame();
             super.onBackPressed();
         }
     }
@@ -216,12 +204,18 @@ public class LobbyHostActivity extends LobbyActivity {
         }
     }
 
+    private void cancelGame(){
+        GameCanceledEvent gameCanceledEvent = new GameCanceledEvent(getAddresses());
+        if (getAddresses().length <= 1) gameCanceledEvent.onPostSending();
+        gameCanceledEvent.send();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_close:
                 Log.i("LHActivity", "action_close");
-                new GameCanceledEvent(getAddresses()).send();
+                cancelGame();
                 break;
             case R.id.action_swapTeam:
                 PlayerInformation playerInformation = findPlayerInformation(AppBluetoothManager.getAddress());

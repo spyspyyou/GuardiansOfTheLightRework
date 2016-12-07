@@ -7,13 +7,10 @@ import android.support.v4.view.GravityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.ChatEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinSuccessfulEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.LobbyLeftEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.TeamRequestEvent;
@@ -44,14 +41,6 @@ public class LobbyClientActivity extends LobbyActivity {
             if (hostAddress.equals(NO_HOST_ADDRESS))Log.e("LCActivity", "no host connection");
         }
         ViewDataSetters.setGameInfo(gameInformation, relativeLayoutGameInfo);
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (inputEditTextChat.getText().length() <= 0)return;
-                new ChatEvent(new String[]{hostAddress}, DataCenter.matchTextToStandards(inputEditTextChat.getText().toString())).send();
-                inputEditTextChat.setText("");
-            }
-        });
     }
 
     @Override

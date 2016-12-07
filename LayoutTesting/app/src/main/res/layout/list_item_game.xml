@@ -34,8 +34,6 @@
         android:layout_alignLeft="@+id/textView_listItemGame_gameName"
         android:layout_alignStart="@+id/textView_listItemGame_gameName"
         android:id="@+id/textView_listItemGame_playerName"
-        android:layout_marginLeft="@dimen/activity_margin_normal"
-        android:layout_marginRight="@dimen/activity_margin_normal"
         android:paddingLeft="@dimen/activity_padding_normal"
         android:paddingRight="@dimen/activity_padding_normal"/>
 

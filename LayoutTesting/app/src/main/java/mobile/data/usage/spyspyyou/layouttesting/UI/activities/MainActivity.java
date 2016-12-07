@@ -82,7 +82,7 @@ public class MainActivity extends GotLActivity {
 
     @Override
     protected void onResume() {
-        activeActivityRequiresServer = false;
+        activeActivityRequiresServer = true;
         super.onResume();
     }
 
