@@ -4,7 +4,7 @@ import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHandling;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 
 public class PlayerInformation {
 

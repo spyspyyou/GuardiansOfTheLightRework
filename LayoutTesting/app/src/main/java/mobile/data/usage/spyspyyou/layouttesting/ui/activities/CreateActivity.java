@@ -16,7 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
 import mobile.data.usage.spyspyyou.layouttesting.utils.EditTextTextWatcher;
 
@@ -215,7 +215,4 @@ public class CreateActivity extends GotLActivity {
         activeActivityRequiresServer = false;
         super.onResume();
     }
-
-    @Override
-    public void onConnectionLost() {}
 }

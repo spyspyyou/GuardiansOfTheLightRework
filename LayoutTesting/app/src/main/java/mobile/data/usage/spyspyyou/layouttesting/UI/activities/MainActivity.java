@@ -20,7 +20,7 @@ import java.util.Random;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
 import mobile.data.usage.spyspyyou.layouttesting.utils.EditTextTextWatcher;
 
@@ -85,9 +85,6 @@ public class MainActivity extends GotLActivity {
         activeActivityRequiresServer = true;
         super.onResume();
     }
-
-    @Override
-    public void onConnectionLost() {}
 
     @Override
     protected void onStart() {

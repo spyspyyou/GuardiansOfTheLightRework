@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyClientActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyHostActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.ChatEvent;
@@ -105,4 +105,5 @@ public class ChatHandler {
             }
         });
     }
+
 }

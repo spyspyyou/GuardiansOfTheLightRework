@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
 
 //todo:professionalize the strings;
 //todo:exchange toast with Snackbar

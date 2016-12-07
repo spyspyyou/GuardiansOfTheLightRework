@@ -44,7 +44,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     //Global Trigger methods
 
     public void onAppStart(){
-        Log.i("APManager", "onAppStart");
+        Log.i("ABManager", "onAppStart");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null)handleNonBluetoothDevice();
         bluetoothOnWhenAppEntered = isBluetoothEnabled();
@@ -69,8 +69,9 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_START_DISCOVERABLE && resultCode == Activity.RESULT_CANCELED) {
-            bluetoothDisabling();
+        if (requestCode == REQUEST_START_DISCOVERABLE) {
+            bluetoothRequestSent = false;
+            if (resultCode == Activity.RESULT_CANCELED) bluetoothDisabling();
         }
     }
 
@@ -114,7 +115,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
         return false;
     }
 
-    public static boolean hasConenction(String address){
+    public static boolean hasConnection(String address){
         return ConnectionManager.hasConnection(address);
     }
 
@@ -156,6 +157,7 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     private static void enableBluetooth(){
+        Log.i("ABManager", "enabling bluetooth");
         if (bluetoothAdapter.isEnabled())setBluetoothName();
         if(bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)return;
         if (bluetoothRequestSent)return;

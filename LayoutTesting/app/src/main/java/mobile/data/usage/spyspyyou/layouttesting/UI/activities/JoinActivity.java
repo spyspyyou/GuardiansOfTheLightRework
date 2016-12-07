@@ -101,7 +101,7 @@ public class JoinActivity extends GotLActivity implements Notificator, TODS {
         buttonJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!AppBluetoothManager.hasConenction(currentlyDisplayedGame)){
+                if (!AppBluetoothManager.hasConnection(currentlyDisplayedGame)){
                     //todo:snackbar tell that it is not yet connected
                     showGameInfo(AppBluetoothManager.getBluetoothDevice(currentlyDisplayedGame));
                 }else new JoinRequestEvent(new String []{currentlyDisplayedGame}).send();
@@ -254,11 +254,6 @@ public class JoinActivity extends GotLActivity implements Notificator, TODS {
         }else{
             AppBluetoothManager.disconnect();
         }
-    }
-
-    @Override
-    public void onConnectionLost() {
-
     }
 
     @Override

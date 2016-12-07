@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.ui;
+package mobile.data.usage.spyspyyou.layouttesting.global;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,9 +9,8 @@ import android.widget.EditText;
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHandling;
-import mobile.data.usage.spyspyyou.layouttesting.global.App;
-import mobile.data.usage.spyspyyou.layouttesting.global.GlobalTrigger;
 
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.MAX_MAP_LENGTH;
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.MIN_MAP_LENGTH;
 
@@ -29,7 +28,8 @@ public class DataCenter implements GlobalTrigger{
             SLIME_ALLOWED = "slimeAllowed",
             GHOST_ALLOWED = "ghostAllowed",
             NOX_ALLOWED = "noxAllowed",
-            JOIN_RIGHTS = "joinRights";
+            JOIN_RIGHTS = "joinRights",
+            CHARACTER = "character";
 
     public static final int[] PROFILE_PICTURES = {
             R.drawable.ic_volume_mute_black_36dp,
@@ -74,7 +74,8 @@ public class DataCenter implements GlobalTrigger{
             pictureId = -1,
             mapWidth = (MIN_MAP_LENGTH+MAX_MAP_LENGTH)/2,
             mapHeight = (MIN_MAP_LENGTH+MAX_MAP_LENGTH)/2,
-            joinRights = PUBLIC;
+            joinRights = PUBLIC,
+            character = ID_FLUFFY;
 
     private static String
             userName = "",
@@ -117,6 +118,7 @@ public class DataCenter implements GlobalTrigger{
         ghostAllowed = sharedPreferences.getBoolean(GHOST_ALLOWED, true);
         noxAllowed = sharedPreferences.getBoolean(NOX_ALLOWED, true);
         joinRights = (byte) sharedPreferences.getInt(JOIN_RIGHTS, PUBLIC);
+        character = (byte) sharedPreferences.getInt(CHARACTER, ID_FLUFFY);
     }
 
     private static void saveData(){
@@ -134,35 +136,15 @@ public class DataCenter implements GlobalTrigger{
         editor.putBoolean(GHOST_ALLOWED, ghostAllowed);
         editor.putBoolean(NOX_ALLOWED, noxAllowed);
         editor.putInt(JOIN_RIGHTS, joinRights);
+        editor.putInt(CHARACTER, character);
         editor.commit();
     }
 
+
+    //todo:set/get the map data
+    //getters and setters
     public static String getUserName(){
         return matchNameToStandards(userName);
-    }
-
-    private static String removeInvalidCharacters(String string){
-        for(char c:BluetoothDeviceNameHandling.FORBIDDEN_CHARS){
-            string = string.replace(""+c, "");
-        }
-        if (string.equals(""))string = "string";
-        return string;
-    }
-
-    public static String matchTextToStandards(String text){
-        if (text == null) text = "text";
-        int maxLength = BluetoothDeviceNameHandling.MAX_TEXT_LENGTH;
-        if (text.length() > maxLength) text = text.substring(0, maxLength);
-        text = removeInvalidCharacters(text);
-        return text;
-    }
-
-    private static String matchNameToStandards(String name){
-        if (name == null)name = "name";
-        int maxLength = BluetoothDeviceNameHandling.MAX_NAME_LENGTH;
-        if (name.length()>maxLength) name = name.substring(0, maxLength);
-        name = removeInvalidCharacters(name);
-        return name;
     }
 
     public static void setUserName(EditText editText) {
@@ -225,8 +207,6 @@ public class DataCenter implements GlobalTrigger{
         return mapHeight;
     }
 
-    //set/get the map data
-
     public static void setFluffyAllowed(boolean allowed){
         fluffyAllowed = allowed;
         saveData();
@@ -280,4 +260,40 @@ public class DataCenter implements GlobalTrigger{
         bool[3] = getNoxAllowed();
         return bool;
     }
+
+    public static void setCharacter(byte mCharacter){
+        character = mCharacter;
+        saveData();
+    }
+
+    public static byte getCharacter(){
+        return character;
+    }
+
+    //other methods
+
+    private static String removeInvalidCharacters(String string){
+        for(char c:BluetoothDeviceNameHandling.FORBIDDEN_CHARS){
+            string = string.replace(""+c, "");
+        }
+        if (string.equals(""))string = "string";
+        return string;
+    }
+
+    public static String matchTextToStandards(String text){
+        if (text == null) text = "text";
+        int maxLength = BluetoothDeviceNameHandling.MAX_TEXT_LENGTH;
+        if (text.length() > maxLength) text = text.substring(0, maxLength);
+        text = removeInvalidCharacters(text);
+        return text;
+    }
+
+    private static String matchNameToStandards(String name){
+        if (name == null)name = "name";
+        int maxLength = BluetoothDeviceNameHandling.MAX_NAME_LENGTH;
+        if (name.length()>maxLength) name = name.substring(0, maxLength);
+        name = removeInvalidCharacters(name);
+        return name;
+    }
+
 }

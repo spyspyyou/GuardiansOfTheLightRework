@@ -42,8 +42,6 @@ public abstract class GotLActivity extends AppCompatActivity {
         App.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public abstract void onConnectionLost();
-
     //todo:add this to the game activity instead of here
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {

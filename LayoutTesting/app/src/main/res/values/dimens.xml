@@ -5,4 +5,5 @@
     <dimen name="activity_padding_normal">12dp</dimen>
     <dimen name="activity_padding_small">8dp</dimen>
     <dimen name="elevation">3dp</dimen>
+    <dimen name="character_selection_length">150dp</dimen>
 </resources>

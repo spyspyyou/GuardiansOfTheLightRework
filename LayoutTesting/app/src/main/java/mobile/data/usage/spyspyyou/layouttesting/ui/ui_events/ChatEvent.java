@@ -5,7 +5,7 @@ import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyHostActivity;
 

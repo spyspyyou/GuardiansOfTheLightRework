@@ -127,4 +127,9 @@
     <string name="send">Send</string>
     <string name="lobby_chat">Lobby Chat</string>
     <string name="type_a_message">Type a message</string>
+    <string name="character_name">CharacterName</string>
+    <string name="fluffy_description">This describes Fluffy</string>
+    <string name="slime_description">This describes Slime</string>
+    <string name="ghost_description">This describes Ghost</string>
+    <string name="nox_description">This describes Nox</string>
 </resources>

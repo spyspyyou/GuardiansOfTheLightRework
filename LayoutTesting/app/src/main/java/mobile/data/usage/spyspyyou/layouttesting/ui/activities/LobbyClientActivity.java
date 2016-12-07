@@ -91,11 +91,6 @@ public class LobbyClientActivity extends LobbyActivity {
         super.onResume();
     }
 
-    @Override
-    public void onConnectionLost() {
-
-    }
-
     public void updateListViews(ArrayList<PlayerInformation> blue, ArrayList<PlayerInformation> green) {
         Log.i("LCActivity", "updating the list views, blue: " + blue.size() + ", green: " + green.size());
         teamBlue = blue;

@@ -4,8 +4,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.CharacterSelector;
 
-public abstract class PreparationActivity extends GotLActivity {
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_SLIME;
+
+public class PreparationActivity extends GotLActivity {
+
+    private byte characters[] = {ID_FLUFFY, ID_SLIME, ID_GHOST, ID_NOX};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -14,13 +22,19 @@ public abstract class PreparationActivity extends GotLActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        CharacterSelector characterSelector = (CharacterSelector) findViewById(R.id.scrollView_preparation_characterTypes);
+        characterSelector.onContentFinished();
+    }
+
+    @Override
     protected void onResume() {
         activeActivityRequiresServer = false;
         super.onResume();
     }
 
-    @Override
-    public void onConnectionLost() {
-
+    public byte[] getCharacters(){
+        return characters;
     }
 }

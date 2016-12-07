@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.GameCanceledEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinAnswerEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.KickPlayerEvent;
@@ -106,11 +106,6 @@ public class LobbyHostActivity extends LobbyActivity {
             cancelGame();
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onConnectionLost() {
-
     }
 
     @Override

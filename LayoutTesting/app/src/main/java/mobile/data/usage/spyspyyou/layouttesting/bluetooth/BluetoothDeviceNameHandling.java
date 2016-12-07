@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
-import mobile.data.usage.spyspyyou.layouttesting.ui.DataCenter;
+import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 
 public class BluetoothDeviceNameHandling implements TODS{
 

@@ -8,9 +8,4 @@ public class GameActivity extends GotLActivity {
         activeActivityRequiresServer = false;
         super.onResume();
     }
-
-    @Override
-    public void onConnectionLost() {
-
-    }
 }
