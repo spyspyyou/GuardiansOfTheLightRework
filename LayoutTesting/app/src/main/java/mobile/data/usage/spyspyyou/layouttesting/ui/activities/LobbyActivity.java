@@ -1,6 +1,7 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +14,7 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.utils.ChatHandler;
 import mobile.data.usage.spyspyyou.layouttesting.utils.GameInformation;
 import mobile.data.usage.spyspyyou.layouttesting.utils.PlayerAdapter;
@@ -55,6 +57,15 @@ public abstract class LobbyActivity extends GotLActivity {
         greenListAdapter = new PlayerAdapter(this, teamGreen);
         blueTeamList.setAdapter(blueListAdapter);
         greenTeamList.setAdapter(greenListAdapter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Activity activity = App.accessActiveActivity(null);
+        if (activity instanceof PreparationActivity){
+            ((PreparationActivity) activity).setCharacters(gameInformation.getCharacters());
+        }
     }
 
     public void updateListViews() {

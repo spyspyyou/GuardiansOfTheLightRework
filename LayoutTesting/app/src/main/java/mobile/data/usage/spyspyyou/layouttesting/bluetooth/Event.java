@@ -3,12 +3,12 @@ package mobile.data.usage.spyspyyou.layouttesting.bluetooth;
 import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.events.BluetoothEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.UIEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.UIEvent;
 
 public abstract class Event {
 
     protected static final char ADDRESS_STOP_INDICATOR = '\n';
-    private final String[] RECEPTORS;
+    protected final String[] RECEPTORS;
     protected final String SENDER_ADDRESS;
 
     public Event(String[] receptors){

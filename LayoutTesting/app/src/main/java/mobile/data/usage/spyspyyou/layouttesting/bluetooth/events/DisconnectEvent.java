@@ -1,9 +1,9 @@
 package mobile.data.usage.spyspyyou.layouttesting.bluetooth.events;
 
-import android.app.Activity;
 import android.content.Intent;
 
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
+import mobile.data.usage.spyspyyou.layouttesting.ui.activities.GotLActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.JoinActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyClientActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyHostActivity;
@@ -26,7 +26,7 @@ public class DisconnectEvent extends BluetoothEvent {
 
     @Override
     public void handle() {
-        Activity activity = App.accessActiveActivity(null);
+        GotLActivity activity = App.accessActiveActivity(null);
         //todo:add snackbar info
         if (activity instanceof LobbyHostActivity){
             ((LobbyHostActivity) activity).onPlayerLeft(SENDER_ADDRESS);

@@ -10,12 +10,16 @@ public interface TODS {
     String APP_IDENTIFIER = "GuardiansOfTheLight";
     String ADDRESS_EXTRA = "address";
     String TEAM_EXTRA = "team";
+    int PREPARATION_TIME = 80;
     byte TEAM_BLUE = 0, TEAM_GREEN = 1, NO_TEAM = -1;
 
     int MIN_MAP_LENGTH = 20;
     int MAX_MAP_LENGTH = 100;
 
     String textEncoding = "UTF-8";
+
+    //seconds
+    int characterSelectionTime = 60;
 
     /*private static final*/ byte
             ID_FLUFFY = 0,

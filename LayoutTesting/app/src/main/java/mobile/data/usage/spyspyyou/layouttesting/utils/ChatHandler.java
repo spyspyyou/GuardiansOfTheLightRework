@@ -17,7 +17,7 @@ import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyClientActivity;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.LobbyHostActivity;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.ChatEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.ChatEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.FocusManagedEditText;
 
 public class ChatHandler {

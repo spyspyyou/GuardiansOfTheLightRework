@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "mobile.data.usage.spyspyyou.layouttesting"
         minSdkVersion 22
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName 'b1'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

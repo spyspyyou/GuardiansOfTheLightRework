@@ -2,6 +2,7 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
@@ -15,11 +16,12 @@ import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.GameCanceledEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinAnswerEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.KickPlayerEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.TeamAnswerEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.TeamChangedEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.GameCanceledEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.JoinAnswerEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.KickPlayerEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.PreparationStartEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.TeamAnswerEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.TeamChangedEvent;
 import mobile.data.usage.spyspyyou.layouttesting.utils.GameInformation;
 import mobile.data.usage.spyspyyou.layouttesting.utils.PlayerInformation;
 import mobile.data.usage.spyspyyou.layouttesting.utils.ViewDataSetters;
@@ -228,7 +230,8 @@ public class LobbyHostActivity extends LobbyActivity {
                 updateListViews();
                 break;
             case R.id.action_startGame:
-                //todo:start the game
+                startActivity(new Intent(getBaseContext(), PreparationActivity.class));
+                new PreparationStartEvent(getAddresses());
                 break;
         }
         return super.onOptionsItemSelected(item);

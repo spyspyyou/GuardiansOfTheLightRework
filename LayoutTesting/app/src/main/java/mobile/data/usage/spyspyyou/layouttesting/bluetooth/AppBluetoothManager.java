@@ -57,15 +57,14 @@ public class AppBluetoothManager implements TODS, GlobalTrigger {
     }
 
     public void onAppStop(){
+        stopReceiving();
         if (stopBluetoothOnAppLeaving){
             disableBluetooth();
             return;
         }
         if (makeBluetoothLikeBeforeAppStart && !bluetoothOnWhenAppEntered){
             disableBluetooth();
-            return;
         }
-        stopReceiving();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

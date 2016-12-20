@@ -1,6 +1,5 @@
 package mobile.data.usage.spyspyyou.layouttesting.global;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +10,7 @@ import android.widget.Toast;
 
 import mobile.data.usage.spyspyyou.layouttesting.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
+import mobile.data.usage.spyspyyou.layouttesting.ui.activities.GotLActivity;
 
 //todo:professionalize the strings;
 //todo:exchange toast with Snackbar
@@ -19,7 +19,7 @@ public class App implements TODS {
     private static boolean appActive = false;
     private static boolean newActivityStarted = false;
 
-    private static Activity currentActivity;
+    private static GotLActivity currentActivity;
 
     //lists with the places to be noticed on big App Events
     private static GlobalTrigger[] onAppTrigger = {
@@ -30,7 +30,7 @@ public class App implements TODS {
     //activity on-calls
     //todo:apply to all activities
 
-    public static void onActivityStarted(Activity newActivity){
+    public static void onActivityStarted(GotLActivity newActivity){
         if (appActive)newActivityStarted = true;
         accessActiveActivity(newActivity);
         Log.i("App", "started activity: " + newActivity.toString());
@@ -83,15 +83,15 @@ public class App implements TODS {
         }
     }
 
-    public static void toast(String text){
+    public static void toast(String text) {
         try {
             Toast.makeText(currentActivity, text, Toast.LENGTH_SHORT).show();
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }
 
-    public static synchronized Activity accessActiveActivity(@Nullable Activity newActivity){
+    public static synchronized GotLActivity accessActiveActivity(@Nullable GotLActivity newActivity){
         if (newActivity!=null)currentActivity=newActivity;
         return currentActivity;
     }

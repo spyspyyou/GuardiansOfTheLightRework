@@ -1,6 +1,5 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.views;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
-import mobile.data.usage.spyspyyou.layouttesting.ui.activities.PreparationActivity;
 
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.DESCRIPTION_FLUFFY;
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.DESCRIPTION_GHOST;
@@ -60,7 +58,6 @@ public class CharacterSelector extends HorizontalScrollView {
             }
             setPosition(getScrollX() / characterLayoutWidth);
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL){
-                Log.i("fingerUp-position", ""+position);
                 smoothScrollTo(position);
                 return true;
             }
@@ -81,13 +78,12 @@ public class CharacterSelector extends HorizontalScrollView {
         addView(scrollViewLayout);
     }
 
-    public void onContentFinished(){
-        Activity activity = App.accessActiveActivity(null);
-        if (characters.length == 0 && activity instanceof PreparationActivity){
-            characters = ((PreparationActivity) activity).getCharacters();
-        }else{
+    public void onContentFinished(byte[] mCharacters){
+        if (characters.length != 0){
             return;
         }
+
+        characters = mCharacters;
 
         for (byte character:characters){
             childLayouts.add(createCharacterView(character));
@@ -100,10 +96,12 @@ public class CharacterSelector extends HorizontalScrollView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         if (scrollViewWidth != 0){
-            smoothScrollTo(0);
+            if (getScrollX() == 0)smoothScrollTo(0);
             return;
         }
+
         scrollViewWidth = getMeasuredWidth();
 
         scrollViewLayout.addView(createSpaceWithWidth(scrollViewWidth/2));
@@ -180,19 +178,16 @@ public class CharacterSelector extends HorizontalScrollView {
     class SwipeGestureDetector extends GestureDetector.SimpleOnGestureListener{
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
             try{
                 //right to left
                 if(e1.getX() - e2.getX() > SWIPE_DISTANCE_MIN && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                     setPosition(++position);
-                    Log.i("fling-position", ""+position);
                     smoothScrollTo(position);
                     return true;
                 }
                 //left to right
                 else if (e2.getX() - e1.getX() > SWIPE_DISTANCE_MIN && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                     setPosition(--position);
-                    Log.i("fling-position", ""+position);
                     smoothScrollTo(position);
                     return true;
                 }

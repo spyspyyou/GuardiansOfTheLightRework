@@ -11,9 +11,9 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.JoinSuccessfulEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.LobbyLeftEvent;
-import mobile.data.usage.spyspyyou.layouttesting.ui.ui_events.TeamRequestEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.JoinSuccessfulEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.LobbyLeftEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.events.TeamRequestEvent;
 import mobile.data.usage.spyspyyou.layouttesting.utils.PlayerAdapter;
 import mobile.data.usage.spyspyyou.layouttesting.utils.PlayerInformation;
 import mobile.data.usage.spyspyyou.layouttesting.utils.ViewDataSetters;

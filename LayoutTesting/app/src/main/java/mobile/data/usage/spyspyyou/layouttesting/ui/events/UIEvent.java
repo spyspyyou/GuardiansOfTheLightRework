@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.ui.ui_events;
+package mobile.data.usage.spyspyyou.layouttesting.ui.events;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -33,6 +33,7 @@ public abstract class UIEvent extends Event {
             case 'K': return new JoinAnswerEvent(eventString);
             case 'L': return new LobbyLeftEvent(eventString);
             case 'M': return new ChatEvent(eventString);
+            case 'P': return new PreparationStartEvent(eventString);
             case 'R': return new GameInformationRequestEvent(eventString);
             case 'S': return new JoinSuccessfulEvent(eventString);
             case 'T': return new TeamChangedEvent(eventString);

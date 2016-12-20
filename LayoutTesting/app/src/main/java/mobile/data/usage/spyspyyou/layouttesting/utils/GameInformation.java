@@ -8,6 +8,10 @@ import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHa
 import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 
 import static java.lang.Integer.parseInt;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_SLIME;
 
 public class GameInformation {
 
@@ -68,5 +72,17 @@ public class GameInformation {
 
     public String getGAME_ADDRESS(){
         return GAME_ADDRESS;
+    }
+
+    public byte[] getCharacters(){
+        int i = 0;
+        for (boolean b:PLAYER_TYPES)++i;
+        byte[] characters = new byte[i];
+        i = 0;
+        if (PLAYER_TYPES[0])characters[i++] = ID_FLUFFY;
+        if (PLAYER_TYPES[1])characters[i++] = ID_SLIME;
+        if (PLAYER_TYPES[2])characters[i++] = ID_GHOST;
+        if (PLAYER_TYPES[3])characters[i] = ID_NOX;
+        return characters;
     }
 }

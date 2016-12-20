@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.ui.ui_events;
+package mobile.data.usage.spyspyyou.layouttesting.ui.events;
 
 import android.app.Activity;
 import android.util.Log;

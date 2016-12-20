@@ -12,7 +12,7 @@
     <item
         android:id="@+id/action_swapTeam"
         android:icon="@drawable/ic_swap_horiz_black_36dp"
-        android:title="@string/start_game"
+        android:title="@string/swap_team"
         app:showAsAction="ifRoom"/>
 
     <item

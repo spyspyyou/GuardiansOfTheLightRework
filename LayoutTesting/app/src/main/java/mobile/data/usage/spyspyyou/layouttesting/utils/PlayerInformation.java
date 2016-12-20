@@ -21,7 +21,7 @@ public class PlayerInformation {
         PICTURE_ID = BluetoothDeviceNameHandling.getPictureId(address);
     }
 
-    private PlayerInformation(String name, int picId) {
+    /*package*/ PlayerInformation(String name, int picId) {
         PLAYER_NAME = name;
         ADDRESS = "";
         PICTURE_ID = picId;

@@ -16,10 +16,12 @@ import mobile.data.usage.spyspyyou.layouttesting.bluetooth.events.DisconnectEven
 import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
 
 /*package*/ class Connection implements TODS {
+
     private static final char EVENT_STRING_FINAL_CHAR = '|';
     private static final short MAX_EVENTS_PER_READ_EVENTS_CALL = 5;
+
     private final byte INDEX;
-    private boolean active = false;
+
     private final InputStream INPUT_STREAM;
     private final OutputStream OUTPUT_STREAM;
     private final BluetoothSocket BLUETOOTH_SOCKET;
@@ -34,7 +36,6 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
             try {
                 inputStream = pBluetoothSocket.getInputStream();
                 outputStream = pBluetoothSocket.getOutputStream();
-                active = true;
             } catch (IOException e) {
                 Log.e("Connection", "failed to get data streams");
                 e.printStackTrace();
@@ -92,19 +93,19 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
         } catch (IOException e) {
             Log.i("Connection", "failed sending data");
             e.printStackTrace();
-            if (active)ConnectionManager.reconnect(this);
         }
         return false;
     }
 
     /*package*/ void disconnect(){
-        active = false;
+        Log.i("Connection", "disconnecting " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
+
         try {
             send(new DisconnectEvent(new String[]{getAddress()}).toString().getBytes(textEncoding));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        Log.i("Connection", "disconnected " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
+
         try {
             INPUT_STREAM.close();
         } catch (IOException e) {
@@ -120,6 +121,7 @@ import mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         ConnectionManager.removeDeadConnection(INDEX);
     }
 
