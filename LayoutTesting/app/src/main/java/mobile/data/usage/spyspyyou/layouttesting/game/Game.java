@@ -1,6 +1,7 @@
 package mobile.data.usage.spyspyyou.layouttesting.game;
 
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.view.View;
 
@@ -18,9 +19,10 @@ public class Game {
     private GameThread gameThread;
     private GameUIManager gameUIManager;
 
-    public Game(View rootView){
+    public Game(Resources resources,View rootView){
         gameThread = new GameThread();
         gameUIManager = new GameUIManager(rootView);
+        BitmapManager.loadBitmaps(resources);
     }
 
     public void addEvent(GameEvent gameEvent){

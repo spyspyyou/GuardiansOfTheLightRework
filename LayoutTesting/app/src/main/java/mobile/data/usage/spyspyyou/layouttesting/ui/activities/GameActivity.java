@@ -6,7 +6,9 @@ import android.util.Log;
 import android.view.View;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.Game;
+import mobile.data.usage.spyspyyou.layouttesting.game.events.GameEvent;
 
 public class GameActivity extends GotLActivity {
 
@@ -25,6 +27,12 @@ public class GameActivity extends GotLActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        BitmapManager.clearMemory();
+    }
+
+    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
@@ -38,7 +46,7 @@ public class GameActivity extends GotLActivity {
     }
 
     public void setupGame(){
-        game = new Game();
+        game = new Game(getResources(), findViewById(R.id.relativeLayout_game));
     }
 
     public void startTick(){
@@ -47,5 +55,9 @@ public class GameActivity extends GotLActivity {
             return;
         }
         game.startGame();
+    }
+
+    public void addEvent(GameEvent gameEvent){
+        game.addEvent(gameEvent);
     }
 }

@@ -96,6 +96,10 @@ public class App implements TODS {
         return currentActivity;
     }
 
+    public static GotLActivity getCurrentActivity(){
+        return accessActiveActivity(null);
+    }
+
     public static Context getContext(){
         return accessActiveActivity(null);
     }

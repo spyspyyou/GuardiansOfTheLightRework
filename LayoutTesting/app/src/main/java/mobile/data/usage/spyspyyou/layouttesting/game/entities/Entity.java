@@ -22,7 +22,7 @@ public abstract class Entity {
 
     public void render(Canvas canvas){
         if(visible){
-            canvas.drawBitmap(bitmap, x, y, null);
+            //todo:make get pos on screen method canvas.drawBitmap(bitmap, x, y, null);
         }
     }
 }

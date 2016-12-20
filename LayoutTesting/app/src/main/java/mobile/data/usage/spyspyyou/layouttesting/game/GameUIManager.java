@@ -8,31 +8,31 @@ import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewJoystick;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewMiniMap;
 
-public class GameUIManager{
+/*package*/ class GameUIManager{
 
     private SurfaceViewGame surfaceViewGame;
     private SurfaceViewJoystick surfaceViewJoystick;
     private SurfaceViewMiniMap surfaceViewMiniMap;
 
-    public GameUIManager(View rootView){
+    /*package*/ GameUIManager(View rootView){
         surfaceViewGame = (SurfaceViewGame) rootView.findViewById(R.id.surfaceView_game);
         surfaceViewJoystick = (SurfaceViewJoystick) rootView.findViewById(R.id.surfaceView_joystick);
         surfaceViewMiniMap = (SurfaceViewMiniMap) rootView.findViewById(R.id.surfaceView_miniMap);
     }
 
-    public Canvas getGameCanvas(){
+    /*package*/ Canvas getGameCanvas(){
         return surfaceViewGame.getMatchingCanvas();
     }
 
-    public void renderGame(Canvas canvas){
+    /*package*/ void renderGame(Canvas canvas){
         surfaceViewGame.render(canvas);
     }
 
-    public void renderJoystick(){
+    /*package*/ void renderJoystick(){
         surfaceViewJoystick.render();
     }
 
-    public void renderMiniMap(){
+    /*package*/ void renderMiniMap(){
         surfaceViewMiniMap.render();
     }
 }
