@@ -14,14 +14,14 @@ import mobile.data.usage.spyspyyou.layouttesting.global.App;
 import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 import mobile.data.usage.spyspyyou.layouttesting.ui.activities.PreparationActivity;
 
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_SLIME;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_SLIME;
 
 public class CharacterPlayerAdapter extends BaseAdapter {
 

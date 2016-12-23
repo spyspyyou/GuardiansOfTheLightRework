@@ -19,22 +19,23 @@ import java.util.ArrayList;
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.global.App;
 
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.DESCRIPTION_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.DESCRIPTION_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.DESCRIPTION_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.DESCRIPTION_SLIME;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_SLIME;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_SLIME;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.NAME_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.NAME_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.NAME_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.NAME_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.DESCRIPTION_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.DESCRIPTION_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.DESCRIPTION_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.DESCRIPTION_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.NAME_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.NAME_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.NAME_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.NAME_SLIME;
+
 
 public class CharacterSelector extends HorizontalScrollView {
     private static final int
@@ -53,14 +54,15 @@ public class CharacterSelector extends HorizontalScrollView {
     private final OnTouchListener onTouchListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (gestureDetector.onTouchEvent(event)){
-                return true;
-            }
+            if (gestureDetector.onTouchEvent(event))return true;
+
             setPosition(getScrollX() / characterLayoutWidth);
+
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL){
                 smoothScrollTo(position);
                 return true;
             }
+
             return false;
         }
     };

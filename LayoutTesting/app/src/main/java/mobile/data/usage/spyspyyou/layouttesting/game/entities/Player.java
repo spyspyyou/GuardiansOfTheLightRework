@@ -5,11 +5,13 @@ import android.graphics.Canvas;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ICON_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_FLUFFY;
+
 
 public class Player extends Entity {
 
     private static Bitmap slimyOverlay;
+    protected double direction = 0;
 
     protected boolean slimy = false;
 
@@ -21,7 +23,7 @@ public class Player extends Entity {
     @Override
     public void render(Canvas canvas) {
         super.render(canvas);
-        if (slimy){
+        if (slimy && visible){
             //draw slimy overlay on the player
         }
     }

@@ -15,10 +15,10 @@ import mobile.data.usage.spyspyyou.layouttesting.ui.views.CharacterSelector;
 import mobile.data.usage.spyspyyou.layouttesting.utils.CharacterPlayerAdapter;
 import mobile.data.usage.spyspyyou.layouttesting.utils.CharacterPlayerInformation;
 
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_SLIME;
 import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.PREPARATION_TIME;
 
 public class PreparationActivity extends GotLActivity {
@@ -95,7 +95,7 @@ public class PreparationActivity extends GotLActivity {
                     break;
                 }
             }
-            startActivity(new Intent(getBaseContext(), GameClient.class));
+            startActivity(new Intent(getBaseContext(), GameActivity.class));
             //todo:startGameLoadingActivity
         }
 

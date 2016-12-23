@@ -45,8 +45,10 @@ public class Game {
 
     private void render(){
         Canvas c = gameUIManager.getGameCanvas();
-        for (Entity entity:entities){
-            entity.render(c);
+        synchronized (gameUIManager.getGameSurfaceHolder()) {
+            for (Entity entity : entities) {
+                entity.render(c);
+            }
         }
         gameUIManager.renderGame(c);
         gameUIManager.renderJoystick();

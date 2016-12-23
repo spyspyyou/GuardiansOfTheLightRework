@@ -8,10 +8,10 @@ import mobile.data.usage.spyspyyou.layouttesting.bluetooth.BluetoothDeviceNameHa
 import mobile.data.usage.spyspyyou.layouttesting.global.DataCenter;
 
 import static java.lang.Integer.parseInt;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_FLUFFY;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_GHOST;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_NOX;
-import static mobile.data.usage.spyspyyou.layouttesting.teststuff.TODS.ID_SLIME;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_GHOST;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_NOX;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_SLIME;
 
 public class GameInformation {
 

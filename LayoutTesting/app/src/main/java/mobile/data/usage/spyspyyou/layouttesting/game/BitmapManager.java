@@ -10,6 +10,10 @@ import mobile.data.usage.spyspyyou.layouttesting.R;
 
 public class BitmapManager {
 
+    private final static int BITMAP_RESOURCES[] = {
+            R.drawable.fluffy
+    };
+
     private static Bitmap defaultBitmap;
     private static boolean loaded = false;
 
@@ -22,6 +26,9 @@ public class BitmapManager {
         }
         loaded = true;
         defaultBitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher);
+        for (int recID:BITMAP_RESOURCES){
+            bitmaps.append(recID, BitmapFactory.decodeResource(resources, recID));
+        }
     }
 
     public static void clearMemory(){
