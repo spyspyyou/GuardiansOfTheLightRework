@@ -1,12 +1,11 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
-import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
+import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
 
 public class Sweet extends Entity {
 
-    public Sweet(int entityX, int entityY) {
-        super(entityX, entityY, true, BitmapManager.getBitmap(R.drawable.sweet));
+    public Sweet(Vector2D entityPosition, boolean isVisible, int entityBitmapID) {
+        super(entityPosition, isVisible, entityBitmapID);
     }
 
     @Override

@@ -10,6 +10,4 @@ public interface Notificator {
     void discoveryFinished();
 
     void connectionRequestResult(BluetoothDevice bluetoothDevice);
-
-    void playerLeft(String address);
 }

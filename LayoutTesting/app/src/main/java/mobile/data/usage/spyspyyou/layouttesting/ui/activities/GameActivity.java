@@ -1,8 +1,8 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.activities;
 
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
@@ -18,6 +18,7 @@ public class GameActivity extends GotLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_1);
+        game = new Game(getResources(), findViewById(R.id.relativeLayout_game), BitmapFactory.decodeResource(getResources(), R.drawable.test_map_3));
     }
 
     @Override
@@ -43,18 +44,6 @@ public class GameActivity extends GotLActivity {
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
-    }
-
-    public void setupGame(){
-        game = new Game(getResources(), findViewById(R.id.relativeLayout_game));
-    }
-
-    public void startTick(){
-        if (game == null){
-            Log.w("GameActivity", "starting nonexistent game");
-            return;
-        }
-        game.startGame();
     }
 
     public void addEvent(GameEvent gameEvent){

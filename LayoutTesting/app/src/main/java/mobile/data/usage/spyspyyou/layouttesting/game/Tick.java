@@ -6,6 +6,10 @@ public interface Tick {
     int TICK = 20;
     int TIME_PER_TICK = 1000 / TICK;
 
+    int
+            MAX_TILES_IN_WIDTH = 8,
+            MAX_TILES_IN_HEIGHT = 6;
+
     byte
             ID_FLUFFY = 0,
             ID_SLIME = 1,

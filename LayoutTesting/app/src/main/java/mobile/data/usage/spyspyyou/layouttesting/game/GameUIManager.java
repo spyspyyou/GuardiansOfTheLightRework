@@ -41,16 +41,21 @@ public class GameUIManager{
         surfaceViewMiniMap.render();
     }
 
-    public float getUserVelocityX(){
-        return surfaceViewJoystick.getUserVelocityX();
-    }
-
-    public float getUserVelocityY(){
-        return surfaceViewJoystick.getUserVelocityY();
+    public Vector2D getUserVelocity(){
+        return surfaceViewJoystick.getUserVelocity();
     }
 
     public double getUserDirection(){
         if (surfaceViewGame.hasUserFocus())return surfaceViewGame.getUserDirection();
         return surfaceViewJoystick.getUserDirection();
     }
+
+    public int getTileSide(){
+        return surfaceViewGame.getTileSide();
+    }
+
+    public boolean areSurfacesCreated(){
+        return surfaceViewGame.isCreated() && surfaceViewJoystick.isCreated() && surfaceViewMiniMap.isCreated();
+    }
+
 }

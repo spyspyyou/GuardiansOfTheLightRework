@@ -3,43 +3,41 @@ package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 import android.graphics.Canvas;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.GameUIManager;
+import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
 
 public abstract class User extends Player {
 
     private static final float SLIMY_SLOW = 0.2f;
+    private static final int MAX_MANA = 1000;
     private final GameUIManager gameUIManager;
+    private int mana;
 
-    public User(int entityX, int entityY, boolean isVisible, byte type, GameUIManager mGameUIManager) {
-        super(entityX, entityY, isVisible, type);
+    public User(Vector2D entityPosition, boolean isVisible, byte characterType, GameUIManager mGameUIManager) {
+        super(entityPosition, isVisible, characterType);
         gameUIManager = mGameUIManager;
     }
+
 
     @Override
     public void update() {
         //update position + direction
-        direction = gameUIManager.getUserDirection();
         move();
     }
 
     private void move(){
-        double
-                xVelocity = gameUIManager.getUserVelocityX(),
-                yVelocity = gameUIManager.getUserVelocityY();
-        if (slimy){
-            xVelocity *= SLIMY_SLOW;
-            yVelocity *= SLIMY_SLOW;
-        }
-        x += xVelocity;
-        y += yVelocity;
+        setDirection(gameUIManager.getUserDirection());
+
+        Vector2D velocity = gameUIManager.getUserVelocity();
+        if (slimy)velocity.scale(SLIMY_SLOW);
+        position.add(velocity);
         //todo:hitbox
     }
 
     @Override
     public void render(Canvas canvas) {
         super.render(canvas);
+        if (!visible) hud.render(canvas);
     }
 
-    public void activateSkill(){
-
-    }
+    public abstract void activateSkill();
 }

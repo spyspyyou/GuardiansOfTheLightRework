@@ -1,34 +1,41 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
-
-import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ICON_FLUFFY;
+import mobile.data.usage.spyspyyou.layouttesting.game.Tick;
+import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
 
 
 public class Player extends Entity {
 
-    private static Bitmap slimyOverlay;
-    protected double direction = 0;
-
     protected boolean slimy = false;
+    protected HUD hud;
 
-    public Player(int entityX, int entityY, boolean isVisible, byte type) {
-        super(entityX, entityY, isVisible, BitmapManager.getBitmap(ICON_FLUFFY));
-        slimyOverlay = BitmapManager.getBitmap(100);
+    public Player(Vector2D entityPosition, boolean isVisible, byte characterType) {
+        super(entityPosition, isVisible, Tick.ICON_FLUFFY);
     }
+
+    protected Player(Vector2D entityPosition, boolean isVisible, int entityBitmapID) {
+        super(entityPosition, isVisible, entityBitmapID);
+    }
+
 
     @Override
     public void render(Canvas canvas) {
         super.render(canvas);
-        if (slimy && visible){
-            //draw slimy overlay on the player
+        if (visible){
+            //hud.render(canvas);
         }
     }
 
     public void update(){
 
+    }
+
+    protected class HUD {
+
+        public void render(Canvas canvas){
+
+        }
     }
 }

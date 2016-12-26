@@ -4,10 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import mobile.data.usage.spyspyyou.layouttesting.game.Tick;
 
 import static android.graphics.Bitmap.Config.ARGB_8888;
 
@@ -15,7 +18,11 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     private int halfWidth = 0, halfHeight = 0;
 
-    private boolean hasFocus = false;
+    private int tileSide = 0;
+
+    private boolean
+            hasFocus = false,
+            created = false;
 
     private float fingerDisplacementX, fingerDisplacementY;
 
@@ -32,6 +39,11 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         invalidate();
         halfWidth = getWidth() / 2;
         halfHeight = getHeight() / 2;
+        int sideW = (int) (1.0 * getWidth() / Tick.MAX_TILES_IN_WIDTH), sideH = getHeight() / Tick.MAX_TILES_IN_HEIGHT;
+        if (sideW > sideH) Log.i("SVGame", "chose width");
+        else  Log.i("SVGame", "chose height");
+        tileSide = Math.max(sideW, sideH);
+        created = true;
     }
 
     @Override
@@ -82,6 +94,22 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         double userDirection = Math.acos(fingerDisplacementX / radiusDistance);
         if (fingerDisplacementY <= 0) userDirection *= -1;
         return userDirection;
+    }
+
+    public int getHalfWidth(){
+        return halfWidth;
+    }
+
+    public int getHalfHeight(){
+        return halfHeight;
+    }
+
+    public boolean isCreated() {
+        return created;
+    }
+
+    public int getTileSide() {
+        return tileSide;
     }
 
     private class ClickDetector extends GestureDetector.SimpleOnGestureListener {

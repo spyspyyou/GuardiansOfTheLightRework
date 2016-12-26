@@ -11,28 +11,33 @@ import android.view.SurfaceView;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
+import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
 
 public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Callback{
 
     private int joystickRadius;
 
-    private float userVelocityX = 0, userVelocityY = 0;
+    private Vector2D userVelocity = new Vector2D(0, 0);
 
     private double userDirection;
 
     private float joystickCoordinateX, joystickCoordinateY, fingerDisplacementX, fingerDisplacementY;
 
-    private boolean active = false, dataChanged = false;
+    private boolean
+            active = false,
+            dataChanged = false,
+            created = false;
 
     public SurfaceViewJoystick(Context context, AttributeSet attrs) {
         super(context, attrs);
-        getHolder();
+        getHolder().addCallback(this);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         invalidate();
         joystickRadius = getWidth() / 2;
+        created = true;
     }
 
     @Override
@@ -48,8 +53,10 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         synchronized (getHolder()){
+            dataChanged = true;
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 active = false;
+                fingerDisplacementX = fingerDisplacementY = 0;
                 return true;
             }
 
@@ -58,11 +65,8 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
                 joystickCoordinateY = event.getY();
                 active = true;
             }
-
             fingerDisplacementX = event.getX() - joystickCoordinateX;
             fingerDisplacementY = event.getY() - joystickCoordinateY;
-
-            dataChanged = true;
             return true;
         }
     }
@@ -72,15 +76,14 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
             updateData();
             if (!active)return;
             Canvas canvas = null;
-
             try {
                 canvas = getHolder().lockCanvas(null);
                 synchronized (getHolder()) {
                     if (canvas != null) {
                         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
-                        canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_ring), joystickCoordinateX - joystickRadius, joystickCoordinateY - joystickRadius, null);
-                        canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_middle), joystickCoordinateX - joystickRadius + fingerDisplacementX, joystickCoordinateY - joystickRadius + fingerDisplacementY, null);
+                        canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_ring), joystickCoordinateX, joystickCoordinateY, null);
+                        canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_middle), joystickCoordinateX, joystickCoordinateY, null);
                     }
                 }
             } finally {
@@ -92,16 +95,9 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
         }
     }
 
-    public float getUserVelocityX() {
-        if (!active) return 0;
+    public Vector2D getUserVelocity() {
         updateData();
-        return userVelocityX;
-    }
-
-    public float getUserVelocityY() {
-        if (!active) return 0;
-        updateData();
-        return userVelocityY;
+        return userVelocity;
     }
 
     public double getUserDirection() {
@@ -115,7 +111,7 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
             dataChanged = false;
 
             if (!active || (fingerDisplacementX == 0 && fingerDisplacementY == 0)){
-                userVelocityX = userVelocityY = 0;
+                userVelocity = new Vector2D(0, 0);
                 return;
             }
 
@@ -128,11 +124,14 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
                 fingerDisplacementY *= joystickRadius;
             }
 
-            userVelocityX = fingerDisplacementX / joystickRadius;
-            userVelocityY = fingerDisplacementY / joystickRadius;
+            userVelocity = new Vector2D(1.0 * fingerDisplacementX / joystickRadius, 1.0 * fingerDisplacementY / joystickRadius);
 
             userDirection = Math.acos(fingerDisplacementX / radiusDistance);
             if (fingerDisplacementY <= 0) userDirection *= -1;
         }
+    }
+
+    public boolean isCreated() {
+        return created;
     }
 }

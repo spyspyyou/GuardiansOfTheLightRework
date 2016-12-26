@@ -1,9 +1,16 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.GameUIManager;
+import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
 
 public class Fluffy extends User {
-    public Fluffy(int entityX, int entityY, boolean isVisible, byte type, GameUIManager mGameUIManager) {
-        super(entityX, entityY, isVisible, type, mGameUIManager);
+
+    public Fluffy(Vector2D entityPosition, boolean isVisible, byte characterType, GameUIManager mGameUIManager) {
+        super(entityPosition, isVisible, characterType, mGameUIManager);
+    }
+
+    @Override
+    public void activateSkill() {
+
     }
 }
