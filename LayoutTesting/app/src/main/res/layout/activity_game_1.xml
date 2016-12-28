@@ -8,24 +8,23 @@
     <mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame
         android:id="@+id/surfaceView_game"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewJoystick
         android:id="@+id/surfaceView_joystick"
-        android:layout_width="200dp"
-        android:layout_height="fill_parent"
-        android:layout_gravity="start|bottom" />
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        />
 
     <mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewMiniMap
         android:id="@+id/surfaceView_miniMap"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="end|top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="@dimen/activity_margin_normal"/>
 
-    <mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewJoystick
+    <Button
         android:id="@+id/button_particle"
         android:layout_gravity="end|bottom"
         android:background="@drawable/button_particle_states"
@@ -39,7 +38,7 @@
         android:layout_marginStart="@dimen/activity_margin_normal"
         android:layout_marginTop="@dimen/activity_margin_normal"/>
 
-    <mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewJoystick
+    <Button
         android:id="@+id/button_skill"
         android:layout_gravity="bottom|end"
         android:background="@drawable/button_skill_states"

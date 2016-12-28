@@ -7,7 +7,7 @@ public interface Tick {
     int TIME_PER_TICK = 1000 / TICK;
 
     int
-            MAX_TILES_IN_WIDTH = 8,
+            MAX_TILES_IN_WIDTH = 10,
             MAX_TILES_IN_HEIGHT = 6;
 
     byte

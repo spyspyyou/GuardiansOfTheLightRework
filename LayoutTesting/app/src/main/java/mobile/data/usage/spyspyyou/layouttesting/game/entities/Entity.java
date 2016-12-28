@@ -4,8 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 
+import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
-import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public abstract class Entity {
 
@@ -25,7 +26,7 @@ public abstract class Entity {
     public Entity(Vector2D entityPosition, boolean isVisible, int  entityBitmapID){
         position = entityPosition;
         visible = isVisible;
-        bitmapID = entityBitmapID;
+        bitmapID = R.drawable.fluffy;
         bitmap = BitmapManager.getBitmap(bitmapID);
         width = bitmap.getWidth();
         height = bitmap.getHeight();
@@ -71,6 +72,11 @@ public abstract class Entity {
     public void setHeight(int height) {
         this.height = height;
         bitmapRecalculationRequired = true;
+    }
+
+    public void setSize(int size){
+        setWidth(size);
+        setHeight(size);
     }
 
     public Vector2D getPosition(){

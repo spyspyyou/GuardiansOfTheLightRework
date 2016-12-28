@@ -6,6 +6,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public class GameMap {
 
@@ -32,7 +33,7 @@ public class GameMap {
 
     private final int TILE_SIDE;
 
-    /*package*/ GameMap(Bitmap pixelMap, int tileSide){
+    /*package*/ GameMap(GameUIManager gameUIManager, Bitmap pixelMap, int tileSide){
         TILE_SIDE = tileSide;
         //--------------------------------------------
         //load all tiles
@@ -50,6 +51,7 @@ public class GameMap {
         tiles.append(LIGHT_BULB_STAND_GREEN, new Tile(BitmapManager.getBitmap(R.drawable.light_bulb_tile_team_green), true, true));
         //--------------------------------------------
         readPixelMap(pixelMap);
+        gameUIManager.setMap(pixelMap);
     }
 
     public void render(Canvas canvas, Vector2D userPosition){

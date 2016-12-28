@@ -1,8 +1,10 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -11,17 +13,25 @@ import android.view.SurfaceView;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
-import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
+import mobile.data.usage.spyspyyou.layouttesting.game.VelocityVector2D;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Callback{
 
-    private int joystickRadius;
+    private float joystickRadius;
 
-    private Vector2D userVelocity = new Vector2D(0, 0);
+    private Bitmap
+            ring,
+            center;
+
+    private VelocityVector2D
+            userVelocity = new VelocityVector2D(0, 0);
+    private Vector2D
+            joystickPosition = new Vector2D(0, 0),
+            fingerDisplacement = new Vector2D(0, 0),
+            centerDisplacement = new Vector2D(0, 0);
 
     private double userDirection;
-
-    private float joystickCoordinateX, joystickCoordinateY, fingerDisplacementX, fingerDisplacementY;
 
     private boolean
             active = false,
@@ -31,12 +41,13 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
     public SurfaceViewJoystick(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
+        getHolder().setFormat(PixelFormat.TRANSPARENT);
+        setZOrderMediaOverlay(true);
+        joystickRadius = getResources().getDimension(R.dimen.joystick_size);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        invalidate();
-        joystickRadius = getWidth() / 2;
         created = true;
     }
 
@@ -56,82 +67,83 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
             dataChanged = true;
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 active = false;
-                fingerDisplacementX = fingerDisplacementY = 0;
+                fingerDisplacement.set(0, 0);
                 return true;
             }
 
             if (event.getAction() == MotionEvent.ACTION_DOWN && !active) {
-                joystickCoordinateX = event.getX();
-                joystickCoordinateY = event.getY();
+                joystickPosition.set(event.getX(), event.getY());
                 active = true;
             }
-            fingerDisplacementX = event.getX() - joystickCoordinateX;
-            fingerDisplacementY = event.getY() - joystickCoordinateY;
+
+            fingerDisplacement.set(event.getX() - joystickPosition.x, event.getY() - joystickPosition.y);
             return true;
         }
     }
 
-    public void render(){
-        synchronized (getHolder()){
-            updateData();
-            if (!active)return;
-            Canvas canvas = null;
-            try {
-                canvas = getHolder().lockCanvas(null);
-                synchronized (getHolder()) {
-                    if (canvas != null) {
-                        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+    public void updateData() {
+        synchronized (getHolder()) {
+            if (!dataChanged) return;
+            dataChanged = false;
 
-                        canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_ring), joystickCoordinateX, joystickCoordinateY, null);
-                        canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_middle), joystickCoordinateX, joystickCoordinateY, null);
+            centerDisplacement.set(fingerDisplacement);
+        }
+
+        if (!active || centerDisplacement.has0Length()) {
+            userVelocity.set(0, 0);
+            return;
+        }
+
+        if (centerDisplacement.getLength() > joystickRadius) {
+            centerDisplacement.scaleTo(joystickRadius);
+        }
+
+        userVelocity.set(centerDisplacement.x / joystickRadius, centerDisplacement.y / joystickRadius);
+
+        userDirection = Math.acos(centerDisplacement.x / centerDisplacement.getLength());
+        if (centerDisplacement.y <= 0) userDirection *= -1;
+    }
+
+    public void render() {
+        if (ring == null) {
+            ring = Bitmap.createScaledBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_ring), (int) (joystickRadius * 2), (int) (joystickRadius * 2), false);
+            center = Bitmap.createScaledBitmap(BitmapManager.getBitmap(R.drawable.joystick_button_middle), (int) joystickRadius, (int) joystickRadius, false);
+        }
+
+        Canvas canvas = null;
+        try {
+            canvas = getHolder().lockCanvas();
+            synchronized (getHolder()) {
+                if (canvas != null) {
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+                    if (active) {
+                        canvas.drawBitmap(ring, joystickPosition.getFloatX() - ring.getWidth() / 2f, joystickPosition.getFloatY() - ring.getHeight() / 2f, null);
+                        canvas.drawBitmap(center, joystickPosition.getFloatX() - center.getWidth() / 2f + centerDisplacement.getFloatX(), joystickPosition.getFloatY() - center.getHeight() / 2f + centerDisplacement.getFloatY(), null);
+
                     }
                 }
-            } finally {
-                if (canvas != null) {
-                    // if we locked the Canvas before we have to unlock it now and give the System the Canvas to draw back
-                    getHolder().unlockCanvasAndPost(canvas);
-                }
+            }
+        } finally {
+            if (canvas != null) {
+                getHolder().unlockCanvasAndPost(canvas);
             }
         }
     }
 
-    public Vector2D getUserVelocity() {
-        updateData();
+    public VelocityVector2D getUserVelocity() {
         return userVelocity;
     }
 
     public double getUserDirection() {
-        updateData();
         return userDirection;
-    }
-
-    private void updateData(){
-        synchronized (getHolder()){
-            if (!dataChanged)return;
-            dataChanged = false;
-
-            if (!active || (fingerDisplacementX == 0 && fingerDisplacementY == 0)){
-                userVelocity = new Vector2D(0, 0);
-                return;
-            }
-
-            double radiusDistance = Math.sqrt(Math.pow(fingerDisplacementX, 2) + Math.pow(fingerDisplacementY, 2));
-            if (radiusDistance > joystickRadius){
-                fingerDisplacementX /= radiusDistance;
-                fingerDisplacementX *= joystickRadius;
-
-                fingerDisplacementY /= radiusDistance;
-                fingerDisplacementY *= joystickRadius;
-            }
-
-            userVelocity = new Vector2D(1.0 * fingerDisplacementX / joystickRadius, 1.0 * fingerDisplacementY / joystickRadius);
-
-            userDirection = Math.acos(fingerDisplacementX / radiusDistance);
-            if (fingerDisplacementY <= 0) userDirection *= -1;
-        }
     }
 
     public boolean isCreated() {
         return created;
+    }
+
+    public boolean isActive(){
+        return active;
     }
 }

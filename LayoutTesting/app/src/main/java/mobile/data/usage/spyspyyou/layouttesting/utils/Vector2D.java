@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.game;
+package mobile.data.usage.spyspyyou.layouttesting.utils;
 
 // a general vector class useful for the hit box resolution
 public class Vector2D {
@@ -6,7 +6,22 @@ public class Vector2D {
     // coordinates the vector points to
     public double x, y;
 
+    public Vector2D(Vector2D vector2D) {
+        this.x = vector2D.x;
+        this.y = vector2D.y;
+    }
+
     public Vector2D(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void set(Vector2D vector2D) {
+        this.x = vector2D.x;
+        this.y = vector2D.y;
+    }
+
+    public void set(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -19,20 +34,26 @@ public class Vector2D {
     }
 
     // multiply the vectors length with the scalar
-    public void scale(double scalar) {
+    public Vector2D scale(double scalar) {
         x *= scalar;
         y *= scalar;
+        return this;
     }
 
     // set the length to newLength
-    public void scaleTo(double newLength) {
+    public Vector2D scaleTo(double newLength) {
         normalize();
         scale(newLength);
+        return this;
     }
 
     // return the length of the vector
     public double getLength() {
         return Math.sqrt(x * x + y * y);
+    }
+
+    public boolean has0Length(){
+        return x == 0 && y == 0;
     }
 
     public void add(Vector2D vector) {

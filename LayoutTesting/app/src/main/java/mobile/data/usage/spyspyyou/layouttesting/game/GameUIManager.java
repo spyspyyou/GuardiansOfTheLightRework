@@ -1,5 +1,6 @@
 package mobile.data.usage.spyspyyou.layouttesting.game;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -29,19 +30,29 @@ public class GameUIManager{
         return  surfaceViewGame.getHolder();
     }
 
-    /*package*/ void renderGame(Canvas canvas){
+    /*package*/ void update() {
+        surfaceViewJoystick.updateData();
+    }
+
+    /*package*/ void render(Canvas canvas){
+        renderGame(canvas);
+        renderJoystick();
+        renderMiniMap();
+    }
+
+    private void renderGame(Canvas canvas){
         surfaceViewGame.drawToScreen(canvas);
     }
 
-    /*package*/ void renderJoystick(){
+    private void renderJoystick(){
         surfaceViewJoystick.render();
     }
 
-    /*package*/ void renderMiniMap(){
+    private void renderMiniMap(){
         surfaceViewMiniMap.render();
     }
 
-    public Vector2D getUserVelocity(){
+    public VelocityVector2D getUserVelocity(){
         return surfaceViewJoystick.getUserVelocity();
     }
 
@@ -50,12 +61,20 @@ public class GameUIManager{
         return surfaceViewJoystick.getUserDirection();
     }
 
+    public boolean activeUserDirection(){
+        return surfaceViewGame.hasUserFocus() || surfaceViewJoystick.isActive();
+    }
+
     public int getTileSide(){
         return surfaceViewGame.getTileSide();
     }
 
     public boolean areSurfacesCreated(){
         return surfaceViewGame.isCreated() && surfaceViewJoystick.isCreated() && surfaceViewMiniMap.isCreated();
+    }
+
+    public void setMap(Bitmap map){
+        surfaceViewMiniMap.setMap(map);
     }
 
 }

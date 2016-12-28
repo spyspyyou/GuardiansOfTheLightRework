@@ -21,7 +21,10 @@ public class BitmapManager {
             R.drawable.spawn_tile,
             R.drawable.wall_tile,
             R.drawable.void_tile,
-            R.drawable.fluffy
+            R.drawable.fluffy,
+            R.drawable.joystick_button_middle,
+            R.drawable.joystick_button_ring,
+            R.drawable.test_map_3
     };
 
     private static Bitmap defaultBitmap;

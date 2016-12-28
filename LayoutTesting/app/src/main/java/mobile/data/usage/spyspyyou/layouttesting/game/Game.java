@@ -16,6 +16,7 @@ import mobile.data.usage.spyspyyou.layouttesting.game.entities.Fluffy;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.User;
 import mobile.data.usage.spyspyyou.layouttesting.game.events.GameEvent;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public class Game {
 
@@ -39,6 +40,8 @@ public class Game {
             eventQueue.poll().apply();
         }
 
+        gameUIManager.update();
+
         for (Entity entity : players) {
             entity.update();
         }
@@ -59,10 +62,7 @@ public class Game {
                 }
             }
         }
-        gameUIManager.renderGame(c);
-
-        gameUIManager.renderJoystick();
-        gameUIManager.renderMiniMap();
+        gameUIManager.render(c);
     }
 
     private class LoadingThread extends Thread {
@@ -89,7 +89,7 @@ public class Game {
             }
             BitmapManager.loadBitmaps(RESOURCES, gameUIManager.getTileSide());
             gameThread = new GameThread();
-            gameMap = new GameMap(PIXEL_MAP, gameUIManager.getTileSide());
+            gameMap = new GameMap(gameUIManager, PIXEL_MAP, gameUIManager.getTileSide());
             user = new Fluffy(new Vector2D(1, 1), true, Tick.ID_FLUFFY, gameUIManager);
             players.add(user);
             gameThread.start();

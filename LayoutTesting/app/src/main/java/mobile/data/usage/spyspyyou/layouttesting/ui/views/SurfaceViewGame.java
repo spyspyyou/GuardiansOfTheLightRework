@@ -1,7 +1,6 @@
 package mobile.data.usage.spyspyyou.layouttesting.ui.views;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,8 +10,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.Tick;
-
-import static android.graphics.Bitmap.Config.ARGB_8888;
 
 public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callback{
 
@@ -59,28 +56,26 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (clickDetector.onTouchEvent(event))return true;
-
-        if (event.getAction() ==  MotionEvent.ACTION_DOWN ||event.getAction() == MotionEvent.ACTION_MOVE){
+        if (event.getAction() == MotionEvent.ACTION_UP){
+            hasFocus = false;
+        }else {
             hasFocus = true;
             fingerDisplacementX = event.getX() - halfWidth;
             fingerDisplacementY = event.getY() - halfHeight;
-        }else if (event.getAction() == MotionEvent.ACTION_UP){
-            hasFocus = false;
         }
-        return false;
+        return true;
     }
 
     public void drawToScreen(Canvas canvas){
-        getHolder().unlockCanvasAndPost(canvas);
+        if (canvas != null)getHolder().unlockCanvasAndPost(canvas);
     }
 
     public Canvas getCanvas(){
         Canvas canvas = null;
         try {
-            canvas = getHolder().lockCanvas(null);
+            canvas = getHolder().lockCanvas();
         } catch (Exception e){
             e.printStackTrace();
-            canvas = new Canvas(Bitmap.createBitmap(getWidth(), getHeight(), ARGB_8888));
         }
         return canvas;
     }

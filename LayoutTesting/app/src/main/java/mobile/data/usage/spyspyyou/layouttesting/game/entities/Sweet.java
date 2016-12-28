@@ -1,6 +1,6 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
-import mobile.data.usage.spyspyyou.layouttesting.game.Vector2D;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public class Sweet extends Entity {
 
