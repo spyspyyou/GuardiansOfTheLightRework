@@ -20,14 +20,14 @@ public abstract class Entity {
 
     private Matrix rotationMatrix = new Matrix();
     private Rect rect = new Rect();
-    private Vector2D screenPosition = new Vector2D(0, 0);
+    protected Vector2D screenPosition = new Vector2D(0, 0);
 
     protected boolean visible = true;
 
     private final int bitmapID;
     private Bitmap bitmap;
 
-    public Entity(Vector2D entityPosition, int width, int height, int  entityBitmapID){
+    protected Entity(Vector2D entityPosition, int width, int height, int  entityBitmapID){
         position = entityPosition;
         bitmapID = entityBitmapID;
         bitmap = BitmapManager.getBitmap(bitmapID);
@@ -46,7 +46,8 @@ public abstract class Entity {
         }
     }
 
-    public void setDirection(double direction){
+    protected void setDirection(double direction){
+        if (direction == 0)return;
 
         //reset all
         rotationMatrix.reset();

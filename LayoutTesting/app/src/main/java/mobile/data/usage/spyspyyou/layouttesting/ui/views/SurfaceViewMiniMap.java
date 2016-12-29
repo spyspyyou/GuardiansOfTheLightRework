@@ -18,12 +18,11 @@ import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.User;
 
-public class SurfaceViewMiniMap extends SurfaceView implements SurfaceHolder.Callback{
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ALLY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ENEMY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_USER;
 
-    private static final int
-            COLOR_VALUE_USER = 0xff0d6ffc,
-            COLOR_VALUE_ALLY = 0xff24de15,
-            COLOR_VALUE_ENEMY = 0xfff62b2b;
+public class SurfaceViewMiniMap extends SurfaceView implements SurfaceHolder.Callback{
 
     private int
             size,

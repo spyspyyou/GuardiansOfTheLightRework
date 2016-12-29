@@ -22,6 +22,8 @@ public class BitmapManager {
             R.drawable.wall_tile,
             R.drawable.void_tile,
             R.drawable.fluffy,
+            R.drawable.slime,
+            R.drawable.ghost,
             R.drawable.joystick_button_middle,
             R.drawable.joystick_button_ring,
             R.drawable.cross,

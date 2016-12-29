@@ -15,7 +15,7 @@ public abstract class User extends Player {
 
     private int mana = 0;
 
-    public User(Vector2D entityPosition, int size, byte characterType, GameUIManager mGameUIManager) {
+    protected User(Vector2D entityPosition, int size, byte characterType, GameUIManager mGameUIManager) {
         super(entityPosition, size, characterType);
         gameUIManager = mGameUIManager;
         velocity = mGameUIManager.getUserVelocity();
