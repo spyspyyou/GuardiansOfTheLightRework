@@ -2,6 +2,7 @@ package mobile.data.usage.spyspyyou.layouttesting.game;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -51,7 +52,6 @@ public class GameMap {
         tiles.append(LIGHT_BULB_STAND_GREEN, new Tile(BitmapManager.getBitmap(R.drawable.light_bulb_tile_team_green), true, true));
         //--------------------------------------------
         readPixelMap(pixelMap);
-        gameUIManager.setMap(pixelMap);
     }
 
     public void render(Canvas canvas, Vector2D userPosition){
@@ -59,13 +59,15 @@ public class GameMap {
 
         double startX = canvas.getWidth() / 2 - (Tick.MAX_TILES_IN_WIDTH / 2 + userPosition.x - userPosition.getIntX()) * TILE_SIDE;
         Vector2D screenPosition = new Vector2D(startX, canvas.getHeight() / 2 - (Tick.MAX_TILES_IN_HEIGHT / 2 + userPosition.y - userPosition.getIntY()) * TILE_SIDE);
-
+        Rect rect = new Rect(0, 0, 0, 0);
         for (int y = userPosition.getIntY() - Tick.MAX_TILES_IN_HEIGHT / 2; y <= userPosition.getIntY() + Tick.MAX_TILES_IN_HEIGHT / 2; ++y){
             screenPosition.x = startX;
             for (int x = userPosition.getIntX() - Tick.MAX_TILES_IN_WIDTH / 2; x <= userPosition.getIntX() + Tick.MAX_TILES_IN_WIDTH / 2; ++x){
                 bitmap = getTile(x, y).getBITMAP();
 
-                canvas.drawBitmap(bitmap, screenPosition.getFloatX(), screenPosition.getFloatY(), null);
+                rect.set(screenPosition.getIntX(), screenPosition.getIntY(), screenPosition.getIntX() + TILE_SIDE, screenPosition.getIntY() + TILE_SIDE);
+                canvas.drawBitmap(bitmap, null, rect, null);
+
                 screenPosition.x += TILE_SIDE;
             }
             screenPosition.y += TILE_SIDE;

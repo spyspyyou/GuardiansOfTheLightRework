@@ -6,6 +6,8 @@ public interface Tick {
     int TICK = 20;
     int TIME_PER_TICK = 1000 / TICK;
 
+    int ENEMY_VISION_RADIUS = 10;
+
     int
             MAX_TILES_IN_WIDTH = 10,
             MAX_TILES_IN_HEIGHT = 6;

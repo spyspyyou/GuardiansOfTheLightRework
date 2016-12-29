@@ -72,6 +72,7 @@ public class SurfaceViewJoystick extends SurfaceView implements SurfaceHolder.Ca
             }
 
             if (event.getAction() == MotionEvent.ACTION_DOWN && !active) {
+                if (event.getX() < joystickRadius)return false;
                 joystickPosition.set(event.getX(), event.getY());
                 active = true;
             }

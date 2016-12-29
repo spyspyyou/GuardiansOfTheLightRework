@@ -3,80 +3,69 @@ package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 
-import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
+import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
+
+import static android.graphics.Bitmap.createBitmap;
 
 public abstract class Entity {
 
     // center of the entity
     protected Vector2D position;
 
-    private double direction = 0;
+    protected int width, height;
 
-    private int width, height;
+    private Matrix rotationMatrix = new Matrix();
+    private Rect rect = new Rect();
+    private Vector2D screenPosition = new Vector2D(0, 0);
 
     protected boolean visible = true;
-    private boolean bitmapRecalculationRequired = false;
 
     private final int bitmapID;
     private Bitmap bitmap;
 
-    public Entity(Vector2D entityPosition, boolean isVisible, int  entityBitmapID){
+    public Entity(Vector2D entityPosition, int width, int height, int  entityBitmapID){
         position = entityPosition;
-        visible = isVisible;
-        bitmapID = R.drawable.fluffy;
+        bitmapID = entityBitmapID;
         bitmap = BitmapManager.getBitmap(bitmapID);
-        width = bitmap.getWidth();
-        height = bitmap.getHeight();
-    }
-
-    public Entity(Vector2D entityPosition, int width, int height, boolean isVisible, int  entityBitmapID){
-        position = entityPosition;
         this.width = width;
         this.height = height;
-        visible = isVisible;
-        bitmapID = entityBitmapID;
-        bitmap = Bitmap.createScaledBitmap(BitmapManager.getBitmap(bitmapID), width, height, false);
     }
 
     public abstract void update();
 
     public void render(Canvas canvas){
         if(visible){
-            if (bitmapRecalculationRequired)updateBitmap();
-            canvas.drawBitmap(bitmap, canvas.getWidth() / 2 - bitmap.getWidth()/2, canvas.getHeight() / 2 - bitmap.getHeight() / 2, null);
-            //todo:make get pos on screen method canvas.drawBitmap(bitmap, x, y, null);
+            Game.updateScreenPosition(position, screenPosition);
+
+            rect.set(screenPosition.getIntX() - width / 2, screenPosition.getIntY() - height / 2, screenPosition.getIntX() + width / 2, screenPosition.getIntY() + height / 2);
+            canvas.drawBitmap(bitmap, null, rect, null);
         }
     }
 
-    private void updateBitmap(){
-        Matrix matrix = new Matrix();
-        matrix.postRotate((float) (direction / Math.PI * 360 / 2) - 90);
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(BitmapManager.getBitmap(bitmapID), width, height, false);
-        bitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, width, height, matrix, false);
-        bitmapRecalculationRequired = false;
-    }
+    public void setDirection(double direction){
 
-    public void setDirection(double direction) {
-        this.direction = direction;
-        bitmapRecalculationRequired = true;
-    }
+        //reset all
+        rotationMatrix.reset();
+        rotationMatrix.postRotate((float) (direction / Math.PI * 360 / 2) - 90);
+        bitmap = BitmapManager.getBitmap(bitmapID);
 
-    public void setWidth(int width) {
-        this.width = width;
-        bitmapRecalculationRequired = true;
-    }
+        int
+                initialWidth = bitmap.getWidth(),
+                initialHeight = bitmap.getHeight();
 
-    public void setHeight(int height) {
-        this.height = height;
-        bitmapRecalculationRequired = true;
-    }
+        //rotate
+        bitmap = createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotationMatrix, true);
 
-    public void setSize(int size){
-        setWidth(size);
-        setHeight(size);
+        int
+                halfDifferenceWidth = (bitmap.getWidth() - initialWidth) / 2,
+                halfDifferenceHeight = (bitmap.getHeight() - initialHeight) / 2;
+
+        //crop away the unnecessary
+        bitmap = Bitmap.createBitmap(bitmap, halfDifferenceWidth, halfDifferenceHeight, initialWidth, initialHeight);
     }
 
     public Vector2D getPosition(){

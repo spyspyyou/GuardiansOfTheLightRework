@@ -9,12 +9,14 @@ import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 public abstract class User extends Player {
 
     private static final int MAX_MANA = 1000;
+
     private final GameUIManager gameUIManager;
     private VelocityVector2D velocity;
-    private int mana;
 
-    public User(Vector2D entityPosition, boolean isVisible, byte characterType, GameUIManager mGameUIManager) {
-        super(entityPosition, isVisible, characterType);
+    private int mana = 0;
+
+    public User(Vector2D entityPosition, int size, byte characterType, GameUIManager mGameUIManager) {
+        super(entityPosition, size, characterType);
         gameUIManager = mGameUIManager;
         velocity = mGameUIManager.getUserVelocity();
     }

@@ -24,16 +24,16 @@ public class BitmapManager {
             R.drawable.fluffy,
             R.drawable.joystick_button_middle,
             R.drawable.joystick_button_ring,
-            R.drawable.test_map_3
+            R.drawable.cross,
+            R.drawable.sweet
     };
 
     private static Bitmap defaultBitmap;
-    private static int tileSize;
     private static boolean loaded = false;
 
     private static SparseArray<Bitmap> bitmaps = new SparseArray<>();
 
-    /*package*/ static void loadBitmaps(Resources resources, int mTileSize){
+    /*package*/ static void loadBitmaps(Resources resources){
         //TODO:the bitmaps should be loaded the size of a tile / their most likely size
         if (loaded){
             Log.i("BitmapManager", "Bitmaps already loaded");
@@ -43,27 +43,11 @@ public class BitmapManager {
         Log.i("BitmapManager", "loading");
 
         loaded = true;
-        tileSize = mTileSize;
 
         defaultBitmap = decodeResource(resources, R.mipmap.ic_launcher);
         for (int recID:BITMAP_RESOURCES){
-            bitmaps.append(recID, loadBitmap(resources, recID));
+            bitmaps.append(recID, BitmapFactory.decodeResource(resources, recID));
         }
-    }
-
-    private static Bitmap loadBitmap(Resources resources, int recID){
-        Bitmap raw = BitmapFactory.decodeResource(resources, recID);
-        int width = raw.getWidth(), height = raw.getHeight();
-        if (width >= height){
-            width = tileSize;
-            height *= tileSize;
-            height /= raw.getWidth();
-        }else{
-            height = tileSize;
-            width *= tileSize;
-            width /= raw.getHeight();
-        }
-        return Bitmap.createScaledBitmap(raw, width, height, false);
     }
 
     public static void clearMemory(){

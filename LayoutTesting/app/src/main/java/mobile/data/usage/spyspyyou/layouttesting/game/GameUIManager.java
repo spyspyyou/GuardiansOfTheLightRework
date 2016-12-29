@@ -6,9 +6,11 @@ import android.view.SurfaceHolder;
 import android.view.View;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewJoystick;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewMiniMap;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public class GameUIManager{
 
@@ -73,8 +75,12 @@ public class GameUIManager{
         return surfaceViewGame.isCreated() && surfaceViewJoystick.isCreated() && surfaceViewMiniMap.isCreated();
     }
 
-    public void setMap(Bitmap map){
-        surfaceViewMiniMap.setMap(map);
+    public void setData(Bitmap map, Player[]players){
+        surfaceViewMiniMap.setData(map, players, getTileSide());
+    }
+
+    public Vector2D getGameSurfaceCenter(){
+        return new Vector2D(surfaceViewGame.getHalfWidth(), surfaceViewGame.getHalfHeight());
     }
 
 }
