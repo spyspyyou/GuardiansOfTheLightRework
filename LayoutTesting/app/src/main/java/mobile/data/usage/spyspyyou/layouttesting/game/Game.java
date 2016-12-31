@@ -10,12 +10,14 @@ import android.view.View;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Entity;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Fluffy;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Sweet;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.User;
 import mobile.data.usage.spyspyyou.layouttesting.game.events.GameEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
@@ -28,12 +30,12 @@ public class Game {
     private Sweet[] sweets = new Sweet[0];
     private User user;
     private GameThread gameThread;
-    private GameUIManager gameUIManager;
+    private SurfaceViewGame gameSurface;
     private static SurfaceCoordinateCalculator screenCalculator;
     private GameMap gameMap;
 
-    public Game(Resources resources, View rootView, Bitmap pixelMap){
-        new LoadingThread(resources, rootView, pixelMap).start();
+    public Game(Resources resources, View rootView, Bitmap pixelMap, byte controlType){
+        new LoadingThread(resources, rootView, pixelMap, controlType).start();
     }
 
     public void addEvent(GameEvent gameEvent){
@@ -45,8 +47,6 @@ public class Game {
             eventQueue.poll().apply();
         }
 
-        gameUIManager.update();
-
         for (Entity entity : players) {
             entity.update();
         }
@@ -54,9 +54,9 @@ public class Game {
 
     private void render(){
         //draw to the main surface
-        Canvas c = gameUIManager.getGameCanvas();
+        Canvas c = gameSurface.getCanvas();
         if (c != null) {
-            synchronized (gameUIManager.getGameSurfaceHolder()) {
+            synchronized (gameSurface.getHolder()) {
                 //todo:remove after debugging the game
                 c.drawColor(Color.MAGENTA);
 
@@ -71,7 +71,7 @@ public class Game {
                 }
             }
         }
-        gameUIManager.render(c);
+        gameSurface.render(c);
     }
 
     public static void updateScreenPosition(Vector2D mapPosition, Vector2D vectorToWriteTo){
@@ -79,23 +79,26 @@ public class Game {
     }
 
     private class LoadingThread extends Thread {
+
+        private final byte CONTROL_TYPE;
         private final Resources RESOURCES;
         private final View ROOT_VIEW;
         private final Bitmap PIXEL_MAP;
 
 
-        private LoadingThread (Resources resources, View rootView, Bitmap pixelMap){
+        private LoadingThread (Resources resources, View rootView, Bitmap pixelMap, byte controlType){
             RESOURCES = resources;
             ROOT_VIEW = rootView;
             PIXEL_MAP = pixelMap;
+            CONTROL_TYPE = controlType;
         }
 
         @Override
         public void run() {
             BitmapManager.loadBitmaps(RESOURCES);
 
-            gameUIManager = new GameUIManager(ROOT_VIEW);
-            while(!gameUIManager.areSurfacesCreated()) {
+            gameSurface = (SurfaceViewGame) ROOT_VIEW.findViewById(R.id.surfaceView_game);
+            while(!gameSurface.isCreated()) {
                 try {
                     sleep(100);
                 } catch (InterruptedException e) {
@@ -103,25 +106,29 @@ public class Game {
                 }
             }
 
-
             gameThread = new GameThread();
-            gameMap = new GameMap(gameUIManager, PIXEL_MAP, gameUIManager.getTileSide());
+            gameMap = new GameMap(PIXEL_MAP, gameSurface.getTileSide());
 
-            players = new Player[3];
+            int tileSide = gameSurface.getTileSide();
             Vector2D userPosition = new Vector2D(1, 1);
-            user = new Fluffy(userPosition, gameUIManager.getTileSide(), gameUIManager);
+
+            // todo: just for testing
+            //-------------------------------------------------------------------------
+            user = new Fluffy(userPosition, tileSide, gameSurface);
+            players = new Player[3];
             players[0] = user;
-            players[1] = new Player(new Vector2D(20, 15), gameUIManager.getTileSide(), ID_FLUFFY);
-            players[2] = new Player(new Vector2D(18, 27), gameUIManager.getTileSide(), ID_GHOST);
+            players[1] = new Player(new Vector2D(20, 15), tileSide, ID_FLUFFY);
+            players[2] = new Player(new Vector2D(18, 27), tileSide, ID_GHOST);
 
             sweets = new Sweet[3];
-            sweets[0] = new Sweet(new Vector2D(40, 23), gameUIManager.getTileSide());
-            sweets[1] = new Sweet(new Vector2D(20, 19), gameUIManager.getTileSide());
-            sweets[2] = new Sweet(new Vector2D(27, 20), gameUIManager.getTileSide());
+            sweets[0] = new Sweet(new Vector2D(40, 23), tileSide);
+            sweets[1] = new Sweet(new Vector2D(20, 19), tileSide);
+            sweets[2] = new Sweet(new Vector2D(27, 20), tileSide);
+            //-------------------------------------------------------------------------
 
-            screenCalculator = new SurfaceCoordinateCalculator(userPosition, gameUIManager);
-            gameUIManager.setData(PIXEL_MAP, players);
+            screenCalculator = new SurfaceCoordinateCalculator(userPosition, gameSurface);
 
+            gameSurface.setup(CONTROL_TYPE, PIXEL_MAP, players);
             gameThread.start();
         }
     }

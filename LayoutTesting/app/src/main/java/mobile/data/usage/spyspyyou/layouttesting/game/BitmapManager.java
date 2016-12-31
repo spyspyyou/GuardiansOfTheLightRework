@@ -24,8 +24,6 @@ public class BitmapManager {
             R.drawable.fluffy,
             R.drawable.slime,
             R.drawable.ghost,
-            R.drawable.joystick_button_middle,
-            R.drawable.joystick_button_ring,
             R.drawable.cross,
             R.drawable.sweet
     };

@@ -1,5 +1,6 @@
 package mobile.data.usage.spyspyyou.layouttesting.game;
 
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public class SurfaceCoordinateCalculator {
@@ -10,10 +11,10 @@ public class SurfaceCoordinateCalculator {
 
     private final int TILE_SIDE;
 
-    public SurfaceCoordinateCalculator(Vector2D userPosition, GameUIManager gameUIManager){
+    public SurfaceCoordinateCalculator(Vector2D userPosition, SurfaceViewGame surfaceViewGame){
         USER_POSITION = userPosition;
-        SURFACE_CENTER = gameUIManager.getGameSurfaceCenter();
-        TILE_SIDE = gameUIManager.getTileSide();
+        SURFACE_CENTER = surfaceViewGame.getCenter();
+        TILE_SIDE = surfaceViewGame.getTileSide();
     }
 
     public void updateScreenPosition(Vector2D mapPosition, Vector2D vectorToWriteTo){

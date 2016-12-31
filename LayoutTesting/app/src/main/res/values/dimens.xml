@@ -7,5 +7,7 @@
     <dimen name="elevation">3dp</dimen>
     <dimen name="character_selection_length">150dp</dimen>
     <dimen name="joystick_size">65dp</dimen>
+    <dimen name="joystick_surface_width">250dp</dimen>
     <dimen name="mini_map_size">100dp</dimen>
+    <dimen name="button_size">80dp</dimen>
 </resources>

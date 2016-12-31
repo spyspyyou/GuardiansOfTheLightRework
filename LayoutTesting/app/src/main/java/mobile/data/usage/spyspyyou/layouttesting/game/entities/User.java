@@ -2,23 +2,25 @@ package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
 import android.graphics.Canvas;
 
-import mobile.data.usage.spyspyyou.layouttesting.game.GameUIManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.VelocityVector2D;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 public abstract class User extends Player {
 
-    private static final int MAX_MANA = 1000;
+    protected static final int MAX_MANA = 1000;
+    private final int manaUsage;
 
-    private final GameUIManager gameUIManager;
-    private VelocityVector2D velocity;
+    private final SurfaceViewGame surfaceViewGame;
+    protected VelocityVector2D velocity;
 
-    private int mana = 0;
+    protected int mana = 0;
 
-    protected User(Vector2D entityPosition, int size, byte characterType, GameUIManager mGameUIManager) {
+    protected User(Vector2D entityPosition, int size, byte characterType, SurfaceViewGame mSurfaceViewGame, int abilityManaUsage) {
         super(entityPosition, size, characterType);
-        gameUIManager = mGameUIManager;
-        velocity = mGameUIManager.getUserVelocity();
+        surfaceViewGame = mSurfaceViewGame;
+        velocity = surfaceViewGame.getUserVelocity();
+        manaUsage = abilityManaUsage;
     }
 
 
@@ -26,10 +28,12 @@ public abstract class User extends Player {
     public void update() {
         //update position + direction
         move();
+        addMana();
+        if (mana > MAX_MANA)mana = MAX_MANA;
     }
 
     private void move(){
-        if (gameUIManager.activeUserDirection())setDirection(gameUIManager.getUserDirection());
+        setDirection(surfaceViewGame.getUserDirection());
 
         position.add(velocity.getVelocity(slimy));
         //todo:hitbox
@@ -41,5 +45,11 @@ public abstract class User extends Player {
         if (!visible) hud.render(canvas);
     }
 
-    public abstract void activateSkill();
+    protected abstract void addMana();
+
+    public boolean activateSkill(){
+        if (manaUsage > mana)return false;
+        mana -= manaUsage;
+        return true;
+    }
 }

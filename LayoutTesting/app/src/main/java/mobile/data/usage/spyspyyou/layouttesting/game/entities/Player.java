@@ -24,6 +24,8 @@ public class Player extends Entity {
         super(entityPosition, size, size, IdLinker.getBitmapId(characterId));
         if (this instanceof User){
             hud = new HUD(this instanceof User);
+        }else{
+            hud = new HUD(false);
         }
     }
 

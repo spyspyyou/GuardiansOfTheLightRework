@@ -9,6 +9,7 @@ import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.game.events.GameEvent;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 
 public class GameActivity extends GotLActivity {
 
@@ -18,8 +19,8 @@ public class GameActivity extends GotLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideSystemUI();
-        setContentView(R.layout.activity_game_2);
-        game = new Game(getResources(), findViewById(R.id.relativeLayout_game), BitmapFactory.decodeResource(getResources(), R.drawable.test_map_3));
+        setContentView(R.layout.activity_game);
+        game = new Game(getResources(), findViewById(R.id.relativeLayout_game), BitmapFactory.decodeResource(getResources(), R.drawable.test_map_3), SurfaceViewGame.LEFT);
     }
 
     @Override

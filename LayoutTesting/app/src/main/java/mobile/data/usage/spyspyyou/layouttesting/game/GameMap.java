@@ -9,7 +9,7 @@ import android.util.SparseArray;
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
-public class GameMap {
+/*package*/ class GameMap {
 
     //color codes
     private static final int
@@ -28,13 +28,16 @@ public class GameMap {
             lightBulbStandBlue = new Vector2D(0, 0),
             lightBulbStandGreen = new Vector2D(0, 0);
 
+    private Rect
+            rect = new Rect(0, 0, 0, 0);
+
     private Tile[][] map;
 
     private SparseArray<Tile> tiles = new SparseArray<>();
 
     private final int TILE_SIDE;
 
-    /*package*/ GameMap(GameUIManager gameUIManager, Bitmap pixelMap, int tileSide){
+    /*package*/ GameMap(Bitmap pixelMap, int tileSide){
         TILE_SIDE = tileSide;
         //--------------------------------------------
         //load all tiles
@@ -54,12 +57,12 @@ public class GameMap {
         readPixelMap(pixelMap);
     }
 
-    public void render(Canvas canvas, Vector2D userPosition){
+    /*package*/ void render(Canvas canvas, Vector2D userPosition){
         Bitmap bitmap;
 
         double startX = canvas.getWidth() / 2 - (Tick.MAX_TILES_IN_WIDTH / 2 + userPosition.x - userPosition.getIntX()) * TILE_SIDE;
         Vector2D screenPosition = new Vector2D(startX, canvas.getHeight() / 2 - (Tick.MAX_TILES_IN_HEIGHT / 2 + userPosition.y - userPosition.getIntY()) * TILE_SIDE);
-        Rect rect = new Rect(0, 0, 0, 0);
+
         for (int y = userPosition.getIntY() - Tick.MAX_TILES_IN_HEIGHT / 2; y <= userPosition.getIntY() + Tick.MAX_TILES_IN_HEIGHT / 2; ++y){
             screenPosition.x = startX;
             for (int x = userPosition.getIntX() - Tick.MAX_TILES_IN_WIDTH / 2; x <= userPosition.getIntX() + Tick.MAX_TILES_IN_WIDTH / 2; ++x){
@@ -162,4 +165,5 @@ public class GameMap {
             return IMPASSABLE;
         }
     }
+
 }
