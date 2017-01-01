@@ -4,12 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
-
-import static android.graphics.Bitmap.createBitmap;
 
 public abstract class Entity {
 
@@ -51,6 +50,7 @@ public abstract class Entity {
 
         //reset all
         rotationMatrix.reset();
+        if (direction != direction)Log.i("Entity", "direction is NaN");
         rotationMatrix.postRotate((float) (direction / Math.PI * 360 / 2) - 90);
         bitmap = BitmapManager.getBitmap(bitmapID);
 
@@ -59,7 +59,7 @@ public abstract class Entity {
                 initialHeight = bitmap.getHeight();
 
         //rotate
-        bitmap = createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotationMatrix, true);
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, initialWidth, initialHeight, rotationMatrix, true);
 
         int
                 halfDifferenceWidth = (bitmap.getWidth() - initialWidth) / 2,

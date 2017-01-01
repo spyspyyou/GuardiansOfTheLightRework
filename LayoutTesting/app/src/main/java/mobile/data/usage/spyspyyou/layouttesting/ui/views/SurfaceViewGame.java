@@ -40,14 +40,13 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             margin;
 
     private boolean
-            hasFocus = false,
             created = false;
 
     private Vector2D
             fingerDisplacement = new Vector2D(0, 0);
 
     private double
-            userDirection;
+            userDirection = 0;
 
     private VelocityVector2D
             userVelocity = new VelocityVector2D(0, 0);
@@ -94,19 +93,19 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         synchronized (getHolder()) {
-            if (
-                    (surfaceMiniMap.preClaimTouchEvent(event) && surfaceMiniMap.onTouchEvent(event))
-                            || (buttonSkill.preClaimTouchEvent(event) && buttonSkill.onTouchEvent(event))
-                            || (buttonParticle.preClaimTouchEvent(event) && buttonParticle.onTouchEvent(event))
-                            || clickDetector.onTouchEvent(event)
-                            || event.getAction() == MotionEvent.ACTION_UP
-                    ) {
-                hasFocus = false;
-            } else if (surfaceJoystick.preClaimTouchEvent(event) || ((SurfaceJoystick)surfaceJoystick).active){
+            if (surfaceMiniMap.preClaimTouchEvent(event)) {
+                surfaceMiniMap.onTouchEvent(event);
+            }else if (surfaceJoystick.preClaimTouchEvent(event)) {
                 surfaceJoystick.onTouchEvent(event);
-            } else {
-                hasFocus = true;
-                fingerDisplacement.set(event.getX() - halfWidth, event.getY() - halfHeight);
+            }else if (buttonSkill.preClaimTouchEvent(event)) {
+                buttonSkill.onTouchEvent(event);
+            }else if (buttonParticle.preClaimTouchEvent(event)){
+                buttonParticle.onTouchEvent(event);
+            }else if(!clickDetector.onTouchEvent(event)){
+                if (event.getAction() == MotionEvent.ACTION_UP && event.getAction() == MotionEvent.ACTION_POINTER_UP)
+                    fingerDisplacement.set(0 ,0);
+                else
+                    fingerDisplacement.set(event.getX() - halfWidth, event.getY() - halfHeight);
             }
         }
         return true;
@@ -170,11 +169,10 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     }
 
     public double getUserDirection() {
-        if (hasFocus) {
+        if (!((SurfaceJoystick)surfaceJoystick).active && ! fingerDisplacement.has0Length()) {
             synchronized (getHolder()) {
                 userDirection = Math.acos(fingerDisplacement.x / fingerDisplacement.getLength());
                 if (fingerDisplacement.y <= 0) userDirection *= -1;
-                return userDirection;
             }
         }
         return userDirection;
@@ -213,7 +211,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         }
 
         private boolean preClaimTouchEvent(MotionEvent motionEvent){
-            return motionEvent.getX() > POSITION.left && motionEvent.getY() > POSITION.top&& motionEvent.getX() < POSITION.right && motionEvent.getY() < POSITION.bottom;
+            return POSITION.contains((int)motionEvent.getRawX(), (int)motionEvent.getRawY());
         }
 
         protected abstract boolean onTouchEvent(MotionEvent motionEvent);
@@ -250,10 +248,10 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             dataChanged = true;
-            if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
                 active = false;
                 fingerDisplacement.set(0, 0);
-            }else if (event.getAction() == MotionEvent.ACTION_DOWN && !active) {
+            }else if ((event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_POINTER_DOWN) && !active) {
                 joystickPosition.set(event.getX(), event.getY());
                 active = true;
             }else if (active){
@@ -267,7 +265,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         public void render(Canvas canvas) {
             updateData();
             if (canvas != null && active) {
-                canvas.drawCircle(joystickPosition.getFloatX(), joystickPosition.getFloatY(), joystickRadius, paintJoystickRing);
+                canvas.drawCircle(joystickPosition.getFloatX(), joystickPosition.getFloatY(), joystickRadius * 0.75f, paintJoystickRing);
                 canvas.drawCircle(joystickPosition.getFloatX() + centerDisplacement.getFloatX(), joystickPosition.getFloatY() + centerDisplacement.getFloatY(), joystickRadius / 2, paintJoystickCenter);
             }
         }
@@ -275,7 +273,9 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         private void updateData() {
             if (!dataChanged) return;
             dataChanged = false;
-            centerDisplacement.set(fingerDisplacement);
+            synchronized (getHolder()) {
+                centerDisplacement.set(fingerDisplacement);
+            }
 
             if (!active || centerDisplacement.has0Length()) {
                 userVelocity.set(0, 0);
@@ -324,18 +324,16 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
             size = (int) getResources().getDimension(R.dimen.mini_map_size);
 
-            bigRect = new Rect(halfWidth - getHeight() / 2, margin, halfWidth + getHeight() / 2, getHeight() - 2 * margin);
+            bigRect = new Rect(halfWidth - getHeight() / 2 + margin, margin, halfWidth + getHeight() / 2 - margin, getHeight() - margin);
 
             miniMapTileSizeSmall = (1f * size) / bitmap.getWidth();
-            miniMapTileSizeBig = (1f * getHeight()) /bitmap.getWidth();
-
+            miniMapTileSizeBig = (1f * (getHeight() - 2 * margin)) / bitmap.getWidth();
             painMiniMapSmall.setAlpha(0xaa);
-
         }
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN){
+            if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_POINTER_DOWN){
                 big = !big;
                 return true;
             }
@@ -355,7 +353,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             }
         }
 
-        private void drawPlayers(Canvas canvas, Rect rect, float tileSide){
+        private void drawPlayers(Canvas canvas, Rect rect, float miniMapTileSide){
             Paint currentColor;
             for (Player player:players){
                 if (player instanceof User){
@@ -367,21 +365,41 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
                 }else{
                     continue;
                 }
-                canvas.drawCircle(rect.left + player.getPosition().getFloatX() * tileSide, rect.top + player.getPosition().getFloatY() * tileSide, player.getRadius() / tileSide * tileSide, currentColor);
+                canvas.drawCircle(rect.left + player.getPosition().getFloatX() * miniMapTileSide, rect.top + player.getPosition().getFloatY() * miniMapTileSide, player.getRadius() / tileSide * miniMapTileSide, currentColor);
             }
         }
 
     }
 
-    private class FillingButton extends VirtualSurface{
+    private abstract class VirtualButton extends VirtualSurface{
+
+        private VirtualButton(Rect position) {
+            super(position);
+        }
+
+        @Override
+        protected boolean onTouchEvent(MotionEvent motionEvent) {
+            if (
+                    (motionEvent.getAction() == MotionEvent.ACTION_DOWN || motionEvent.getAction() == MotionEvent.ACTION_POINTER_DOWN)
+                    && POSITION.contains((int)motionEvent.getX(), (int)motionEvent.getY())
+                    ){
+                onClick();
+            }
+            return true;
+        }
+
+        protected abstract void onClick();
+    }
+
+    private class FillingButton extends VirtualButton{
 
         private FillingButton(Rect position) {
             super(position);
         }
 
         @Override
-        protected boolean onTouchEvent(MotionEvent motionEvent) {
-            return true;
+        protected void onClick() {
+
         }
 
         @Override
