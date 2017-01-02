@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Entity;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Fluffy;
+import mobile.data.usage.spyspyyou.layouttesting.game.entities.LightBulb;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Sweet;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.User;
@@ -28,6 +29,7 @@ public class Game {
     private static Queue<GameEvent> eventQueue = new LinkedBlockingQueue<>();
     private Player[] players = new Player[0];
     private Sweet[] sweets = new Sweet[0];
+    private LightBulb[] lightBulbs = new LightBulb[0];
     private User user;
     private GameThread gameThread;
     private SurfaceViewGame gameSurface;
@@ -50,6 +52,10 @@ public class Game {
         for (Entity entity : players) {
             entity.update();
         }
+
+        for (LightBulb lightBulb:lightBulbs){
+            lightBulb.update();
+        }
     }
 
     private void render(){
@@ -64,6 +70,10 @@ public class Game {
 
                 for (Sweet sweet:sweets){
                     sweet.render(c);
+                }
+
+                for (LightBulb lightBulb:lightBulbs){
+                    lightBulb.render(c);
                 }
 
                 for (Entity entity : players) {
@@ -124,6 +134,10 @@ public class Game {
             sweets[0] = new Sweet(new Vector2D(40, 23), tileSide);
             sweets[1] = new Sweet(new Vector2D(20, 19), tileSide);
             sweets[2] = new Sweet(new Vector2D(27, 20), tileSide);
+
+            lightBulbs = new LightBulb[1];
+            lightBulbs[0] = new LightBulb(new Vector2D(1.5, 1.5), tileSide);
+            lightBulbs[0].startPickingUp();
             //-------------------------------------------------------------------------
 
             screenCalculator = new SurfaceCoordinateCalculator(userPosition, gameSurface);

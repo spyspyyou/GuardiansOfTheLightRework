@@ -8,10 +8,11 @@ import android.graphics.Rect;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
@@ -19,8 +20,8 @@ import mobile.data.usage.spyspyyou.layouttesting.game.Tick;
 import mobile.data.usage.spyspyyou.layouttesting.game.VelocityVector2D;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.User;
+import mobile.data.usage.spyspyyou.layouttesting.utils.BorderPaint;
 import mobile.data.usage.spyspyyou.layouttesting.utils.ColorPaint;
-import mobile.data.usage.spyspyyou.layouttesting.utils.RingPaint;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ALLY;
@@ -41,10 +42,8 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             margin;
 
     private boolean
-            created = false;
-
-    private Vector2D
-            fingerDisplacement = new Vector2D(0, 0);
+            created = false,
+            joyStickActive = false;
 
     private double
             userDirection = 0;
@@ -52,18 +51,14 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     private VelocityVector2D
             userVelocity = new VelocityVector2D(0, 0);
 
-    private VirtualSurface
-            surfaceJoystick,
-            surfaceMiniMap,
-            buttonSkill,
-            buttonParticle;
+    private SurfaceJoystick surfaceJoystick;
 
-    private GestureDetector clickDetector;
+    private ArrayList<VirtualButton>
+            buttons = new ArrayList<>();
 
     public SurfaceViewGame(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
-        clickDetector = new GestureDetector(new ClickDetector());
         margin = (int) getResources().getDimension(R.dimen.activity_margin_normal);
     }
 
@@ -93,40 +88,13 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isActionDown(event)) {
-            Vector2D position = getActionPosition(event);
-            //assign the Event to a surface
-            if (surfaceMiniMap.preClaimTouchEvent(position)) {
-            } else if (buttonSkill.preClaimTouchEvent(position)) {
-            } else if (buttonParticle.preClaimTouchEvent(position)) {
-            } else if (clickDetector.onTouchEvent(event)) {
-            } else if (surfaceJoystick.preClaimTouchEvent(position)) {
-            } else {
-            }
-            Log.i("SVGame", "touchDown");
-        }
+        for (VirtualButton button:buttons)button.onTouchEvent(event);
 
-        //distribute the event
-        surfaceMiniMap.onTouchEvent(event);
-        buttonSkill.onTouchEvent(event);
-        buttonParticle.onTouchEvent(event);
-        onTouch(event);
+        if (isActionDown(event))surfaceJoystick.claimTouchSeries(event);
         surfaceJoystick.onTouchEvent(event);
+        if (isActionUp(event))surfaceJoystick.releaseTouchSeries(event);
 
-        if (isActionUp(event)) {
-            //release the Event assignment
-            Log.i("SVGame", "release");
-        }
         return true;
-    }
-
-    private void onTouch(MotionEvent event){
-        synchronized (getHolder()) {
-            if (isActionUp(event))
-                fingerDisplacement.set(0, 0);
-            else
-                fingerDisplacement.set(event.getX() - halfWidth, event.getY() - halfHeight);
-        }
     }
 
     public void setup(int controlType, Bitmap map, Player[] players){
@@ -144,25 +112,27 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void createLeft(Bitmap map, Player[] players){
-        surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
         int miniMapSize = (int) getResources().getDimension(R.dimen.mini_map_size);
-        surfaceMiniMap = new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players);
-        buttonSkill = new FillingButton(new Rect(0, 0, 0, 0));
-        buttonParticle = new FillingButton(new Rect(0, 0, 0, 0));
+        surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
+        buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players));
+        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
     }
 
     private void createRight(Bitmap map, Player[] players){
-        surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, 0, 0));
-        surfaceMiniMap = new SurfaceMiniMap(new Rect(0, 0, 0, 0), map, players);
-        buttonSkill = new FillingButton(new Rect(0, 0, 0, 0));
-        buttonParticle = new FillingButton(new Rect(0, 0, 0, 0));
+        int miniMapSize = (int) getResources().getDimension(R.dimen.mini_map_size);
+        surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
+        buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players));
+        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
     }
 
     private void createRandom(Bitmap map, Player[] players){
-        surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, 0, 0));
-        surfaceMiniMap = new SurfaceMiniMap(new Rect(0, 0, 0, 0), map, players);
-        buttonSkill = new FillingButton(new Rect(0, 0, 0, 0));
-        buttonParticle = new FillingButton(new Rect(0, 0, 0, 0));
+        int miniMapSize = (int) getResources().getDimension(R.dimen.mini_map_size);
+        surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
+        buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players));
+        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
     }
 
     public Canvas getCanvas(){
@@ -178,21 +148,15 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     public void render(Canvas canvas){
         if (canvas != null){
             surfaceJoystick.render(canvas);
-            surfaceMiniMap.render(canvas);
-            buttonSkill.render(canvas);
-            buttonParticle.render(canvas);
+            for (VirtualButton button: buttons){
+                button.render(canvas);
+            }
 
             getHolder().unlockCanvasAndPost(canvas);
         }
     }
 
     public double getUserDirection() {
-        if (!((SurfaceJoystick)surfaceJoystick).active && ! fingerDisplacement.has0Length()) {
-            synchronized (getHolder()) {
-                userDirection = Math.acos(fingerDisplacement.x / fingerDisplacement.getLength());
-                if (fingerDisplacement.y <= 0) userDirection *= -1;
-            }
-        }
         return userDirection;
     }
 
@@ -212,27 +176,26 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         return new Vector2D(halfWidth, halfHeight);
     }
 
-    private boolean isActionDown(MotionEvent motionEvent){
-        return motionEvent.getAction() == MotionEvent.ACTION_DOWN || MotionEventCompat.getActionMasked(motionEvent) == MotionEventCompat.ACTION_POINTER_DOWN;
+    //----------------------------------------------------------------------------------------------------------------------------
+    // MotionEvent getter methods
+
+    private boolean isActionDown(MotionEvent event){
+        int action = event.getActionMasked();
+        return action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN;
     }
 
-    private boolean isActionUp(MotionEvent motionEvent){
-        return motionEvent.getAction() == MotionEvent.ACTION_UP || MotionEventCompat.getActionMasked(motionEvent) == MotionEventCompat.ACTION_POINTER_UP;
+    private boolean isActionUp(MotionEvent event){
+        int action = event.getActionMasked();
+        return action == MotionEvent.ACTION_UP  || action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_CANCEL;
     }
 
-    private Vector2D getActionPosition(MotionEvent motionEvent){
-        int index = MotionEventCompat.getActionIndex(motionEvent);
-        return new Vector2D(motionEvent.getX(index), motionEvent.getY(index));
+    private Vector2D getActionPosition(MotionEvent event){
+        int index = MotionEventCompat.getActionIndex(event);
+        return new Vector2D(event.getX(index), event.getY(index));
     }
 
-    private class ClickDetector extends GestureDetector.SimpleOnGestureListener {
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            //todo:check if a player was clicked
-            return false;
-        }
-    }
+    //----------------------------------------------------------------------------------------------------------------------------
+    // Virtual Surfaces
 
     private abstract class VirtualSurface {
 
@@ -242,18 +205,22 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             POSITION = position;
         }
 
-        protected boolean preClaimTouchEvent(Vector2D position){
+        protected boolean contains(Vector2D position){
             return POSITION.contains(position.getIntX(), position.getIntY());
         }
 
-        protected abstract void onTouchEvent(MotionEvent motionEvent);
+        protected abstract boolean onTouchEvent(MotionEvent event);
 
         protected abstract void render(Canvas canvas);
     }
 
     private class SurfaceJoystick extends VirtualSurface implements Tick{
 
-        private float joystickRadius;
+        private int
+                pointerID;
+
+        private float
+                joystickRadius;
 
         private Paint
                 paintJoystickRing,
@@ -265,7 +232,6 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
                 centerDisplacement = new Vector2D(0, 0);
 
         private boolean
-                active = false,
                 dataChanged = false;
 
         private SurfaceJoystick(Rect position) {
@@ -274,31 +240,41 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
             paintJoystickCenter = new Paint();
             paintJoystickCenter.setColor(COLOR_VALUE_BAR_BACKGROUND);
-            paintJoystickRing = new RingPaint((int)(joystickRadius / 2), COLOR_VALUE_BAR_BACKGROUND);
+            paintJoystickRing = new BorderPaint((int)(joystickRadius / 2), COLOR_VALUE_BAR_BACKGROUND);
         }
 
-        @Override
-        protected boolean preClaimTouchEvent(Vector2D position) {
-            return super.preClaimTouchEvent(position) && !active;
-        }
-
-        @Override
-        public void onTouchEvent(MotionEvent event) {
-            dataChanged = true;
-            if (!active) {
-                joystickPosition.set(event.getX(), event.getY());
-                active = true;
-            } else if (isActionUp(event)) {
-                active = false;
+        private boolean claimTouchSeries(MotionEvent event) {
+            Vector2D position = getActionPosition(event);
+            if (POSITION.contains(position.getIntX(), position.getIntY()) && !joyStickActive) {
+                Log.d("SVGame", "joystick start");
+                joystickPosition.set(position.x, position.y);
                 fingerDisplacement.set(0, 0);
-            } else{
-                fingerDisplacement.set(event.getX() - joystickPosition.x, event.getY() - joystickPosition.y);
+                joyStickActive = true;
+                pointerID = event.getPointerId(event.getActionIndex());
+                return true;
             }
+            return false;
+        }
+
+        private void releaseTouchSeries(MotionEvent event){
+            if (event.getPointerId(event.getActionIndex()) != pointerID)return;
+            Log.d("SVGame", "joystick stop");
+            joyStickActive = false;
+            fingerDisplacement.set(0, 0);
+        }
+
+        @Override
+        protected boolean onTouchEvent(MotionEvent event) {
+            if (!joyStickActive)return false;
+            dataChanged = true;
+
+            fingerDisplacement.set(event.getX(event.findPointerIndex(pointerID)) - joystickPosition.x, event.getY(event.findPointerIndex(pointerID)) - joystickPosition.y);
+            return true;
         }
 
         public void render(Canvas canvas) {
             updateData();
-            if (canvas != null && active) {
+            if (canvas != null && joyStickActive) {
                 canvas.drawCircle(joystickPosition.getFloatX(), joystickPosition.getFloatY(), joystickRadius * 0.75f, paintJoystickRing);
                 canvas.drawCircle(joystickPosition.getFloatX() + centerDisplacement.getFloatX(), joystickPosition.getFloatY() + centerDisplacement.getFloatY(), joystickRadius / 2, paintJoystickCenter);
             }
@@ -311,7 +287,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
                 centerDisplacement.set(fingerDisplacement);
             }
 
-            if (!active || centerDisplacement.has0Length()) {
+            if (!joyStickActive || centerDisplacement.has0Length()) {
                 userVelocity.set(0, 0);
                 return;
             }
@@ -334,10 +310,12 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         }
 
         @Override
-        protected void onTouchEvent(MotionEvent motionEvent) {
-            if ((motionEvent.getAction() == MotionEvent.ACTION_DOWN || motionEvent.getAction() == MotionEvent.ACTION_POINTER_DOWN)){
+        protected boolean onTouchEvent(MotionEvent event) {
+            if (isActionDown(event) && contains(getActionPosition(event))){
                 onClick();
+                return true;
             }
+            return false;
         }
 
         protected abstract void onClick();
@@ -356,7 +334,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
                 bigRect;
 
         private Paint
-                painMiniMapSmall = new Paint(),
+                paintMiniMapSmall = new Paint(),
                 colorUser = new ColorPaint(COLOR_VALUE_USER),
                 colorAlly = new ColorPaint(COLOR_VALUE_ALLY),
                 colorEnemy = new ColorPaint(COLOR_VALUE_ENEMY);
@@ -376,22 +354,22 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             players = mPlayers;
 
             size = (int) getResources().getDimension(R.dimen.mini_map_size);
-
             bigRect = new Rect(halfWidth - getHeight() / 2 + margin, margin, halfWidth + getHeight() / 2 - margin, getHeight() - margin);
 
             miniMapTileSizeSmall = (1f * size) / bitmap.getWidth();
             miniMapTileSizeBig = (1f * (getHeight() - 2 * margin)) / bitmap.getWidth();
-            painMiniMapSmall.setAlpha(0xaa);
+
+            paintMiniMapSmall.setAlpha(0xaa);
         }
 
         public void render(Canvas canvas) {
             if (canvas != null) {
                 if (big) {
                     canvas.drawBitmap(bitmap, null, bigRect, null);
-                    canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.cross), null, POSITION, painMiniMapSmall);
+                    canvas.drawBitmap(BitmapManager.getBitmap(R.drawable.cross), null, POSITION, null);
                     drawPlayers(canvas, bigRect, miniMapTileSizeBig);
                 } else {
-                    canvas.drawBitmap(bitmap, null, POSITION, painMiniMapSmall);
+                    canvas.drawBitmap(bitmap, null, POSITION, paintMiniMapSmall);
                     drawPlayers(canvas, POSITION, miniMapTileSizeSmall);
                 }
             }

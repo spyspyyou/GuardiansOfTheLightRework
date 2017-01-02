@@ -25,7 +25,8 @@ public class BitmapManager {
             R.drawable.slime,
             R.drawable.ghost,
             R.drawable.cross,
-            R.drawable.sweet
+            R.drawable.sweet,
+            R.drawable.light_bulb_on_square
     };
 
     private static Bitmap defaultBitmap;

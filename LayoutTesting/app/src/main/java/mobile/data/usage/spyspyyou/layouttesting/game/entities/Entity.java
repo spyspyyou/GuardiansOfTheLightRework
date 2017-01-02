@@ -3,7 +3,7 @@ package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
@@ -18,7 +18,7 @@ public abstract class Entity {
     protected int width, height;
 
     private Matrix rotationMatrix = new Matrix();
-    private Rect rect = new Rect();
+    protected RectF rect = new RectF();
     protected Vector2D screenPosition = new Vector2D(0, 0);
 
     protected boolean visible = true;
@@ -46,13 +46,18 @@ public abstract class Entity {
     }
 
     protected void setDirection(double direction){
-        if (direction == 0)return;
+        if (direction != direction){
+            Log.w("Entity", "direction is NaN");
+            return;
+        }
 
         //reset all
         rotationMatrix.reset();
         if (direction != direction)Log.i("Entity", "direction is NaN");
         rotationMatrix.postRotate((float) (direction / Math.PI * 360 / 2) - 90);
         bitmap = BitmapManager.getBitmap(bitmapID);
+
+        if (direction == 0)return;
 
         int
                 initialWidth = bitmap.getWidth(),

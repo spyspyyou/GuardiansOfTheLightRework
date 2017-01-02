@@ -2,12 +2,12 @@ package mobile.data.usage.spyspyyou.layouttesting.utils;
 
 import android.graphics.Paint;
 
-public class RingPaint extends Paint {
+public class BorderPaint extends Paint {
 
-    public RingPaint(int ringWidth, int color){
+    public BorderPaint(int borderWidth, int color){
         setFlags(ANTI_ALIAS_FLAG);
         setStyle(Style.STROKE);
-        setStrokeWidth(ringWidth);
+        setStrokeWidth(borderWidth);
         setColor(color);
     }
 }
