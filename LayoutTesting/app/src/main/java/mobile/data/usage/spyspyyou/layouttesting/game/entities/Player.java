@@ -43,7 +43,7 @@ public class Player extends Entity {
         return ally;
     }
 
-    public int getRadius(){
+    public float getRadius(){
         return width / 2;
     }
 
