@@ -3,11 +3,8 @@ package mobile.data.usage.spyspyyou.layouttesting.game;
 import mobile.data.usage.spyspyyou.layouttesting.R;
 
 public interface Tick {
-    int TICK = 20;
+    int TICK = 25;
     int TIME_PER_TICK = 1000 / TICK;
-
-    int
-            ENEMY_VISION_RADIUS = 10;
 
     int
             COLOR_VALUE_BAR_BACKGROUND = 0x50000000,
@@ -17,7 +14,9 @@ public interface Tick {
 
     int
             MAX_TILES_IN_WIDTH = 10,
-            MAX_TILES_IN_HEIGHT = 6;
+            MAX_TILES_IN_HEIGHT = 5,
+            HALF_TILES_IN_WIDTH = MAX_TILES_IN_WIDTH / 2 + ((MAX_TILES_IN_WIDTH % 2 != 0)?1:0),
+            HALF_TILES_IN_HEIGHT = MAX_TILES_IN_HEIGHT / 2 + ((MAX_TILES_IN_HEIGHT % 2 != 0)?1:0);
 
     byte
             ID_FLUFFY = 0,

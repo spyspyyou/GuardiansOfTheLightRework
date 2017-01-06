@@ -3,13 +3,14 @@ package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.game.IdLinker;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ALLY;
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_BAR_BACKGROUND;
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ENEMY;
-import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_USER;
 
 
 public class Player extends Entity {
@@ -20,13 +21,9 @@ public class Player extends Entity {
 
     protected HUD hud;
 
-    public Player(Vector2D entityPosition, int size, byte characterId) {
-        super(entityPosition, size, size, IdLinker.getBitmapId(characterId));
-        if (this instanceof User){
-            hud = new HUD(this instanceof User);
-        }else{
-            hud = new HUD(false);
-        }
+    public Player(Vector2D entityPosition, byte characterId) {
+        super(entityPosition, SurfaceViewGame.getTileSide(), SurfaceViewGame.getTileSide(), IdLinker.getBitmapId(characterId));
+        hud = new HUD();
     }
 
     @Override
@@ -37,7 +34,8 @@ public class Player extends Entity {
         }
     }
 
-    public void update(){}
+    @Override
+    public void update(Game game){}
 
     public boolean isAlly(){
         return ally;
@@ -45,6 +43,10 @@ public class Player extends Entity {
 
     public float getRadius(){
         return width / 2;
+    }
+
+    protected void setRadius(int radius){
+        width = height = 2*radius;
     }
 
     protected class HUD {
@@ -55,10 +57,9 @@ public class Player extends Entity {
                 barBackgroundColor = new Paint(),
                 healthBarColor = new Paint();
 
-        public HUD(boolean isUser){
+        public HUD(){
             barBackgroundColor.setColor(COLOR_VALUE_BAR_BACKGROUND);
-            if (isUser)healthBarColor.setColor(COLOR_VALUE_USER);
-            else if (ally)healthBarColor.setColor(COLOR_VALUE_ALLY);
+            if (ally)healthBarColor.setColor(COLOR_VALUE_ALLY);
             else healthBarColor.setColor(COLOR_VALUE_ENEMY);
         }
 

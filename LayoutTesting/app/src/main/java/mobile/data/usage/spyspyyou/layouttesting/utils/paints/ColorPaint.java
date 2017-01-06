@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.utils;
+package mobile.data.usage.spyspyyou.layouttesting.utils.paints;
 
 import android.graphics.Paint;
 

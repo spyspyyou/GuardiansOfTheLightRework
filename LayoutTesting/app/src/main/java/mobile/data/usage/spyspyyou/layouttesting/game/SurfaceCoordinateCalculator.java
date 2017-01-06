@@ -20,4 +20,8 @@ public class SurfaceCoordinateCalculator {
     public void updateScreenPosition(Vector2D mapPosition, Vector2D vectorToWriteTo){
         vectorToWriteTo.set(SURFACE_CENTER.x + (mapPosition.x - USER_POSITION.x) * TILE_SIDE, SURFACE_CENTER.y + (mapPosition.y - USER_POSITION.y) * TILE_SIDE);
     }
+
+    public Vector2D getUserPosition(){
+        return USER_POSITION;
+    }
 }

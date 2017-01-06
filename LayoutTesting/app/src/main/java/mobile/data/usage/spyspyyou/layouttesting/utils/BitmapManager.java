@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.game;
+package mobile.data.usage.spyspyyou.layouttesting.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -26,7 +26,8 @@ public class BitmapManager {
             R.drawable.ghost,
             R.drawable.cross,
             R.drawable.sweet,
-            R.drawable.light_bulb_on_square
+            R.drawable.light_bulb_on_square,
+            R.drawable.slime_trail
     };
 
     private static Bitmap defaultBitmap;
@@ -34,7 +35,7 @@ public class BitmapManager {
 
     private static SparseArray<Bitmap> bitmaps = new SparseArray<>();
 
-    /*package*/ static void loadBitmaps(Resources resources){
+    public static void loadBitmaps(Resources resources){
         //TODO:the bitmaps should be loaded the size of a tile / their most likely size
         if (loaded){
             Log.i("BitmapManager", "Bitmaps already loaded");
@@ -45,7 +46,7 @@ public class BitmapManager {
 
         loaded = true;
 
-        defaultBitmap = decodeResource(resources, R.mipmap.ic_launcher);
+        defaultBitmap = decodeResource(resources, R.drawable.ic_launcher);
         for (int recID:BITMAP_RESOURCES){
             bitmaps.append(recID, BitmapFactory.decodeResource(resources, recID));
         }

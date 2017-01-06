@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.utils;
+package mobile.data.usage.spyspyyou.layouttesting.utils.paints;
 
 import android.graphics.Paint;
 
@@ -9,5 +9,6 @@ public class BorderPaint extends Paint {
         setStyle(Style.STROKE);
         setStrokeWidth(borderWidth);
         setColor(color);
+        setAntiAlias(true);
     }
 }

@@ -3,7 +3,9 @@ package mobile.data.usage.spyspyyou.layouttesting.ui.views;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
@@ -15,14 +17,19 @@ import android.view.SurfaceView;
 import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.Tick;
-import mobile.data.usage.spyspyyou.layouttesting.game.VelocityVector2D;
+import mobile.data.usage.spyspyyou.layouttesting.game.UserVelocityVector2D;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.Player;
 import mobile.data.usage.spyspyyou.layouttesting.game.entities.User;
-import mobile.data.usage.spyspyyou.layouttesting.utils.BorderPaint;
-import mobile.data.usage.spyspyyou.layouttesting.utils.ColorPaint;
+import mobile.data.usage.spyspyyou.layouttesting.game.events.local.GumButtonClickedEvent;
+import mobile.data.usage.spyspyyou.layouttesting.game.events.local.SkillActivationEvent;
+import mobile.data.usage.spyspyyou.layouttesting.utils.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
+import mobile.data.usage.spyspyyou.layouttesting.utils.paints.BorderPaint;
+import mobile.data.usage.spyspyyou.layouttesting.utils.paints.ColorPaint;
+import mobile.data.usage.spyspyyou.layouttesting.utils.paints.FillPaint;
+import mobile.data.usage.spyspyyou.layouttesting.utils.paints.HolePaint;
+import mobile.data.usage.spyspyyou.layouttesting.utils.paints.SrcOutPaint;
 
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ALLY;
 import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.COLOR_VALUE_ENEMY;
@@ -38,18 +45,21 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     private int
             halfWidth = 0,
             halfHeight = 0,
-            tileSide = 0,
             margin;
+
+    private static int
+            tileSide = 0;
 
     private boolean
             created = false,
+            setup = false,
             joyStickActive = false;
 
     private double
             userDirection = 0;
 
-    private VelocityVector2D
-            userVelocity = new VelocityVector2D(0, 0);
+    private UserVelocityVector2D
+            userVelocity = new UserVelocityVector2D(0, 0);
 
     private SurfaceJoystick surfaceJoystick;
 
@@ -88,6 +98,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!setup)return false;
         for (VirtualButton button:buttons)button.onTouchEvent(event);
 
         if (isActionDown(event))surfaceJoystick.claimTouchSeries(event);
@@ -109,30 +120,32 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             default:
                 createRandom(map, players);
         }
+        setup = true;
     }
 
     private void createLeft(Bitmap map, Player[] players){
         int miniMapSize = (int) getResources().getDimension(R.dimen.mini_map_size);
+        int buttonSize = (int) getResources().getDimension(R.dimen.button_size);
         surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
         buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players));
-        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
-        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        buttons.add(new SkillButton(new Rect(getWidth() - margin - buttonSize, getHeight() - margin - buttonSize, getWidth() - margin, getHeight() - margin)));
+        buttons.add(new GumButton(new Rect(getWidth() - margin - buttonSize, getHeight() - 2*margin - 2*buttonSize, getWidth() - margin, getHeight() - 2*margin - buttonSize)));
     }
 
     private void createRight(Bitmap map, Player[] players){
         int miniMapSize = (int) getResources().getDimension(R.dimen.mini_map_size);
         surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
         buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players));
-        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
-        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        //buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        //buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
     }
 
     private void createRandom(Bitmap map, Player[] players){
         int miniMapSize = (int) getResources().getDimension(R.dimen.mini_map_size);
         surfaceJoystick = new SurfaceJoystick(new Rect(0, 0, (int) getResources().getDimension(R.dimen.joystick_surface_width), getHeight()));
         buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), map, players));
-        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
-        buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        //buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
+        //buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
     }
 
     public Canvas getCanvas(){
@@ -160,12 +173,8 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         return userDirection;
     }
 
-    public VelocityVector2D getUserVelocity(){
+    public UserVelocityVector2D getUserVelocity(){
         return userVelocity;
-    }
-
-    public int getTileSide() {
-        return tileSide;
     }
 
     public boolean isCreated() {
@@ -174,6 +183,10 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     public Vector2D getCenter(){
         return new Vector2D(halfWidth, halfHeight);
+    }
+
+    public static int getTileSide(){
+        return tileSide;
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
@@ -261,6 +274,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             Log.d("SVGame", "joystick stop");
             joyStickActive = false;
             fingerDisplacement.set(0, 0);
+            pointerID = -1;
         }
 
         @Override
@@ -401,20 +415,95 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
-    private class FillingButton extends VirtualButton{
+    private abstract class FillingButton extends VirtualButton{
 
-        private FillingButton(Rect position) {
+        protected int level = 400;
+
+        private Rect
+                bitmapRect,
+                rect;
+        private Bitmap
+                button,
+                icon = null;
+        private Canvas
+                bitmapEditor;
+        private Paint
+                paintFill = new FillPaint(Color.MAGENTA),
+                paintSrcOut,
+                paintStroke = new BorderPaint(6, Color.BLACK),
+                holePaint = new HolePaint();
+
+
+        private FillingButton(Rect position, Bitmap icon, int fillColor) {
             super(position);
-        }
-
-        @Override
-        protected void onClick() {
-
+            button = Bitmap.createBitmap(POSITION.width(),POSITION.height(), Bitmap.Config.ARGB_8888);
+            bitmapEditor = new Canvas(button);
+            rect = new  Rect(0, 0, POSITION.width(), POSITION.height());
+            bitmapRect = new Rect(POSITION.width() / 4, POSITION.height() / 4, POSITION.width() / 4 * 3, POSITION.height() / 4 * 3);
+            paintSrcOut = new SrcOutPaint(fillColor);
+            this.icon = icon;
         }
 
         @Override
         protected void render(Canvas canvas) {
+            updateFillLevel();
+            rect.set(0, (int) (POSITION.height() / 1000.0 * (1000-level)), POSITION.width(), POSITION.height());
 
+            bitmapEditor.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+            bitmapEditor.drawRect(rect, paintFill);
+            bitmapEditor.drawCircle(POSITION.width() / 2, POSITION.height() / 2, POSITION.width() / 2 - 2, holePaint);
+            bitmapEditor.drawRect(rect, paintSrcOut);
+
+            bitmapEditor.drawCircle(POSITION.width() / 2, POSITION.height() / 2, POSITION.width() / 2 - 4, paintStroke);
+            if (icon != null)bitmapEditor.drawBitmap(icon, null, bitmapRect, null);
+            canvas.drawBitmap(button, null, POSITION, null);
+        }
+
+        protected abstract void updateFillLevel();
+    }
+
+    private class SkillButton extends FillingButton{
+
+        private byte change = -10;
+
+        private SkillButton(Rect position) {
+            super(position, BitmapManager.getBitmap(R.drawable.slime_trail), Color.CYAN);
+        }
+
+        @Override
+        protected void onClick() {
+            Log.d("SkillButton", "clicked");
+            new SkillActivationEvent().send();
+        }
+
+        @Override
+        protected void updateFillLevel() {
+            level += change;
+            if (level < 0)change = 10;
+            if (level > 1000)change = -10;
+        }
+    }
+
+    private class GumButton extends FillingButton{
+
+        private byte change = -10;
+
+        private GumButton(Rect position) {
+            super(position, null, Color.RED);
+        }
+
+        @Override
+        protected void onClick() {
+            Log.d("GumButton", "clicked");
+            new GumButtonClickedEvent().send();
+        }
+
+        @Override
+        protected void updateFillLevel() {
+            level += change;
+            if (level < 0)change = 10;
+            if (level > 1000)change = -10;
         }
     }
 

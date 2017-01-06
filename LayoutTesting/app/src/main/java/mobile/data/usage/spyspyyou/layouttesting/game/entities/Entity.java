@@ -6,7 +6,8 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.util.Log;
 
-import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
+import mobile.data.usage.spyspyyou.layouttesting.utils.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
@@ -34,7 +35,14 @@ public abstract class Entity {
         this.height = height;
     }
 
-    public abstract void update();
+    protected Entity(Vector2D entityPosition, int  entityBitmapID){
+        position = entityPosition;
+        bitmapID = entityBitmapID;
+        bitmap = BitmapManager.getBitmap(bitmapID);
+        width = height = SurfaceViewGame.getTileSide();
+    }
+
+    public abstract void update(Game game);
 
     public void render(Canvas canvas){
         if(visible){

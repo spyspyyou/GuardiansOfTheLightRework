@@ -1,9 +1,10 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
-        import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
-        import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
+import mobile.data.usage.spyspyyou.layouttesting.game.Game;
+import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
+import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
-        import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.ID_FLUFFY;
 
 public class Fluffy extends User {
 
@@ -12,8 +13,8 @@ public class Fluffy extends User {
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(Game game) {
+        super.update(game);
     }
 
     @Override
@@ -22,8 +23,8 @@ public class Fluffy extends User {
     }
 
     @Override
-    public boolean activateSkill() {
-       if (super.activateSkill()){
+    public boolean activateSkill(Game game) {
+       if (super.activateSkill(game)){
            return true;
        }
         return false;

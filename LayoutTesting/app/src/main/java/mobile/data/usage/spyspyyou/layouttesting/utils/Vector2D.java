@@ -47,6 +47,14 @@ public class Vector2D {
         return this;
     }
 
+    public double squareDistance(Vector2D vector2D){
+        return (x-vector2D.x) * (x-vector2D.x) + (y-vector2D.y) * (y-vector2D.y);
+    }
+
+    public double distance(Vector2D vector2D){
+        return Math.sqrt(squareDistance(vector2D));
+    }
+
     // return the length of the vector
     public double getLength() {
         return Math.sqrt(x * x + y * y);
@@ -80,6 +88,10 @@ public class Vector2D {
 
     public int getIntY(){
         return (int)y;
+    }
+
+    public Vector2D copy(){
+        return new Vector2D(x, y);
     }
 }
 

@@ -2,14 +2,19 @@ package mobile.data.usage.spyspyyou.layouttesting.game;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 import android.util.SparseArray;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
+import mobile.data.usage.spyspyyou.layouttesting.utils.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
-/*package*/ class GameMap {
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.HALF_TILES_IN_HEIGHT;
+import static mobile.data.usage.spyspyyou.layouttesting.game.Tick.HALF_TILES_IN_WIDTH;
+
+public class GameMap {
 
     //color codes
     private static final int
@@ -26,7 +31,8 @@ import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
             spawnBlue = new Vector2D(0, 0),
             spawnGreen = new Vector2D(0, 0),
             lightBulbStandBlue = new Vector2D(0, 0),
-            lightBulbStandGreen = new Vector2D(0, 0);
+            lightBulbStandGreen = new Vector2D(0, 0),
+            screenPosition = new Vector2D(0, 0);
 
     private Rect
             rect = new Rect(0, 0, 0, 0);
@@ -59,21 +65,51 @@ import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
     /*package*/ void render(Canvas canvas, Vector2D userPosition){
         Bitmap bitmap;
+        Paint p = new Paint();
+        p.setAntiAlias(false);
+        long nanoCount = 0;
+        long tmp;
+        long longestTime = 0;
+        int longestTileType = 0;
 
-        double startX = canvas.getWidth() / 2 - (Tick.MAX_TILES_IN_WIDTH / 2 + userPosition.x - userPosition.getIntX()) * TILE_SIDE;
-        Vector2D screenPosition = new Vector2D(startX, canvas.getHeight() / 2 - (Tick.MAX_TILES_IN_HEIGHT / 2 + userPosition.y - userPosition.getIntY()) * TILE_SIDE);
+        Game.updateScreenPosition(new Vector2D(userPosition.getIntX() - HALF_TILES_IN_WIDTH, userPosition.getIntY() - HALF_TILES_IN_HEIGHT), screenPosition);
+        double startPositionX = screenPosition.x;
 
-        for (int y = userPosition.getIntY() - Tick.MAX_TILES_IN_HEIGHT / 2; y <= userPosition.getIntY() + Tick.MAX_TILES_IN_HEIGHT / 2; ++y){
-            screenPosition.x = startX;
-            for (int x = userPosition.getIntX() - Tick.MAX_TILES_IN_WIDTH / 2; x <= userPosition.getIntX() + Tick.MAX_TILES_IN_WIDTH / 2; ++x){
-                bitmap = getTile(x, y).getBITMAP();
+        for (int tileIndexY = userPosition.getIntY() - HALF_TILES_IN_HEIGHT; tileIndexY <= userPosition.getIntY() + HALF_TILES_IN_HEIGHT; ++tileIndexY){
+            screenPosition.x = startPositionX;
+            for (int tileIndexX = userPosition.getIntX() - HALF_TILES_IN_WIDTH; tileIndexX <= userPosition.getIntX() + HALF_TILES_IN_WIDTH; ++tileIndexX){
+                bitmap = getTile(tileIndexX, tileIndexY).getBITMAP();
 
                 rect.set(screenPosition.getIntX(), screenPosition.getIntY(), screenPosition.getIntX() + TILE_SIDE, screenPosition.getIntY() + TILE_SIDE);
-                canvas.drawBitmap(bitmap, null, rect, null);
+
+                tmp = System.nanoTime();
+                canvas.drawBitmap(bitmap, null, rect, p);
+                long diff = System.nanoTime() - tmp;
+                nanoCount += diff;
+                if (diff>longestTime){
+                    longestTime = diff;
+                    longestTileType = tiles.keyAt(tiles.indexOfValue(getTile(tileIndexX, tileIndexY)));
+                }
 
                 screenPosition.x += TILE_SIDE;
             }
             screenPosition.y += TILE_SIDE;
+        }
+
+        if (nanoCount / 1000000 > 20)Log.e("GameMap.render", "took: " + nanoCount / 1000000 + "longestType: " + getTypeString(longestTileType));
+        else Log.d("GameMap.render", "took: " + nanoCount / 1000000);
+    }
+
+    private String getTypeString(int type){
+        switch (type){
+            case VOID:return "VOID";
+            case FLOOR:return "FLOOR";
+            case WALL:return "WALL";
+            case SPAWN_BLUE:return "SPAWN_BLUE";
+            case SPAWN_GREEN:return "SPAWN_GREEN";
+            case LIGHT_BULB_STAND_BLUE: return "LIGHT_BULB_STAND_BLUE";
+            case LIGHT_BULB_STAND_GREEN: return "LIGHT_BULB_STAND_GREEN";
+            default:return "nopes";
         }
     }
 
@@ -108,7 +144,7 @@ import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
         }
     }
 
-    public boolean iaSolid(Vector2D position){
+    public boolean isSolid(Vector2D position){
         int
                 x = position.getIntX(),
                 y = position.getIntY();

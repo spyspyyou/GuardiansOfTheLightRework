@@ -8,16 +8,16 @@ import mobile.data.usage.spyspyyou.layouttesting.ui.events.UIEvent;
 public abstract class Event {
 
     protected static final char ADDRESS_STOP_INDICATOR = '\n';
-    protected final String[] RECEPTORS;
+    protected String[] receptors;
     protected final String SENDER_ADDRESS;
 
     public Event(String[] receptors){
-        RECEPTORS = receptors;
+        this.receptors = receptors;
         SENDER_ADDRESS = AppBluetoothManager.getAddress();
     }
 
     public Event(String eventString){
-        RECEPTORS = null;
+        receptors = null;
         SENDER_ADDRESS = eventString.substring(1, eventString.indexOf(ADDRESS_STOP_INDICATOR));
     }
 
@@ -47,7 +47,7 @@ public abstract class Event {
     }
 
     public void send(){
-        if (RECEPTORS == null){
+        if (receptors == null){
             Log.w("Event", "tried sending a received Event");
             return;
         }
@@ -55,6 +55,6 @@ public abstract class Event {
     }
 
     /*package*/ String[] getReceptors(){
-        return RECEPTORS;
+        return receptors;
     }
 }

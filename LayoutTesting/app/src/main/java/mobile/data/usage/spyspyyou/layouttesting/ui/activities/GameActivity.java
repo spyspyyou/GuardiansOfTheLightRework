@@ -6,10 +6,11 @@ import android.os.Bundle;
 import android.view.View;
 
 import mobile.data.usage.spyspyyou.layouttesting.R;
-import mobile.data.usage.spyspyyou.layouttesting.game.BitmapManager;
 import mobile.data.usage.spyspyyou.layouttesting.game.Game;
+import mobile.data.usage.spyspyyou.layouttesting.game.GameServer;
 import mobile.data.usage.spyspyyou.layouttesting.game.events.GameEvent;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
+import mobile.data.usage.spyspyyou.layouttesting.utils.BitmapManager;
 
 public class GameActivity extends GotLActivity {
 
@@ -20,7 +21,7 @@ public class GameActivity extends GotLActivity {
         super.onCreate(savedInstanceState);
         hideSystemUI();
         setContentView(R.layout.activity_game);
-        game = new Game(getResources(), findViewById(R.id.relativeLayout_game), BitmapFactory.decodeResource(getResources(), R.drawable.test_map_3), SurfaceViewGame.LEFT);
+        game = new GameServer(getResources(), findViewById(R.id.relativeLayout_game), BitmapFactory.decodeResource(getResources(), R.drawable.test_map_3), SurfaceViewGame.LEFT);
     }
 
     @Override
@@ -33,6 +34,7 @@ public class GameActivity extends GotLActivity {
     protected void onStop() {
         super.onStop();
         BitmapManager.clearMemory();
+        game.stopGame();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
+import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
 
@@ -17,7 +18,7 @@ public class Ghost extends User {
     }
 
     @Override
-    public boolean activateSkill() {
-        return super.activateSkill();
+    public boolean activateSkill(Game game) {
+        return super.activateSkill(game);
     }
 }

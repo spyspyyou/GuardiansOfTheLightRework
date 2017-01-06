@@ -32,6 +32,6 @@ public class PreparationStartEvent extends UIEvent {
 
     @Override
     public void onEventSendFailure(String[] addresses) {
-        new ReturnToLobbyEvent(RECEPTORS);
+        new ReturnToLobbyEvent(receptors);
     }
 }
