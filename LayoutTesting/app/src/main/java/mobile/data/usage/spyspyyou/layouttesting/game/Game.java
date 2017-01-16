@@ -155,6 +155,10 @@ public class Game {
         if (gameThread != null)gameThread.quitGame();
     }
 
+    public GameMap getWorld(){
+        return gameMap;
+    }
+
     private class LoadingThread extends Thread {
 
         private final byte CONTROL_TYPE;
@@ -184,9 +188,9 @@ public class Game {
             }
 
             gameThread = new GameThread();
-            gameMap = new GameMap(PIXEL_MAP, gameSurface.getTileSide());
+            gameMap = new GameMap(PIXEL_MAP, SurfaceViewGame.getTileSide());
 
-            int tileSide = gameSurface.getTileSide();
+            int tileSide = SurfaceViewGame.getTileSide();
             Vector2D userPosition = new Vector2D(1, 1);
 
             // todo: just for testing

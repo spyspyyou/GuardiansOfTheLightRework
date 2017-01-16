@@ -1,6 +1,7 @@
 package mobile.data.usage.spyspyyou.layouttesting.game.entities;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
 import mobile.data.usage.spyspyyou.layouttesting.game.Game;
 import mobile.data.usage.spyspyyou.layouttesting.game.UserVelocityVector2D;
@@ -15,6 +16,9 @@ public abstract class User extends Player {
     //int millis
     private static final int
             PARTICLE_COOL_DOWN = 500;
+
+    private static final float
+            FLOOR_CHECK_RATIO = 0.75f;
     private long
             lastParticleEjection = 0;
     private final int
@@ -39,9 +43,13 @@ public abstract class User extends Player {
 
     @Override
     public void update(Game game) {
-        if (falling)fallingUpdate();
+        if (falling){
+            fallingUpdate();
+            return;
+        }
         //update position + direction
         move();
+        //checkFloor(game);
         addMana();
         if (mana > MAX_MANA)mana = MAX_MANA;
     }
@@ -50,12 +58,22 @@ public abstract class User extends Player {
         setDirection(surfaceViewGame.getUserDirection());
 
         position.add(velocity.getVelocity(slimy));
-        //todo:hitbox
-        checkFloor();
+        //todo:hit box
     }
 
-    private void checkFloor(){
-
+    private void checkFloor(Game game){
+        float tileRad = (1f*getRadius())/SurfaceViewGame.getTileSide();
+        Vector2D pointing = new Vector2D((int) (position.x - tileRad * FLOOR_CHECK_RATIO), (int) (position.y - tileRad * FLOOR_CHECK_RATIO));
+        String s = "";
+        boolean b = true;
+        for (; pointing.y < position.y + tileRad * FLOOR_CHECK_RATIO + 1; ++pointing.y){
+            for (pointing.x = (int) (position.x - tileRad * FLOOR_CHECK_RATIO); pointing.x < position.x + tileRad * FLOOR_CHECK_RATIO + 1; ++pointing.x){
+                s+= "fall check on x" + pointing.x + "y" + pointing.y + '\n';
+                if (game.getWorld().isSolid(pointing))b = false;
+            }
+        }
+        Log.i("User", s);
+        falling = b;
     }
 
     private void fallingUpdate(){

@@ -96,7 +96,7 @@ public class GameMap {
             screenPosition.y += TILE_SIDE;
         }
 
-        if (nanoCount / 1000000 > 20)Log.e("GameMap.render", "took: " + nanoCount / 1000000 + "longestType: " + getTypeString(longestTileType));
+        if (nanoCount / 1000000 > 20)Log.e("GameMap.render", "took: " + nanoCount / 1000000 + " longestType: " + getTypeString(longestTileType));
         else Log.d("GameMap.render", "took: " + nanoCount / 1000000);
     }
 
@@ -148,7 +148,7 @@ public class GameMap {
         int
                 x = position.getIntX(),
                 y = position.getIntY();
-        if (x < 0 || y < 0 || x >= map.length || y >= map[0].length) return false;
+        if (x < 0 || y < 0 || x >= map.length || y >= map[0].length) return true;
         return map[x][y].isSOLID();
     }
 
