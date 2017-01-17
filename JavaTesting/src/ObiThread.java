@@ -1,17 +1,9 @@
-public class ObiThread extends Thread{
-    ReturnTest1 returnTest1;
+public class ObiThread extends ReturnTest1{
+
     @Override
-    public void run() {
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        returnTest1.o.a = 10;
+    public void ma(Class c) {
+        super.ma(c);
+        if (c == super.getClass())System.out.print("\nstill equal");
     }
 
-    public ObiThread setReturnTest(ReturnTest1 r){
-        returnTest1 = r;
-        return this;
-    }
 }

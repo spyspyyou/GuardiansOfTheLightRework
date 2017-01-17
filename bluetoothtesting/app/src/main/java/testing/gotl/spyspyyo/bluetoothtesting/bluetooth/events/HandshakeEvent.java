@@ -5,25 +5,26 @@ import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.Connection;
 
 public class HandshakeEvent extends BluetoothEvent {
 
-    private final long IDENTIFIER;
+    public HandshakeEvent(String[] addresses){
+        super(addresses);
+    }
 
-    public HandshakeEvent(Connection[] receptors, long identifier) {
-        super(receptors);
-        IDENTIFIER = identifier;
+    public HandshakeEvent(String eventString) {
+        super(eventString);
     }
 
     @Override
     public void handle() {
-
+        //Log.i("HandshakeEvent", "successful handshake with: " + SENDER_ADDRESS);
     }
 
     @Override
-    public void apply() {
-        //not used here
+    public String toString() {
+        return super.toString() + 'H';
     }
 
     @Override
-    public void onEventSendFailure(Connection[] connections) {
+    public void onEventSendFailure(String[] addresses) {
 
     }
 }

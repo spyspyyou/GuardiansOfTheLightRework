@@ -1,22 +1,29 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth.events;
 
-import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.Connection;
+import android.support.annotation.Nullable;
+
 import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.Event;
 
 public abstract class BluetoothEvent extends Event {
 
-    public BluetoothEvent(Connection[] receptors) {
-        super(receptors);
+    public BluetoothEvent(String[] addresses){
+        super(addresses);
     }
 
+    public BluetoothEvent(String evenString){
+        super(eventString);
+    }
+
+    @Nullable
     public static BluetoothEvent fromEventString(String eventString){
-        switch(eventString.charAt(1)){
+        switch(eventString.charAt(eventString.indexOf(INFO_SEPARATION_CHAR)+1)){
+            case 'H':return new HandshakeEvent(eventString);
             default: return null;
         }
     }
 
     @Override
     public String toString() {
-        return "B";
+        return "B" + super.toString();
     }
 }

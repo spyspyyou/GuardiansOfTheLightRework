@@ -1,23 +1,40 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
-/*package*/ class EventReceiverThread extends Thread {
-    // the Events are stored in this ArrayList of Queues, so they can get processed in the same order they got received at the beginning of every loop of the GameThread
 
-    public EventReceiverThread(){
+/*package*/ class EventReceiverThread extends Thread {
+
+    private static final int
+            SLEEP_TIME = 100;
+
+    private static boolean
+            activeThreadExisting = false;
+
+    /*package*/ EventReceiverThread(){
         start();
     }
 
     @Override
     public void run(){
-        // this Thread's purpose is to receive the incoming Events through the InputStream of the BluetoothSocket
+        if (activeThreadExisting)return;
+        activeThreadExisting = true;
+
         while(ConnectionManager.hasConnections()) {
+            boolean received = false;
             Connection[] connections = ConnectionManager.getConnections();
             for (Connection connection : connections) {
                 if (connection == null) continue;
                 for (Event event:connection.readEvents()){
+                    received = true;
                     event.handle();
                 }
             }
+            if (!received) try {
+                sleep(SLEEP_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+        activeThreadExisting = false;
     }
 }

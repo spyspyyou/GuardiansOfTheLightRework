@@ -10,9 +10,7 @@ public interface TODS {
     String gameName = "Spiel 1";
     char EVENT_STRING_FINAL_CHAR = '|';
 
+    String TEXT_ENCODING = "UTF-8";
 
-    boolean stopBluetoothOnAppLeaving = false;
-    boolean alertBluetoothTurnedOff = true;
-    boolean hostingGame = true;
-    boolean allowInsecureConnections = true;
+    boolean STOP_BT_ON_APP_LEAVE = false;
 }
