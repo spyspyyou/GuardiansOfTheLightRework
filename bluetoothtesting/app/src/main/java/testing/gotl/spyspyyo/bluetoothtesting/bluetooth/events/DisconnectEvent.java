@@ -1,9 +1,5 @@
 package testing.gotl.spyspyyo.bluetoothtesting.bluetooth.events;
 
-import android.content.Intent;
-
-import testing.gotl.spyspyyo.bluetoothtesting.UI.activities.MainActivity;
-
 public class DisconnectEvent extends BluetoothEvent {
 
     public DisconnectEvent(String[] addresses) {
@@ -21,11 +17,6 @@ public class DisconnectEvent extends BluetoothEvent {
 
     @Override
     public void handle() {
-
-    }
-
-    @Override
-    public void onEventSendFailure(String[] addresses) {
 
     }
 }

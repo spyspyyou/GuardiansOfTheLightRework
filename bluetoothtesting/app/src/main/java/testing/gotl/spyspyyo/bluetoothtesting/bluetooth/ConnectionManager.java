@@ -117,9 +117,11 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         return addresses;
     }
 
-    /*package*/ static boolean send(String address, byte[] data) {
-        Connection connection = getConnection(address);
-        return connection != null && connection.send(data);
+    /*package*/ static void send(String[] addressArray, byte[] data) {
+        for (String address:addressArray) {
+            Connection connection = getConnection(address);
+            connection.send(data);
+        }
     }
 
     /*package*/ static void removeDeadConnection(int index){

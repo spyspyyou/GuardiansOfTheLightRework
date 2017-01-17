@@ -12,23 +12,21 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
+import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.events.DisconnectEvent;
 import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
 /*package*/ class Connection implements TODS {
 
     private static final char EVENT_STRING_FINAL_CHAR = '|';
-    private static final short MAX_EVENTS_PER_READ_EVENTS_CALL = 5;
-
-    private final byte INDEX;
+    private static final short MAX_EVENTS_PER_CALL = 5;
 
     private final InputStream INPUT_STREAM;
     private final OutputStream OUTPUT_STREAM;
     private final BluetoothSocket BLUETOOTH_SOCKET;
     private final BufferedReader BUFFERED_READER;
 
-    /*package*/ Connection(BluetoothSocket pBluetoothSocket, byte index){
+    /*package*/ Connection(BluetoothSocket pBluetoothSocket){
         BLUETOOTH_SOCKET = pBluetoothSocket;
-        INDEX = index;
         InputStream inputStream = null;
         OutputStream outputStream = null;
         if (BLUETOOTH_SOCKET != null){
@@ -55,7 +53,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
     }
 
     /**
-     * this method reads from the connection's InputStream until it gets at most MAX_EVENTS_PER_READ_EVENTS_CALL Events or the stream has no more data
+     * this method reads from the connection's InputStream until it gets at most MAX_EVENTS_PER_CALL Events or the stream has no more data
      * @return events - a list of Events from the InputStream
      */
     /*package*/ ArrayList<Event> readEvents(){
@@ -65,7 +63,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         int numberOfEventsRead = 0;
         try {
             while ((BUFFERED_READER.ready() || !eventString.equals(""))
-                    && numberOfEventsRead < MAX_EVENTS_PER_READ_EVENTS_CALL) {
+                    && numberOfEventsRead < MAX_EVENTS_PER_CALL) {
                 nextChar = (char) BUFFERED_READER.read();
                 if (nextChar == EVENT_STRING_FINAL_CHAR){
                     Log.i("Connection", "Event received: " + eventString);
@@ -84,23 +82,21 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         return events;
     }
 
-    /*package*/ synchronized boolean send(byte[]data){
+    /*package*/ synchronized void send(byte[]data){
         try {
             OUTPUT_STREAM.write(data);
             OUTPUT_STREAM.write(EVENT_STRING_FINAL_CHAR);
-            return true;
         } catch (IOException e) {
-            Log.i("Connection", "failed sending data");
+            Log.i("Connection", "failed sending data, connection broken");
             e.printStackTrace();
         }
-        return false;
     }
 
     /*package*/ void disconnect(){
         Log.i("Connection", "disconnecting " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
 
         try {
-            send(new DisconnectEvent(new String[]{getAddress()}).toString().getBytes(textEncoding));
+            send(new DisconnectEvent(new String[]{getAddress()}).toString().getBytes(TEXT_ENCODING));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
