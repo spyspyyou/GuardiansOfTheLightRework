@@ -1,12 +1,10 @@
-package testing.gotl.spyspyyo.bluetoothtesting.UI.activities;
+package testing.gotl.spyspyyo.bluetoothtesting.activities;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import testing.gotl.spyspyyo.bluetoothtesting.R;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends BluetoothActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

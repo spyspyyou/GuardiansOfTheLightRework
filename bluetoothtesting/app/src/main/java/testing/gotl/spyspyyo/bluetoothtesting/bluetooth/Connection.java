@@ -2,6 +2,7 @@ package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -20,27 +21,25 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
     private static final char EVENT_STRING_FINAL_CHAR = '|';
     private static final short MAX_EVENTS_PER_CALL = 5;
 
+    private final ArrayList<AppBluetoothManager.ConnectionListener> listeners = new ArrayList<>();
+
     private final InputStream INPUT_STREAM;
     private final OutputStream OUTPUT_STREAM;
     private final BluetoothSocket BLUETOOTH_SOCKET;
     private final BufferedReader BUFFERED_READER;
 
-    /*package*/ Connection(BluetoothSocket pBluetoothSocket){
+    /*package*/ Connection(BluetoothSocket pBluetoothSocket, @Nullable AppBluetoothManager.ConnectionListener listener) throws IOException{
         BLUETOOTH_SOCKET = pBluetoothSocket;
+
         InputStream inputStream = null;
         OutputStream outputStream = null;
         if (BLUETOOTH_SOCKET != null){
-            try {
-                inputStream = pBluetoothSocket.getInputStream();
-                outputStream = pBluetoothSocket.getOutputStream();
-            } catch (IOException e) {
-                Log.e("Connection", "failed to get data streams");
-                e.printStackTrace();
-                ConnectionManager.reconnect(this);
-            }
+            inputStream = pBluetoothSocket.getInputStream();
+            outputStream = pBluetoothSocket.getOutputStream();
         }
         INPUT_STREAM = inputStream;
         OUTPUT_STREAM = outputStream;
+
         BufferedReader bufferedReader = null;
         if (INPUT_STREAM!= null) {
             try {
@@ -50,6 +49,11 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
             }
         }
         BUFFERED_READER = bufferedReader;
+
+        if (listener != null) {
+            listeners.add(listener);
+            listener.onConnectionEstablished();
+        }
     }
 
     /**
@@ -69,12 +73,12 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
                     Log.i("Connection", "Event received: " + eventString);
                     Event event = Event.fromEventString(eventString);
                     if (event!=null)events.add(event);
-                    else Log.w("Connection", "Received an invalid Event: " + eventString);
                     eventString = "";
                     ++numberOfEventsRead;
                 }else eventString += nextChar;
             }
         }catch (IOException e){
+            //todo:handle broken connection
             disconnect();
             Log.e("Connection", "read failed");
             e.printStackTrace();
@@ -122,11 +126,6 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
     /*package*/ BluetoothDevice getRemoteDevice(){
         return BLUETOOTH_SOCKET.getRemoteDevice();
-    }
-
-
-    /*package*/ byte getIndex(){
-        return INDEX;
     }
 
     /*package*/ String getAddress(){

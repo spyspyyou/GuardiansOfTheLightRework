@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -22,34 +23,27 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
     private static final String UUID_STRING = "a810452d-2fda-4113-977e-3494579d3ee";
 
     private static final byte MAX_CONNECTIONS = 7;
-    private static boolean serverAvailable = false;
-    private static Connection[] connections = {
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-    };
+    private static boolean serverActive = false;
+    private static Map<String, Connection> connections = new LinkedHashMap<>();
 
     private static ArrayList<AcceptConnectionThread> acceptConnectionThreads = new ArrayList<>();
 
-    /*package*/ static void startServerAvailability(){
-        if (serverAvailable || !AppBluetoothManager.isBluetoothEnabled())return;
-        serverAvailable = true;
+    /*package*/ static void startServer(){
+        if (serverActive)return;
+        disconnect();
+        serverActive = true;
         Log.i("ConnectionManager", "starting the Server");
-        acceptConnectionThreads = new ArrayList<>();
+        acceptConnectionThreads.clear();
         for(byte i = 0; i < MAX_CONNECTIONS; ++i){
             if (connections[i] == null) acceptConnectionThreads.add(new AcceptConnectionThread(i));
         }
-        serverAvailable = true;
+        serverActive = true;
     }
 
-    /*package*/ static void stopServerAvailability(){
-        if (!serverAvailable)return;
+    /*package*/ static void stopServer(){
+        if (!serverActive)return;
         Log.i("ConnectionManager", "stopping the Server");
-        serverAvailable  = false;
+        serverActive = false;
         while(!acceptConnectionThreads.isEmpty()){
             acceptConnectionThreads.remove(0).cancelAvailability();
         }
@@ -73,8 +67,8 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         return false;
     }
 
-    /*package*/ static void connect(BluetoothDevice bluetoothDevice, Notificator deviceFoundNotificator){
-        new CreateConnectionThread(bluetoothDevice, deviceFoundNotificator);
+    /*package*/ static void connect(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener){
+        new CreateConnectionThread(bluetoothDevice, listener);
     }
 
     /*package*/ static void disconnect(String address){
@@ -84,13 +78,6 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
             return;
         }
         connection.disconnect();
-    }
-
-    /*package*/ static void disconnectExcept(String address){
-        if (!hasConnection(address))Log.i("ConnectionManager", "the excepted connection is null, disconnecting from all");
-        for (Connection connection:connections){
-            if (connection != null && !connection.getAddress().equals(address))connection.disconnect();
-        }
     }
 
     /*package*/ static void disconnect(){
@@ -135,6 +122,10 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         connect(connection.getRemoteDevice(), null);
     }
 
+    public static void addConnectionListener(AppBluetoothManager.ConnectionListener listener){
+        //todo:add listener to Connection
+    }
+
     @Nullable
     private static Connection getConnection(String address){
         for (Connection connection:connections){
@@ -164,7 +155,6 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
     private static class CreateConnectionThread extends Thread {
         private final BluetoothDevice BLUETOOTH_DEVICE;
-        private final Notificator DEVICE_FOUND_NOTIFICATOR;
         private static Map<String, CreateConnectionThread> activeCreateConnectionThreads = new HashMap<>();
         BluetoothSocket bluetoothSocket = null;
 
@@ -246,7 +236,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         public void run() {
             //todo:remove with toasts
             Looper.prepare();
-            while(serverAvailable && connections[INDEX]==null) {
+            while(serverActive && connections[INDEX]==null) {
                 BluetoothSocket bluetoothSocket;
                 try {
                     bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(UUID);
@@ -264,7 +254,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
                 try {
                     bluetoothSocket = bluetoothServerSocket.accept();
                 } catch (IOException e) {
-                    if (serverAvailable)Log.e("ACThread", "failed to accept the connection with index: " + INDEX);
+                    if (serverActive)Log.e("ACThread", "failed to accept the connection with index: " + INDEX);
                     e.printStackTrace();
                     continue;
                 }

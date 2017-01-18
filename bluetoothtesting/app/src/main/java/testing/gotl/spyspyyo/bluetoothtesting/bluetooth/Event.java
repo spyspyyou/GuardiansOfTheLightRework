@@ -8,14 +8,13 @@ import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.events.BluetoothEvent;
 public abstract class Event {
 
     protected static final char INFO_SEPARATION_CHAR = '\n';
-    private static final char DEFAULT_IDENTIFIER = '\b';
 
     protected String[] receptors;
     protected final String SENDER_ADDRESS;
 
     public Event(String[] receptors){
         this.receptors = receptors;
-        SENDER_ADDRESS = AppBluetoothManager.getAddress();
+        SENDER_ADDRESS = AppBluetoothManager.getLocalAddress();
     }
 
     public Event(String eventString){
