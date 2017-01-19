@@ -18,6 +18,6 @@ public abstract class BluetoothActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //todo:report to the AppBTManager
+        AppBluetoothManager.onActivityResult(requestCode);
     }
 }

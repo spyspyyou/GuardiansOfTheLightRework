@@ -17,7 +17,6 @@ public abstract class BluetoothEvent extends Event {
     @Nullable
     public static BluetoothEvent fromEventString(String eventString){
         switch(eventString.charAt(eventString.indexOf(INFO_SEPARATION_CHAR)+1)){
-            case 'H':return new HandshakeEvent(eventString);
             default: return null;
         }
     }

@@ -9,8 +9,8 @@ public abstract class Event {
 
     protected static final char INFO_SEPARATION_CHAR = '\n';
 
-    protected String[] receptors;
-    protected final String SENDER_ADDRESS;
+    //MAC-ADDRESS(es) of the target device(s)
+    private String[] receptors;
 
     public Event(String[] receptors){
         this.receptors = receptors;
@@ -27,28 +27,30 @@ public abstract class Event {
      */
     public abstract void handle();
 
-    public String toString(){
-        return SENDER_ADDRESS + INFO_SEPARATION_CHAR;
-    }
-
-    /*package*/ static Event fromEventString(String eventString){
-        switch(eventString.charAt(0)){
-            case 'B':return BluetoothEvent.fromEventString(eventString);
-            default:
-                Log.w("Event", "could not read Event from String" + eventString);
-                return null;
-        }
-    }
+    public abstract String toString();
 
     public void send(){
         if (receptors == null){
-            Log.w("Event", "no receptors. tried sending a received Event?");
+            Log.w("Event", "no receptors. Trying to sending a received Event?");
             return;
         }
-        EventSenderThread.send(this);
+        ConnectionManager.EventSenderThread.send(this);
     }
 
     /*package*/ String[] getReceptors(){
         return receptors;
+    }
+    
+    /*package*/ static Event fromEventString(String eventString) throws InvalidEventStringException {
+        switch(eventString.charAt(0)){
+            case 'B':return BluetoothEvent.fromEventString(eventString);
+            default:
+                Log.w("Event", "could not read Event from String" + eventString);
+                throw new InvalidEventStringException();
+        }
+    }
+
+    public static class InvalidEventStringException extends Exception{
+
     }
 }

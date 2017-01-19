@@ -3,26 +3,34 @@ package testing.gotl.spyspyyo.bluetoothtesting.bluetooth;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-import testing.gotl.spyspyyo.bluetoothtesting.global.App;
-import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
+import static testing.gotl.spyspyyo.bluetoothtesting.bluetooth.ConnectionManager.CreateConnectionThread.cancelConnecting;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODING;
 
 /*package*/ class ConnectionManager {
     //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
-    private static final String UUID_STRING = "a810452d-2fda-4113-977e-3494579d3ee";
-
     private static final byte MAX_CONNECTIONS = 7;
+
+    private static final String BASE_UUID_STRING = "a810452d-2fda-4113-977e-3494579d3ee";
+    private static final UUID[] UUID_ARRAY = new UUID[MAX_CONNECTIONS];
+    static {
+        for (int i = 0; i < MAX_CONNECTIONS; ++i){
+            UUID_ARRAY[i] = UUID.fromString(BASE_UUID_STRING + i);
+        }
+    }
+
     private static boolean serverActive = false;
     private static Map<String, Connection> connections = new LinkedHashMap<>();
 
@@ -30,190 +38,115 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
     /*package*/ static void startServer(){
         if (serverActive)return;
+        cancelConnecting();
         disconnect();
-        serverActive = true;
-        Log.i("ConnectionManager", "starting the Server");
         acceptConnectionThreads.clear();
-        for(byte i = 0; i < MAX_CONNECTIONS; ++i){
-            if (connections[i] == null) acceptConnectionThreads.add(new AcceptConnectionThread(i));
-        }
         serverActive = true;
+        for(byte i = 0; i < UUID_ARRAY.length; ++i){
+            try{
+                acceptConnectionThreads.add(new AcceptConnectionThread(UUID_ARRAY[i]));
+            }catch (IOException e){
+                Log.e("ConnectionManager", "Could not create AcceptConnectionThread for uuid + " + UUID_ARRAY[i]);
+                e.printStackTrace();
+            }
+        }
+        Log.i("ConnectionManager", "started the Server");
     }
 
     /*package*/ static void stopServer(){
         if (!serverActive)return;
-        Log.i("ConnectionManager", "stopping the Server");
         serverActive = false;
         while(!acceptConnectionThreads.isEmpty()){
             acceptConnectionThreads.remove(0).cancelAvailability();
         }
-        CreateConnectionThread.cancelConnections();
-    }
-
-    /*package*/ static BluetoothDevice getBluetoothDevice(String address){
-        Connection connection = getConnection(address);
-        if (connection == null)return null;
-        return connection.getRemoteDevice();
-    }
-
-    /*package*/ static boolean hasConnection(String address){
-        return getConnection(address) != null;
+        Log.i("ConnectionManager", "stopped the Server");
     }
 
     /*package*/ static boolean hasConnections(){
-        for (Connection c:connections){
-            if (c != null)return true;
-        }
-        return false;
+        return !connections.isEmpty();
     }
 
     /*package*/ static void connect(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener){
-        new CreateConnectionThread(bluetoothDevice, listener);
+        try {
+            new CreateConnectionThread(bluetoothDevice, listener);
+        } catch (AddressAlreadyConnected e) {
+            Log.w("ConnectionManager", "No need to (start) connect to address " + bluetoothDevice.getAddress() + ". Already is connected or connecting.");
+            e.printStackTrace();
+        }
     }
 
-    /*package*/ static void disconnect(String address){
-        Connection connection = getConnection(address);
-        if (connection == null){
-            Log.w("ConnectionManager", "No connection to device trying to disconnect from.");
-            return;
+    /*package*/ static void disconnect(String address) {
+        if (connections.containsKey(address)){
+            connections.get(address).close();
+        } else {
+            Log.w("ConnectionManager", "No connection to device trying to close from.");
         }
-        connection.disconnect();
     }
 
     /*package*/ static void disconnect(){
-        for (Connection connection:connections){
-            if (connection!=null){
-                connection.disconnect();
-            }
+        for (String address:connections.keySet()){
+            connections.get(address).close();
         }
     }
 
-    /*package*/ static Connection[] getConnections(){
-        return connections;
-    }
-
-    /*package*/ static String[] getAddresses(){
-        ArrayList<String>addressList = new ArrayList<>();
-        for (Connection connection:connections){
-            if (connection!=null)addressList.add(connection.getAddress());
-        }
-        String[]addresses = new String[addressList.size()];
-        for(int i = 0; i < addressList.size(); ++i){
-            addresses[i] = addressList.get(i);
-        }
-        return addresses;
-    }
-
-    /*package*/ static void send(String[] addressArray, byte[] data) {
-        for (String address:addressArray) {
-            Connection connection = getConnection(address);
-            connection.send(data);
-        }
-    }
-
-    /*package*/ static void removeDeadConnection(int index){
-        if (index >= connections.length ||index < 0)Log.w("ConnectionManager", "connection with index out of bounds: " + index);
-        connections[index] = null;
-    }
-
-    /*package*/ static void reconnect(Connection connection){
-        Log.i("ConnectionManager", "reconnecting: " + connection.getRemoteDevice().getName());
-        connection.disconnect();
-        connect(connection.getRemoteDevice(), null);
-    }
-
-    public static void addConnectionListener(AppBluetoothManager.ConnectionListener listener){
-        //todo:add listener to Connection
-    }
-
-    @Nullable
-    private static Connection getConnection(String address){
-        for (Connection connection:connections){
-            if (connection != null && connection.getRemoteDevice().getAddress().equals(address)){
-                return connection;
-            }
-        }
-        Log.w("ConnectionManager", "address has no connection");
-        return null;
-    }
-
-    private static void addConnection(Connection connection){
+    /*package*/ static void addConnection(Connection connection){
         Log.i("ConnectionManager", "adding a connection");
-        if (!hasConnections()){
-            Log.i("ConnectionManager", "Started the Send/Receive Threads");
-            connections[connection.getIndex()] = connection;
-            new EventSenderThread();
-            new EventReceiverThread();
-            return;
-        }
-        connections[connection.getIndex()] = connection;
+        connections.put(connection.getAddress(), connection);
+        new EventSenderThread();
+        new EventReceiverThread();
     }
 
-    private static UUID getUUID (int i){
-        return UUID.fromString(UUID_STRING + i);
-    }
+    /*package*/ static class CreateConnectionThread extends Thread {
 
-    private static class CreateConnectionThread extends Thread {
-        private final BluetoothDevice BLUETOOTH_DEVICE;
         private static Map<String, CreateConnectionThread> activeCreateConnectionThreads = new HashMap<>();
+
+        private final BluetoothDevice BLUETOOTH_DEVICE;
+        private final AppBluetoothManager.ConnectionListener LISTENER;
+
         BluetoothSocket bluetoothSocket = null;
 
-        /**
-         * This Thread is started automatically upon creation!
-         *
-         * @param pBluetoothDevice - the remote device to connect to
-         */
-        /*package*/ CreateConnectionThread(BluetoothDevice pBluetoothDevice, Notificator deviceFoundNotificator) {
-            BLUETOOTH_DEVICE = pBluetoothDevice;
-            DEVICE_FOUND_NOTIFICATOR = deviceFoundNotificator;
+        private CreateConnectionThread(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener) throws AddressAlreadyConnected {
+            BLUETOOTH_DEVICE = bluetoothDevice;
+            LISTENER = listener;
+            if (connections.get(bluetoothDevice.getAddress()) != null || activeCreateConnectionThreads.containsKey(BLUETOOTH_DEVICE.getAddress()))
+                throw new AddressAlreadyConnected();
+            activeCreateConnectionThreads.put(BLUETOOTH_DEVICE.getAddress(), this);
             start();
         }
 
         @Override
         public void run() {
-            //todo:remove prepare statement with toasts
-            if (activeCreateConnectionThreads.containsKey(BLUETOOTH_DEVICE.getAddress())) {
-                Log.i("CCThread", "there is already a Thread for this device");
-                return;
-            }
-            activeCreateConnectionThreads.put(BLUETOOTH_DEVICE.getAddress(), this);
-            Looper.prepare();
-            AppBluetoothManager.cancelSearch();
-            Log.i("CCThread", "Started connection Thread for: " + BLUETOOTH_DEVICE.getName());
-            byte index = 0;
-            for (; index < MAX_CONNECTIONS; ++index) {
-                Log.i("CCThread", "Attempting connection with index " + index);
+            Log.d("CCThread", "Started connection Thread for: " + BLUETOOTH_DEVICE.getName());
+            for (byte index = 0; index < UUID_ARRAY.length; ++index) {
+                Log.d("CCThread", "Attempting connection using uuid with index " + index);
                 try {
-                    bluetoothSocket = BLUETOOTH_DEVICE.createInsecureRfcommSocketToServiceRecord(getUUID(index));
+                    bluetoothSocket = BLUETOOTH_DEVICE.createRfcommSocketToServiceRecord(UUID_ARRAY[index]);
                 } catch (IOException e) {
-                    Log.e("CCThread", "Failed to create BluetoothSocket");
+                    Log.e("CCThread", "Failed to create BluetoothSocket for uuid with index " + index);
                     e.printStackTrace();
                     continue;
                 }
                 try {
                     bluetoothSocket.connect();
+                    new Connection(bluetoothSocket, LISTENER);
                     break;
                 } catch (IOException e) {
-                    Log.w("CCThread", "Failed to connect with index " + index);
+                    Log.w("CCThread", "Failed to connect using uuid with index " + index);
                     e.printStackTrace();
                 }
             }
-            if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
-                Log.e("CCThread", "Failed to connect " + BLUETOOTH_DEVICE.getName() + ": " + BLUETOOTH_DEVICE.getAddress());
-                if (DEVICE_FOUND_NOTIFICATOR != null) DEVICE_FOUND_NOTIFICATOR.connectionRequestResult(null);
-            } else {
-                Log.i("CCThread", "Connection to " + BLUETOOTH_DEVICE.getName() + " successful");
-                addConnection(new Connection(bluetoothSocket, index));
-                if (DEVICE_FOUND_NOTIFICATOR != null) DEVICE_FOUND_NOTIFICATOR.connectionRequestResult(connections[index].getRemoteDevice());
+
+            if (bluetoothSocket == null) {
+                Log.e("CCThread", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ", MAC = " + BLUETOOTH_DEVICE.getAddress());
+                if (LISTENER != null)LISTENER.onConnectionFailed();
             }
             activeCreateConnectionThreads.remove(BLUETOOTH_DEVICE.getAddress());
         }
 
-        public static void cancelConnections(){
-            Set<String> keys = activeCreateConnectionThreads.keySet();
-            for (String key:keys){
+        /*package*/ static void cancelConnecting(){
+            for (String key:activeCreateConnectionThreads.keySet()){
                 try {
-                    activeCreateConnectionThreads.get(key).bluetoothSocket.close();
+                    activeCreateConnectionThreads.remove(key).bluetoothSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -221,61 +154,148 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         }
     }
 
-    private static class AcceptConnectionThread extends Thread implements TODS {
+    private static class AcceptConnectionThread extends Thread {
+
         private BluetoothServerSocket bluetoothServerSocket = null;
         private final UUID UUID;
-        private final byte INDEX;
 
-        /*package*/ AcceptConnectionThread(byte i){
-            INDEX = i;
-            UUID = getUUID(i);
+        /*package*/ AcceptConnectionThread(UUID uuid) throws IOException{
+            UUID = uuid;
+            bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(UUID);
             start();
         }
 
         @Override
         public void run() {
-            //todo:remove with toasts
-            Looper.prepare();
-            while(serverActive && connections[INDEX]==null) {
-                BluetoothSocket bluetoothSocket;
-                try {
-                    bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(UUID);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.i("ACThread", "Could not open the bluetoothServerSocket with uuid " + UUID.toString());
-                    continue;
-                }
-
-                if (bluetoothServerSocket == null) {
-                    Log.i("ACThread", "Failed to get the bluetoothServerSocket with uuid " + UUID.toString());
-                    continue;
-                }
-
+            BluetoothSocket bluetoothSocket;
+            while(serverActive) {
                 try {
                     bluetoothSocket = bluetoothServerSocket.accept();
+                    AppBluetoothManager.notifyConnectionEstablished(new Connection(bluetoothSocket, null).getAddress());
                 } catch (IOException e) {
-                    if (serverActive)Log.e("ACThread", "failed to accept the connection with index: " + INDEX);
-                    e.printStackTrace();
-                    continue;
-                }
-
-                if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
-                    Log.e("ACThread", "failed to connect correctly");
+                    if (serverActive) {
+                        Log.e("ACThread", "failed to accept a connection with uuid " + UUID + ". Continuing...");
+                        e.printStackTrace();
+                        continue;
+                    }
                     break;
                 }
-                Log.i("ACThread", "Connected to " + bluetoothSocket.getRemoteDevice().getName());
-                addConnection(new Connection(bluetoothSocket, INDEX));
             }
-            cancelAvailability();
+
+            try {
+                bluetoothServerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         /*package*/ void cancelAvailability(){
             try {
-                if (bluetoothServerSocket!=null)bluetoothServerSocket.close();
+                bluetoothServerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            acceptConnectionThreads.remove(this);
         }
+    }
+
+    /*package*/ static class EventSenderThread extends Thread {
+
+        private static final int
+                /**
+                 * Amount of time in millis to wait until cancelling the polling of the next event
+                 */
+                MAXIMUM_WAIT_TIME = 1000;
+
+        private static final LinkedBlockingQueue<Event>
+                events = new LinkedBlockingQueue<>();
+
+        private static boolean
+                activeSenderThread = false;
+
+        private EventSenderThread(){
+            start();
+        }
+
+        @Override
+        public void run() {
+            if (activeSenderThread) return;
+            activeSenderThread = true;
+            Log.i("ESThread", "started");
+
+            Event event = null;
+            byte[]data;
+            while (hasConnections()) {
+                try {
+                    event = events.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (event != null) {
+                    try {
+                        data = event.toString().getBytes(TEXT_ENCODING);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                    for (String address:event.getReceptors()){
+                        if (connections.containsKey(address))
+                            connections.get(address).send(data);
+                    }
+                }
+            }
+
+            activeSenderThread = false;
+        }
+
+        /*package*/ static void send(Event event) {
+            if (!events.offer(event)) {
+                Log.w("ESThread", "Couldn't add Event.");
+            }
+        }
+    }
+
+    private static class EventReceiverThread extends Thread {
+
+        private static final int
+                SLEEP_TIME = 100;
+
+        private static boolean
+                activeReceiverThread = false;
+
+        private EventReceiverThread(){
+            start();
+        }
+
+        @Override
+        public void run(){
+            if (activeReceiverThread)return;
+            activeReceiverThread = true;
+
+            Connection connection;
+            boolean received = false;
+            while(hasConnections()) {
+                received = false;
+                for (String address:connections.keySet()) {
+                    connection = connections.get(address);
+                    if (connection == null)continue;
+                    for (Event event:connection.readEvents()){
+                        received = true;
+                        event.handle();
+                    }
+                }
+                if (!received) try {
+                    sleep(SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            activeReceiverThread = false;
+        }
+    }
+
+    private static class AddressAlreadyConnected extends Exception{
+
     }
 }
