@@ -42,11 +42,11 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
         disconnect();
         acceptConnectionThreads.clear();
         serverActive = true;
-        for(byte i = 0; i < UUID_ARRAY.length; ++i){
-            try{
-                acceptConnectionThreads.add(new AcceptConnectionThread(UUID_ARRAY[i]));
-            }catch (IOException e){
-                Log.e("ConnectionManager", "Could not create AcceptConnectionThread for uuid + " + UUID_ARRAY[i]);
+        for (UUID uuid : UUID_ARRAY) {
+            try {
+                acceptConnectionThreads.add(new AcceptConnectionThread(uuid));
+            } catch (IOException e) {
+                Log.e("ConnectionManager", "Could not create AcceptConnectionThread for uuid + " + uuid);
                 e.printStackTrace();
             }
         }
@@ -62,7 +62,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
         Log.i("ConnectionManager", "stopped the Server");
     }
 
-    /*package*/ static boolean hasConnections(){
+    private static boolean hasConnections(){
         return !connections.isEmpty();
     }
 
@@ -94,6 +94,11 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
         connections.put(connection.getAddress(), connection);
         new EventSenderThread();
         new EventReceiverThread();
+    }
+
+    /*package*/ static void removeClosedConnection(Connection connection){
+        if (connections.containsKey(connection.getAddress()))
+            connections.remove(connection.getAddress());
     }
 
     /*package*/ static class CreateConnectionThread extends Thread {
@@ -273,7 +278,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
             activeReceiverThread = true;
 
             Connection connection;
-            boolean received = false;
+            boolean received;
             while(hasConnections()) {
                 received = false;
                 for (String address:connections.keySet()) {

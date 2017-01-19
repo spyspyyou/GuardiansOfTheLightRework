@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import testing.gotl.spyspyyo.bluetoothtesting.bluetooth.events.DisconnectEvent;
 import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
 /*package*/ class Connection implements TODS {
@@ -92,13 +90,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
     }
 
     /*package*/ void close(){
-        Log.i("Connection", "disconnecting " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
-
-        try {
-            send(new DisconnectEvent(new String[]{getAddress()}).toString().getBytes(TEXT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        Log.i("Connection", "closing connection " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
 
         try {
             INPUT_STREAM.close();
@@ -115,6 +107,8 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        ConnectionManager.removeClosedConnection(this);
     }
 
     /*package*/ String getAddress(){
