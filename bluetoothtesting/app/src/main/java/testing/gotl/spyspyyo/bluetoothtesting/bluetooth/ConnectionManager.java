@@ -17,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static testing.gotl.spyspyyo.bluetoothtesting.bluetooth.ConnectionManager.CreateConnectionThread.cancelConnecting;
-import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODING;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TEXT_ENCODING;
 
 /*package*/ class ConnectionManager {
     //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
@@ -69,8 +69,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
     /*package*/ static void connect(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener){
         try {
             new CreateConnectionThread(bluetoothDevice, listener);
-        } catch (AddressAlreadyConnected e) {
-            Log.w("ConnectionManager", "No need to (start) connect to address " + bluetoothDevice.getAddress() + ". Already is connected or connecting.");
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -110,11 +109,11 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
 
         BluetoothSocket bluetoothSocket = null;
 
-        private CreateConnectionThread(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener) throws AddressAlreadyConnected {
+        private CreateConnectionThread(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener) throws IllegalArgumentException {
             BLUETOOTH_DEVICE = bluetoothDevice;
             LISTENER = listener;
             if (connections.get(bluetoothDevice.getAddress()) != null || activeCreateConnectionThreads.containsKey(BLUETOOTH_DEVICE.getAddress()))
-                throw new AddressAlreadyConnected();
+                throw new IllegalArgumentException("There is either already a connection to this address or a Thread trying to connect to it");
             activeCreateConnectionThreads.put(BLUETOOTH_DEVICE.getAddress(), this);
             start();
         }
@@ -176,7 +175,6 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
             while(serverActive) {
                 try {
                     bluetoothSocket = bluetoothServerSocket.accept();
-                    AppBluetoothManager.notifyConnectionEstablished(new Connection(bluetoothSocket, null).getAddress());
                 } catch (IOException e) {
                     if (serverActive) {
                         Log.e("ACThread", "failed to accept a connection with uuid " + UUID + ". Continuing...");
@@ -211,8 +209,8 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
                  */
                 MAXIMUM_WAIT_TIME = 1000;
 
-        private static final LinkedBlockingQueue<Event>
-                events = new LinkedBlockingQueue<>();
+        private static final LinkedBlockingQueue<Messenger>
+                MESSENGER_QUEUE = new LinkedBlockingQueue<>();
 
         private static boolean
                 activeSenderThread = false;
@@ -227,23 +225,23 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
             activeSenderThread = true;
             Log.i("ESThread", "started");
 
-            Event event = null;
+            Messenger messenger = null;
             byte[]data;
             while (hasConnections()) {
                 try {
-                    event = events.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS);
+                    messenger = MESSENGER_QUEUE.poll(MAXIMUM_WAIT_TIME, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                if (event != null) {
+                if (messenger != null) {
                     try {
-                        data = event.toString().getBytes(TEXT_ENCODING);
+                        data = messenger.toString().getBytes(TEXT_ENCODING);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                         continue;
                     }
-                    for (String address:event.getReceptors()){
+                    for (String address:messenger.getReceptors()){
                         if (connections.containsKey(address))
                             connections.get(address).send(data);
                     }
@@ -253,9 +251,9 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
             activeSenderThread = false;
         }
 
-        /*package*/ static void send(Event event) {
-            if (!events.offer(event)) {
-                Log.w("ESThread", "Couldn't add Event.");
+        /*package*/ static void send(Messenger messenger) {
+            if (!MESSENGER_QUEUE.offer(messenger)) {
+                Log.w("ESThread", "Couldn't add Messenger.");
             }
         }
     }
@@ -284,9 +282,9 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
                 for (String address:connections.keySet()) {
                     connection = connections.get(address);
                     if (connection == null)continue;
-                    for (Event event:connection.readEvents()){
+                    for (Messenger messenger :connection.readEvents()){
                         received = true;
-                        event.handle();
+                        messenger.onReception();
                     }
                 }
                 if (!received) try {
@@ -298,9 +296,5 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.TEXT_ENCODIN
 
             activeReceiverThread = false;
         }
-    }
-
-    private static class AddressAlreadyConnected extends Exception{
-
     }
 }

@@ -27,10 +27,10 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.GameInformation;
 import testing.gotl.spyspyyo.bluetoothtesting.teststuff.GameInformationList;
 
 import static android.support.v4.app.ActivityCompat.shouldShowRequestPermissionRationale;
-import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.APP_IDENTIFIER;
-import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.ASK_TO_TURN_ON_BT;
-import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.GAME_NAME;
-import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS.REQUEST_COARSE_LOCATION_PERMISSION;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.APP_IDENTIFIER;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.ASK_TO_TURN_ON_BT;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.GAME_NAME;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.REQUEST_COARSE_LOCATION_PERMISSION;
 
 //todo:turn off when the app is left?
 
@@ -53,10 +53,6 @@ public class AppBluetoothManager {
             status = NONE,
             targetStatus = NONE;
 
-    private static boolean
-            bluetoothOnRequested = false,
-            bluetoothDiscoverableRequested = false;
-
     private static String localAddress = "";
 
     private static BluetoothAdapter bluetoothAdapter = null;
@@ -78,14 +74,6 @@ public class AppBluetoothManager {
         }
         localAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
         bluetoothBroadcastReceiver = new BluetoothBroadcastReceiver();
-    }
-
-    public static void onActivityResult(int requestCode){
-        if (requestCode == REQUEST_ENABLE_BT) {
-            bluetoothOnRequested = false;
-        }else if (requestCode == REQUEST_START_DISCOVERABLE){
-            bluetoothDiscoverableRequested = false;
-        }
     }
 
     public static void onAppLeave(Context context){
@@ -119,11 +107,10 @@ public class AppBluetoothManager {
         bluetoothBroadcastReceiver.register(activity);
         //start the reception threads
         ConnectionManager.startServer();
-        if(bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE && ! bluetoothDiscoverableRequested) {
+        if(bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
             activity.startActivityForResult(intent, REQUEST_START_DISCOVERABLE);
-            bluetoothDiscoverableRequested = true;
         } else {
             bluetoothAdapter.cancelDiscovery();
             setBluetoothName();
@@ -222,18 +209,15 @@ public class AppBluetoothManager {
 
     private static boolean prepareClient(Activity activity) {
         bluetoothBroadcastReceiver.register(activity);
-        if (bluetoothAdapter.isEnabled()){
+        if (bluetoothAdapter.isEnabled()) {
             setBluetoothName();
             Log.i("BtTest", "bluetooth client available");
             return true;
         }
-        else if (!bluetoothOnRequested) {
-            if (ASK_TO_TURN_ON_BT){
-                activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
-                bluetoothOnRequested = true;
-            }else{
-                bluetoothAdapter.enable();
-            }
+        if (ASK_TO_TURN_ON_BT) {
+            activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
+        } else {
+            bluetoothAdapter.enable();
         }
         return false;
     }
@@ -431,8 +415,8 @@ public class AppBluetoothManager {
         }
 
         private boolean isHosting(BluetoothDevice bluetoothDevice){
-            if (!bluetoothDevice.getName().endsWith(NOT_HOSTING_STRING))return true;
-            return false;
+            String name = bluetoothDevice.getName();
+            return name.startsWith(APP_IDENTIFIER) && !bluetoothDevice.getName().endsWith(NOT_HOSTING_STRING);
         }
     }
 

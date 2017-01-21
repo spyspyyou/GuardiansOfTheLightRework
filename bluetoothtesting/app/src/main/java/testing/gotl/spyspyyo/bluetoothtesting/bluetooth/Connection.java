@@ -10,10 +10,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
-import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TEXT_ENCODING;
 
-/*package*/ class Connection implements TODS {
+/*package*/ class Connection {
 
     private static final char DATA_BLOCK_END_CHAR = '|';
     private static final short MAX_EVENTS_PER_CALL = 5;
@@ -40,6 +41,7 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
         ConnectionManager.addConnection(this);
 
+        AppBluetoothManager.notifyConnectionEstablished(new Connection(bluetoothSocket, null).getAddress());
         if (listener != null) {
             listeners.add(listener);
             listener.onConnectionEstablished();
@@ -51,31 +53,31 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
      * this method reads from the connection's InputStream until it gets at most MAX_EVENTS_PER_CALL Events or the stream has no more data
      * @return events - a list of Events from the InputStream
      */
-    /*package*/ ArrayList<Event> readEvents(){
-        ArrayList<Event> events = new ArrayList<>();
+    /*package*/ ArrayList<Messenger> readEvents(){
+        ArrayList<Messenger> messengers = new ArrayList<>();
         String eventString = "";
         char nextChar;
-        int numberOfEventsRead = 0;
+        int count = 0;
         try {
             while ((BUFFERED_READER.ready() || !eventString.equals(""))
-                    && numberOfEventsRead < MAX_EVENTS_PER_CALL) {
+                    && count < MAX_EVENTS_PER_CALL) {
                 nextChar = (char) BUFFERED_READER.read();
                 if (nextChar == DATA_BLOCK_END_CHAR){
-                    Log.i("Connection", "Event received: " + eventString);
+                    Log.i("Connection", "Messenger received: " + eventString);
                     try{
-                        events.add(Event.fromEventString(eventString));
-                    }catch (Event.InvalidEventStringException e){
+                        messengers.add(Messenger.fromEventString(eventString));
+                    }catch (Exception e){
                         continue;
                     }
                     eventString = "";
-                    ++numberOfEventsRead;
+                    ++count;
                 }else eventString += nextChar;
             }
         }catch (IOException e){
             close();
             e.printStackTrace();
         }
-        return events;
+        return messengers;
     }
 
     /*package*/ synchronized void send(byte[]data) {
@@ -91,6 +93,11 @@ import testing.gotl.spyspyyo.bluetoothtesting.teststuff.TODS;
 
     /*package*/ void close(){
         Log.i("Connection", "closing connection " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
+
+        Iterator<AppBluetoothManager.ConnectionListener> i = listeners.iterator();
+        while (i.hasNext()){
+            i.next().onConnectionClosed();
+        }
 
         try {
             INPUT_STREAM.close();
