@@ -24,40 +24,24 @@ import java.util.UUID;
 
 import testing.gotl.spyspyyo.bluetoothtesting.activities.BluetoothActivity;
 import testing.gotl.spyspyyo.bluetoothtesting.teststuff.GameInformation;
-import testing.gotl.spyspyyo.bluetoothtesting.teststuff.GameInformationList;
 
 import static android.support.v4.app.ActivityCompat.shouldShowRequestPermissionRationale;
 import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.APP_IDENTIFIER;
 import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.ASK_TO_TURN_ON_BT;
 import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.GAME_NAME;
-import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.REQUEST_COARSE_LOCATION_PERMISSION;
-
-//todo:turn off when the app is left?
+import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TURN_OFF_DISCOVERABLE_WHEN_NOT_REQUIRED;
 
 public class AppBluetoothManager {
 
     private static final String NOT_HOSTING_STRING = "\n";
 
-    private static final int
-            REQUEST_START_DISCOVERABLE = 0,
-            REQUEST_ENABLE_BT = 1;
-
-    //the status options
-    private static final byte
-            NONE = 0,
-            CONNECTION = 1,
-            SEARCH = 2,
-            SERVER = 3;
-
-    private static byte
-            status = NONE,
-            targetStatus = NONE;
-
     private static String localAddress = "";
+
+    private static boolean isServer = false;
 
     private static BluetoothAdapter bluetoothAdapter = null;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver = null;
-    private static GameInformationList gameList;
+    private static ArrayList<GameInformation> gameList;
     private static final ArrayList<BluetoothActionListener> listeners = new ArrayList<>();
 
     /**
@@ -76,11 +60,6 @@ public class AppBluetoothManager {
         bluetoothBroadcastReceiver = new BluetoothBroadcastReceiver();
     }
 
-    public static void onAppLeave(Context context){
-        releaseRequirements(context);
-        //todo:turn off bt?
-    }
-
     //----------------------------------------------------------------------------------------------
     //
     //          START OF PUBLIC ACCESS METHODS
@@ -88,73 +67,50 @@ public class AppBluetoothManager {
     //----------------------------------------------------------------------------------------------
 
     public static void releaseRequirements(Context context){
-        targetStatus = NONE;
-        if (status != NONE) {
-            status = NONE;
-            notifyStatusChanged();
-        }
-        setBluetoothName();
-
         bluetoothBroadcastReceiver.unregister(context);
         bluetoothAdapter.cancelDiscovery();
-
-        ConnectionManager.stopServer();
         ConnectionManager.disconnect();
     }
 
-    public static void startServer(Activity activity, GameInformation gameInformation){
-        targetStatus = SERVER;
-        bluetoothBroadcastReceiver.register(activity);
-        //start the reception threads
-        ConnectionManager.startServer();
-        if(bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
-            activity.startActivityForResult(intent, REQUEST_START_DISCOVERABLE);
-        } else {
+    public static boolean startServer(Activity activity){
+        if (prepareBluetooth(activity, true)) {
+            ConnectionManager.startServer();
             bluetoothAdapter.cancelDiscovery();
-            setBluetoothName();
-            status = targetStatus;
-            notifyStatusChanged();
-            Log.i("BtTest", "bluetooth server available");
+            return true;
         }
+        return false;
     }
 
-    public static void stopServer(){
+    public static void stopServer(Activity activity){
         ConnectionManager.stopServer();
-        //todo:turn off discoverable with 1s intent if user wants it
-        if (targetStatus == SERVER){
-            status = targetStatus = CONNECTION;
-            notifyStatusChanged();
+        isServer = false;
+        setBluetoothName();
+        if (TURN_OFF_DISCOVERABLE_WHEN_NOT_REQUIRED && bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 1);
+            activity.startActivity(intent);
         }
     }
 
-    public static boolean searchGames(Activity activity, GameInformationList list){
+    public static boolean searchGames(Activity activity, ArrayList<GameInformation> list){
         if (!assureCoarseLocationPermission(activity)){
             Log.w("APManager", "ain't got no coarse location permission");
             return false;
         }
 
-        targetStatus = SEARCH;
-        if (prepareClient(activity)){
+        if (prepareBluetooth(activity, false)){
             bluetoothAdapter.cancelDiscovery();
             bluetoothAdapter.startDiscovery();
+            gameList = list;
+            gameList.clear();
+            return true;
         }
-
-        gameList = list;
-        gameList.clear();
-        return true;
+        return false;
     }
 
     public static void joinGame(String gameAddress, @Nullable ConnectionListener listener){
-        if (status != SEARCH && status != CONNECTION)return;
         bluetoothAdapter.cancelDiscovery();
-        targetStatus = CONNECTION;
-        if (status != CONNECTION) {
-            status = CONNECTION;
-            notifyStatusChanged();
-        }
-        ConnectionManager.connect(getBluetoothDevice(gameAddress), listener);
+        ConnectionManager.connect(gameAddress, listener);
     }
 
     public static void addBluetoothListener(BluetoothActionListener listener){
@@ -175,10 +131,19 @@ public class AppBluetoothManager {
     //
     //----------------------------------------------------------------------------------------------
 
-    private static void notifyStatusChanged(){
+    private static void notifyStart(){
         synchronized (listeners){
             for (BluetoothActionListener listener:listeners){
-                listener.onStateChanged(status);
+                listener.onStart();
+            }
+        }
+    }
+
+    private static void notifyStop() {
+        synchronized (listeners) {
+            for (BluetoothActionListener listener : listeners) {
+                listener.onStop();
+
             }
         }
     }
@@ -207,33 +172,38 @@ public class AppBluetoothManager {
         }
     }
 
-    private static boolean prepareClient(Activity activity) {
+    private static boolean prepareBluetooth(Activity activity, boolean server) {
         bluetoothBroadcastReceiver.register(activity);
+        isServer = false;
         if (bluetoothAdapter.isEnabled()) {
-            setBluetoothName();
-            Log.i("BtTest", "bluetooth client available");
-            return true;
+            if (!server) {
+                setBluetoothName();
+                return true;
+            }
         }
-        if (ASK_TO_TURN_ON_BT) {
-            activity.startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
+        if (server) {
+            if (bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+                isServer = true;
+                setBluetoothName();
+                return true;
+            }
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+            activity.startActivity(intent);
         } else {
-            bluetoothAdapter.enable();
+            if (ASK_TO_TURN_ON_BT) {
+                activity.startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
+            } else {
+                bluetoothAdapter.enable();
+            }
         }
         return false;
     }
 
     private static void setBluetoothName(){
-        String bluetoothName = APP_IDENTIFIER + ((status == SERVER)?GAME_NAME:NOT_HOSTING_STRING);
+        String bluetoothName = APP_IDENTIFIER + ((isServer)?GAME_NAME:NOT_HOSTING_STRING);
         if (!bluetoothAdapter.isEnabled() || bluetoothAdapter.getName().equals(bluetoothName))return;
         bluetoothAdapter.setName(bluetoothName);
-    }
-
-    private static BluetoothDevice getBluetoothDevice(String address) {
-        BluetoothDevice bluetoothDevice = null;
-        if (BluetoothAdapter.checkBluetoothAddress(address))
-            bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
-        else Log.w("ABManager", "received an invalid address");
-        return bluetoothDevice;
     }
 
     /*package*/ static String getLocalAddress(){
@@ -258,7 +228,7 @@ public class AppBluetoothManager {
                                 }
                         ).show();
             }
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_COARSE_LOCATION_PERMISSION);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             return false;
         }
         return true;
@@ -281,6 +251,11 @@ public class AppBluetoothManager {
                 .show();
     }
 
+    /*package*/ static BluetoothDevice getRemoteDevice(String address) throws IllegalArgumentException{
+        if (!BluetoothAdapter.checkBluetoothAddress(address)) throw new IllegalArgumentException("Invalid MAC-Address");
+        return bluetoothAdapter.getRemoteDevice(address);
+    }
+
     private static class BluetoothBroadcastReceiver extends BroadcastReceiver {
         private static final int INVALID_STATE = -1;
 
@@ -289,7 +264,6 @@ public class AppBluetoothManager {
                 BluetoothAdapter.ACTION_DISCOVERY_STARTED,
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED,
                 BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED,
-                BluetoothAdapter.ACTION_SCAN_MODE_CHANGED,
                 BluetoothDevice.ACTION_FOUND
         };
 
@@ -318,9 +292,6 @@ public class AppBluetoothManager {
                 case BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED:
                     onNameChange();
                     break;
-                case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
-                    onScanModeChanged(context);
-                    break;
                 case BluetoothDevice.ACTION_FOUND:
                     onDeviceFound(intent);
                     break;
@@ -331,51 +302,29 @@ public class AppBluetoothManager {
             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, INVALID_STATE);
             switch (extra){
                 case BluetoothAdapter.STATE_ON:
-                    if (targetStatus == SEARCH){
-                        bluetoothAdapter.cancelDiscovery();
-                        bluetoothAdapter.startDiscovery();
-                    }
+                    notifyStart();
                     break;
                 case BluetoothAdapter.STATE_OFF:
                 case BluetoothAdapter.STATE_TURNING_OFF:
-                    if (targetStatus != NONE)releaseRequirements(context);
+                    notifyStop();
+                    releaseRequirements(context);
                     break;
             }
         }
 
         private void onDiscoveryStart(){
             notifySearchStarted();
-            if (targetStatus == SEARCH) {
-                status = targetStatus;
-                notifyStatusChanged();
-            }else{
-                bluetoothAdapter.cancelDiscovery();
-            }
             Log.i("BtTest", "starting discovery");
         }
 
         private void onDiscoveryFinish(){
             notifySearchFinished();
-            if (status == SEARCH){
-                status = targetStatus = CONNECTION;
-                notifyStatusChanged();
-            }
             Log.i("BtTest", "discovery finished");
         }
 
         private void onNameChange(){
             Log.i("BtTest", "name was changed to" + bluetoothAdapter.getName());
             setBluetoothName();
-        }
-
-        private void onScanModeChanged(Context context){
-            if (targetStatus == SERVER)
-                if (bluetoothAdapter.getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
-                    status = targetStatus;
-                    notifyStatusChanged();
-                }else {
-                    releaseRequirements(context);
-                }
         }
 
         private void onDeviceFound(Intent intent){
@@ -437,7 +386,9 @@ public class AppBluetoothManager {
 
     public interface BluetoothActionListener{
 
-        void onStateChanged(byte status);
+        void onStart();
+
+        void onStop();
 
         void onGameSearchStarted();
 

@@ -65,7 +65,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TE
                 if (nextChar == DATA_BLOCK_END_CHAR){
                     Log.i("Connection", "Messenger received: " + eventString);
                     try{
-                        messengers.add(Messenger.fromEventString(eventString));
+                        messengers.add(Messenger.fromMessageString(eventString));
                     }catch (Exception e){
                         continue;
                     }

@@ -66,8 +66,9 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TE
         return !connections.isEmpty();
     }
 
-    /*package*/ static void connect(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener){
+    /*package*/ static void connect(String address, @Nullable AppBluetoothManager.ConnectionListener listener){
         try {
+            BluetoothDevice bluetoothDevice = AppBluetoothManager.getRemoteDevice(address);
             new CreateConnectionThread(bluetoothDevice, listener);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
