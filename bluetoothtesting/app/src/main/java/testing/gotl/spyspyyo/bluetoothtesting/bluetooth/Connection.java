@@ -16,7 +16,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TE
 
 /*package*/ class Connection {
 
-    private static final char DATA_BLOCK_END_CHAR = '|';
+    private static final char DATA_BLOCK_END_CHAR = '\0';
     private static final short MAX_EVENTS_PER_CALL = 5;
 
     private final ArrayList<AppBluetoothManager.ConnectionListener> listeners = new ArrayList<>();
@@ -84,6 +84,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TE
         try {
             OUTPUT_STREAM.write(data);
             OUTPUT_STREAM.write(DATA_BLOCK_END_CHAR);
+            OUTPUT_STREAM.flush();
         } catch (IOException e) {
             Log.w("Connection", "failed sending data, connection broken");
             close();
