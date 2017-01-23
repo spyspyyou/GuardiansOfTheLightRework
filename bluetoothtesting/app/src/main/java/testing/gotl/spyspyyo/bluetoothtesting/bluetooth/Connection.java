@@ -67,6 +67,7 @@ import static testing.gotl.spyspyyo.bluetoothtesting.teststuff.TEST_VARIABLES.TE
                     try{
                         messengers.add(Messenger.fromMessageString(eventString));
                     }catch (Exception e){
+                        e.printStackTrace();
                         continue;
                     }
                     eventString = "";
