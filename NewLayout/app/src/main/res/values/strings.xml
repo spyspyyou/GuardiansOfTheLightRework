@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">NewLayout</string>
     <string name="title_activity_start">Guardians of the Light</string>
+    <string name="hello_world">test</string>
 </resources>
