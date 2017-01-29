@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,7 @@ public class StartActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
 
         final FloatingActionButton fabCreate = (FloatingActionButton) findViewById(R.id.fab_create);
         fabCreate.setOnClickListener(new View.OnClickListener() {
@@ -56,22 +58,24 @@ public class StartActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar == null)return;
         actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setElevation(2);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.hello_world, R.string.hello_world) {
+            float  lastOffset = 0;
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
-                fabCreate.hide();
-                fabWorlds.hide();
-                if (slideOffset <= 0.2){
+                if (slideOffset > lastOffset) {
+                    fabCreate.hide();
+                    fabWorlds.hide();
+                }else{
                     if (tabLayout.getSelectedTabPosition() == 0)fabCreate.show();
                     if (tabLayout.getSelectedTabPosition() == 2)fabWorlds.show();
                 }
+                lastOffset = slideOffset;
             }
 
             public void onDrawerClosed(View view) {
@@ -122,6 +126,7 @@ public class StartActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
     }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig)
@@ -175,7 +180,21 @@ public class StartActivity extends AppCompatActivity {
     public static class SearchFragment extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.tab_search, container, false);
+            View v = inflater.inflate(R.layout.tab_search, container, false);
+            final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh);
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    Snackbar.make(swipeRefreshLayout, "On Refresh", Snackbar.LENGTH_LONG)
+                            .setAction("Stop Refresh", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    swipeRefreshLayout.setRefreshing(false);
+                                }
+                            }).show();
+                }
+            });
+            return v;
         }
     }
 

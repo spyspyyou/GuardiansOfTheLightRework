@@ -1,32 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
-    android:layout_gravity="start">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:text="TextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
 
-    <ToggleButton
-        android:text="ToggleButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/toggleButton"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:elevation="2dp"
+                android:background="@drawable/background_rounded"
+                android:padding="@dimen/activity_padding"
+                android:layout_margin="@dimen/activity_margin"
+                android:layout_height="wrap_content">
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressBar"/>
+                <TextView
+                    android:text="Worlds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/textView"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorAccent"/>
 
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner"/>
-</LinearLayout>
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    app:srcCompat="@drawable/test_map_3"
+                    android:layout_below="@+id/textView"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/imageView"
+                    android:layout_margin="@dimen/activity_margin"
+                    android:padding="1dp"
+                    android:antialias="true"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_create_black_24dp"
+                    android:layout_alignBottom="@+id/imageView"
+                    android:layout_alignEnd="@+id/imageView"
+                    android:id="@+id/imageButton"
+                    android:background="@drawable/background_transparent"
+                    android:padding="@dimen/activity_padding"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:padding="@dimen/activity_padding"
+                android:elevation="2dp"
+                android:background="@drawable/background_rounded"
+                android:layout_margin="@dimen/activity_margin">
+
+                <TextView
+                    android:text="Characters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView3"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorAccent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentStart="true"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:elevation="2dp"
+                android:background="@drawable/background_rounded"
+                android:padding="@dimen/activity_padding"
+                android:layout_margin="@dimen/activity_margin">
+
+                <TextView
+                    android:text="Advanced"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/textView4"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorAccent"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+</ScrollView>
