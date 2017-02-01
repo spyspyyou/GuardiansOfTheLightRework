@@ -143,7 +143,7 @@ public class StartActivity extends AppCompatActivity {
                 "Worlds"
         };
 
-        public DemoCollectionPagerAdapter(FragmentManager fm) {
+        /*package*/ DemoCollectionPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -194,6 +194,7 @@ public class StartActivity extends AppCompatActivity {
                             }).show();
                 }
             });
+            swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
             return v;
         }
     }

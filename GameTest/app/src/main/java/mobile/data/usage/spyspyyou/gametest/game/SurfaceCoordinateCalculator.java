@@ -1,4 +1,4 @@
-package mobile.data.usage.spyspyyou.layouttesting.game;
+package mobile.data.usage.spyspyyou.gametest.game;
 
 import mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.layouttesting.utils.Vector2D;
@@ -18,7 +18,7 @@ public class SurfaceCoordinateCalculator {
     }
 
     public void updateScreenPosition(Vector2D mapPosition, Vector2D vectorToWriteTo){
-        vectorToWriteTo.set();
+        vectorToWriteTo.set(SURFACE_CENTER.x + (mapPosition.x - USER_POSITION.x) * TILE_SIDE, SURFACE_CENTER.y + (mapPosition.y - USER_POSITION.y) * TILE_SIDE);
     }
 
     public Vector2D getUserPosition(){

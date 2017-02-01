@@ -1,0 +1,10 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="joystick_size">65dp</dimen>
+    <dimen name="joystick_surface_width">200dp</dimen>
+    <dimen name="mini_map_size">100dp</dimen>
+    <dimen name="button_size">80dp</dimen>
+</resources>

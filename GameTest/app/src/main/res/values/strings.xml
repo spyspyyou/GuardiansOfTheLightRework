@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">GameTest</string>
+    <string name="fluffy">Fluffy</string>
+    <string name="slime">Slime</string>
+    <string name="ghost">Ghost</string>
+    <string name="nox"/>
+    <string name="fluffy_description">dunno yet</string>
+    <string name="slime_description">not yet</string>
+    <string name="ghost_description">nopes</string>
+    <string name="nox_description">soooon</string>
+</resources>
