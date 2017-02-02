@@ -50,7 +50,8 @@ public class GameWorld implements WorldVars{
     private final int
             TILE_SIDE;
 
-    private int totalTime = 0, count = 0;
+    private int count = 0;
+    private long totalTime = 0;
 
     public GameWorld(World world, Vector2D userPosition) {
         this.userPosition = userPosition;
@@ -95,7 +96,7 @@ public class GameWorld implements WorldVars{
         long time = (System.nanoTime() - startTime);
         ++count;
         totalTime += time;
-        Log.d("GameWorld-render", "took " + time + " nanos, " + (int)(time / 1000000) + " milis" + "\naverage time " + (time / count / 1000000) + " milis");
+        Log.d("GameWorld-render", "took " + time + " nanos, " + (int)(time / 1000000) + " milis" + "\naverage time " + (totalTime / count / 1000000) + " milis");
 
     }
 
@@ -154,7 +155,7 @@ public class GameWorld implements WorldVars{
             }
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
             BITMAP = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), recID, options), tileSide, tileSide, false);
             Log.e("Tile", "bitmap config" + BITMAP.getConfig());
             SOLID = solid;
