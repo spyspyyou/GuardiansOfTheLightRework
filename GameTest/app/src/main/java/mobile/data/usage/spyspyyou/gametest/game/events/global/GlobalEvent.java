@@ -1,24 +1,23 @@
 package mobile.data.usage.spyspyyou.gametest.game.events.global;
 
-import mobile.data.usage.spyspyyou.layouttesting.game.Game;
-import mobile.data.usage.spyspyyou.layouttesting.game.events.GameEvent;
+
+import mobile.data.usage.spyspyyou.gametest.game.Game;
+import mobile.data.usage.spyspyyou.gametest.game.events.GameEvent;
 
 public abstract class GlobalEvent extends GameEvent {
 
-    protected GlobalEvent() {
+    public GlobalEvent(){
 
     }
 
-    protected GlobalEvent(String eventString) {
+    protected GlobalEvent(String eventString) throws InvalidMessageException {
         super(eventString);
-        if (Game.isHost())super.send();
     }
 
     @Override
-    public void send() {
-        super.send();
-        handle();
+    public void onReception() {
+        super.onReception();
+        if (Game.HOST)send();
     }
-
 }
 

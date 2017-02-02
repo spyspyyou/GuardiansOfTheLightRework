@@ -8,12 +8,10 @@ import android.view.View;
 import mobile.data.usage.spyspyyou.gametest.R;
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.game.GameServer;
-import mobile.data.usage.spyspyyou.gametest.teststuff.bluetooth.Messenger;
-import mobile.data.usage.spyspyyou.gametest.utils.GameData;
+import mobile.data.usage.spyspyyou.gametest.game.GameData;
 
 public class GameActivity extends AppCompatActivity {
-
-    private Game game = null;
+    private static Game game = null;
     private static Resources resources;
 
     @Override
@@ -22,17 +20,15 @@ public class GameActivity extends AppCompatActivity {
         hideSystemUI();
         setContentView(R.layout.activity_game);
         resources = getResources();
-        try {
-            game = new GameServer(new GameData("nö"));
-        } catch (Messenger.InvalidMessageException e) {
-            e.printStackTrace();
-        }
+        //todo:decide server or not
+        game = new GameServer(findViewById(R.id.relativeLayout_game));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         if (game != null)game.stopGame();
+        game = null;
     }
 
     @Override
@@ -53,6 +49,14 @@ public class GameActivity extends AppCompatActivity {
 
     public static Resources getRec(){
         return resources;
+    }
+
+    public static void prepareGame(GameData gameData){
+        game.prepare(gameData);
+    }
+
+    public static void startGame(){
+        game.start();
     }
 }
 

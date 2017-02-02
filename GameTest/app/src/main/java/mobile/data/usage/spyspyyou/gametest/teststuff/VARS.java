@@ -5,4 +5,5 @@ import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
 public interface VARS {
     byte PREF_LAYOUT = SurfaceViewGame.LEFT;
     String address = "hallo, @see VARS in teststuff";
+    String USER_AD = "addresse";
 }

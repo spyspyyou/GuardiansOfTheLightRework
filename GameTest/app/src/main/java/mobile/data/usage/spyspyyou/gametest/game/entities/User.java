@@ -88,8 +88,7 @@ public abstract class User extends Player {
     public void shootGum(){
         if (lastParticleEjection + PARTICLE_COOL_DOWN < System.currentTimeMillis()){
             lastParticleEjection = System.currentTimeMillis();
-            if (!velocity.has0Length())new GumShotEvent(position, velocity).send();
-            else new GumShotEvent(position, new Vector2D(Math.cos(direction), Math.sin(direction))).send();
+            new GumShotEvent(position, new Vector2D(Math.cos(direction), Math.sin(direction)), 10).send();
         }
     }
 

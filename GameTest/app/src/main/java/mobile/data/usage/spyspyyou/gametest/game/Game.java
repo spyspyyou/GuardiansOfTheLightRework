@@ -7,35 +7,32 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
-import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import mobile.data.usage.spyspyyou.gametest.R;
-import mobile.data.usage.spyspyyou.gametest.game.entities.Entity;
 import mobile.data.usage.spyspyyou.gametest.game.entities.Gum;
 import mobile.data.usage.spyspyyou.gametest.game.entities.LightBulb;
 import mobile.data.usage.spyspyyou.gametest.game.entities.Player;
-import mobile.data.usage.spyspyyou.gametest.game.entities.Slime;
 import mobile.data.usage.spyspyyou.gametest.game.entities.SlimeTrail;
 import mobile.data.usage.spyspyyou.gametest.game.entities.Sweet;
 import mobile.data.usage.spyspyyou.gametest.game.entities.User;
 import mobile.data.usage.spyspyyou.gametest.game.events.GameEvent;
 import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
-import mobile.data.usage.spyspyyou.gametest.utils.GameData;
 import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
-import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_FLUFFY;
-import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_GHOST;
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.PREF_LAYOUT;
 
 
 public class Game {
 
     private static Queue<GameEvent> eventQueue = new LinkedBlockingQueue<>();
+    public static boolean HOST = false;
 
     //todo:better entity encapsulation
-    private Player[] players = new Player[0];
+    private Map<String, Player> players = new LinkedHashMap<>();
     private User user;
     private LightBulb
             lightBulbBlue,
@@ -45,12 +42,21 @@ public class Game {
     private SparseArray<SlimeTrail> slimes = new SparseArray<>();
     private SparseArray<Gum> gums = new SparseArray<>();
 
-    protected GameThread gameThread;
+    protected GameThread gameThread = new GameThread();
     private SurfaceViewGame gameSurface;
     private GameWorld gameWorld;
 
-    public Game(GameData gameData){
+    public Game(View rootView){
+        HOST = this instanceof GameServer;
+        gameSurface = (SurfaceViewGame) rootView.findViewById(R.id.surfaceView_game);
+    }
+
+    public void prepare(GameData gameData){
         new LoadingThread(gameData);
+    }
+
+    public void start(){
+        gameThread.start();
     }
 
     protected void update() {
@@ -60,11 +66,11 @@ public class Game {
 
         user.update(this);
 
-        Iterator<Entity> iterator;
+        for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).update(this);
 
-        for (Entity gum:gums.)gum.update(this);
+        for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).update(this);
 
-        for (Sweet sweet:sweets)sweet.update(this);
+        for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).update(this);
 
         lightBulbBlue.update(this);
         lightBulbGreen.update(this);
@@ -78,25 +84,18 @@ public class Game {
                 //todo:remove after debugging the game
                 c.drawColor(Color.MAGENTA);
 
-                gameMap.render(c, user.getPosition());
+                gameWorld.render(c, user.getPosition());
 
-                for (Sweet sweet:sweets){
-                    sweet.render(c);
-                }
+                for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).render(c, user.getPosition());
 
-                for (Gum gum:gums)gum.render(c);
+                for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).render(c, user.getPosition());
 
-                for (SlimeTrail slime:slimes){
-                    slime.render(c);
-                }
+                for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).render(c, user.getPosition());
 
-                for (LightBulb lightBulb:lightBulbs){
-                    lightBulb.render(c);
-                }
+                lightBulbBlue.render(c, user.getPosition());
+                lightBulbGreen.render(c, user.getPosition());
 
-                for (Entity entity : players) {
-                    entity.render(c);
-                }
+                for (Player player:players.values())player.render(c, user.getPosition());
             }
         }
         gameSurface.render(c);
@@ -118,16 +117,20 @@ public class Game {
         user.shootGum();
     }
 
-    public void addSlime(Vector2D vector2D, int birthTick){
-        slimes.add(new SlimeTrail(vector2D, birthTick));
+    public void addSlime(Vector2D vector2D, int birthTick, int id){
+        slimes.put(id, new SlimeTrail(vector2D, birthTick));
     }
 
-    public void removeSlime(SlimeTrail slimeTrail){
-        slimes.remove(slimeTrail);
+    public void removeSlime(int id){
+        slimes.remove(id);
     }
 
-    public void addGum(Vector2D position, Vector2D velocity){
-        gums.add(new Gum(position, velocity));
+    public void addGum(Vector2D position, Vector2D velocity, int id){
+        gums.put(id, new Gum(position, velocity));
+    }
+
+    public void removeGum(int id){
+        gums.remove(id);
     }
 
     public void setSynchronizedTick(int tick){
@@ -151,9 +154,8 @@ public class Game {
         private final GameData GAME_DATA;
 
 
-        private LoadingThread (GameData gameData, View rootView){
+        private LoadingThread (GameData gameData){
             GAME_DATA = gameData;
-            gameSurface = (SurfaceViewGame) rootView.findViewById(R.id.surfaceView_game);
             start();
         }
 
@@ -167,23 +169,12 @@ public class Game {
                 }
             }
 
-            gameThread = new GameThread();
             gameWorld = new GameWorld(GAME_DATA.WORLD);
+            players = GAME_DATA.PLAYER_DATA.generatePlayers();
+            gameSurface.setup(PREF_LAYOUT, GAME_DATA.WORLD, players.values().toArray(new Player[players.size()]));
 
-            int tileSide = SurfaceViewGame.getTileSide();
-            Vector2D userPosition = new Vector2D(1, 1);
-
-            user = new Slime(userPosition, tileSide, gameSurface);
-            players = new Player[3];
-            players[0] = user;
-            players[1] = new Player(new Vector2D(20, 15), ID_FLUFFY);
-            players[2] = new Player(new Vector2D(18, 27), ID_GHOST);
-
-            lightBulbBlue = new LightBulb(new Vector2D(10, 10));
-            lightBulbGreen = new LightBulb(new Vector2D(1.5, 1.5));
-
-            gameSurface.setup(PREF_LAYOUT, GAME_DATA.WORLD, players);
-            gameThread.start();
+            lightBulbBlue = new LightBulb(gameWorld.getLightBulbStandBlue());
+            lightBulbGreen = new LightBulb(gameWorld.getLightBulbStandGreen());
         }
     }
 
@@ -229,9 +220,6 @@ public class Game {
                     Log.d("GameThread", "lag");
                 }
             }
-
-            //kill any static object references so garbage collection can clean up
-            screenCalculator = null;
         }
 
         private void pauseGame(){

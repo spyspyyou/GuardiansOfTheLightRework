@@ -24,7 +24,7 @@ public class Slime extends User {
     @Override
     public boolean activateSkill(Game game) {
        if (super.activateSkill(game)){
-           new AddSlimeEvent(position.copy(), game.getSynchronizedTick()).send();
+           new AddSlimeEvent(position.copy(), game.getSynchronizedTick(), 0).send();
            Log.d("Slime", "adding SlimeTrail");
            return true;
        }

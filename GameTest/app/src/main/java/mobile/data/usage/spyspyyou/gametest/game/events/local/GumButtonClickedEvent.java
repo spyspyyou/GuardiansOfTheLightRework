@@ -1,6 +1,6 @@
 package mobile.data.usage.spyspyyou.gametest.game.events.local;
 
-import mobile.data.usage.spyspyyou.layouttesting.game.Game;
+import mobile.data.usage.spyspyyou.gametest.game.Game;
 
 public class GumButtonClickedEvent extends LocalEvent {
 

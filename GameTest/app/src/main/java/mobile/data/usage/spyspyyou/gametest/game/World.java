@@ -51,37 +51,32 @@ public class World {
     private Tile[][] map;
     private Tile voidTile;
 
-    public World(String dataString)throws IllegalArgumentException{
-        try {
-            Tile[][] tiles = new Tile[LIGHT_BULB_STAND][0];
-            tiles[VOID][0] = voidTile = new Tile(VOID, (byte) 0, false, false);
-            tiles[FLOOR][0] = new Tile(FLOOR, (byte) 0, true, false);
-            tiles[WALL][0] = new Tile(WALL, (byte) 0, true, true);
-            tiles[SPAWN][0] = new Tile(SPAWN, (byte) 0, true, false);
-            tiles[LIGHT_BULB_STAND][0] = new Tile(LIGHT_BULB_STAND, (byte) 0, true, true);
+    public World(String dataString) {
+        Tile[][] tiles = new Tile[LIGHT_BULB_STAND][0];
+        tiles[VOID][0] = voidTile = new Tile(VOID, (byte) 0, false, false);
+        tiles[FLOOR][0] = new Tile(FLOOR, (byte) 0, true, false);
+        tiles[WALL][0] = new Tile(WALL, (byte) 0, true, true);
+        tiles[SPAWN][0] = new Tile(SPAWN, (byte) 0, true, false);
+        tiles[LIGHT_BULB_STAND][0] = new Tile(LIGHT_BULB_STAND, (byte) 0, true, true);
 
-            ArrayList<Pair<Byte, Byte>> worldData = new ArrayList<>();
+        ArrayList<Pair<Byte, Byte>> worldData = new ArrayList<>();
 
-            for (int i = 0; i < dataString.length() - 1; ) {
-                worldData.add(new Pair<>(Byte.parseByte(dataString.substring(i, ++i)), Byte.parseByte(dataString.substring(i, ++i))));
+        for (int i = 0; i < dataString.length() - 1; ) {
+            worldData.add(new Pair<>(Byte.parseByte(dataString.substring(i, ++i)), Byte.parseByte(dataString.substring(i, ++i))));
+        }
+
+        int size = (int) Math.sqrt(worldData.size() / 2);
+        map = new Tile[size][size];
+
+        int x = 0, y = 0;
+        Iterator<Pair<Byte, Byte>> iterator = worldData.iterator();
+        while (iterator.hasNext()) {
+            Pair<Byte, Byte> pair = iterator.next();
+            map[x++][y] = tiles[pair.first][pair.second];
+            if (x == size) {
+                x = 0;
+                ++y;
             }
-
-            int size = (int) Math.sqrt(worldData.size() / 2);
-            map = new Tile[size][size];
-
-            int x = 0, y = 0;
-            Iterator<Pair<Byte, Byte>> iterator = worldData.iterator();
-            while (iterator.hasNext()) {
-                Pair<Byte, Byte> pair = iterator.next();
-                map[x++][y] = tiles[pair.first][pair.second];
-                if (x == size){
-                    x = 0;
-                    ++y;
-                }
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-            throw new IllegalArgumentException("invalid dataString: " + dataString);
         }
     }
 

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <mobile.data.usage.spyspyyou.layouttesting.ui.views.SurfaceViewGame
+    <mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame
         android:id="@+id/surfaceView_game"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

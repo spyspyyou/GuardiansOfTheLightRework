@@ -1,23 +1,19 @@
 package mobile.data.usage.spyspyyou.gametest.game.events;
 
-import android.app.Activity;
-import android.util.Log;
-
 import java.util.Collection;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.teststuff.bluetooth.Messenger;
-import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
 
 public abstract class GameEvent extends Messenger {
 
-    protected static String[]receptors = {};
+    protected static String[]GAME_RECEPTORS = {};
 
     protected GameEvent() {
-        super(receptors);
+        super(GAME_RECEPTORS);
     }
 
-    public GameEvent(String eventString) {
+    public GameEvent(String eventString) throws InvalidMessageException {
         super(eventString);
     }
 
@@ -30,11 +26,6 @@ public abstract class GameEvent extends Messenger {
 
     //todo:when the game starts this needs to be set by the ui section
     public static void setReceptors(Collection<String> mReceptors){
-        receptors = mReceptors;
-    }
-
-    @Override
-    public void onEventSendFailure(String[] addresses) {
-        Log.i("GameEvent", "failed to send event: " + toString());
+        GAME_RECEPTORS = mReceptors.toArray(GAME_RECEPTORS);
     }
 }

@@ -1,7 +1,8 @@
 package mobile.data.usage.spyspyyou.gametest.game;
 
+import android.view.View;
+
 import mobile.data.usage.spyspyyou.gametest.game.events.global.SynchronizationEvent;
-import mobile.data.usage.spyspyyou.gametest.utils.GameData;
 
 public class GameServer extends Game implements Tick{
 
@@ -11,8 +12,8 @@ public class GameServer extends Game implements Tick{
 
     private int counter = 0;
 
-    public GameServer(GameData gameData) {
-        super(gameData);
+    public GameServer(View view) {
+        super(view);
     }
 
     @Override
