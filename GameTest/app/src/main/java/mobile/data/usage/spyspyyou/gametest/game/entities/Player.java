@@ -12,7 +12,6 @@ import mobile.data.usage.spyspyyou.gametest.game.GameWorld;
 import mobile.data.usage.spyspyyou.gametest.game.IdLinker;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
 import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
-import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 import mobile.data.usage.spyspyyou.gametest.utils.paints.ColorPaint;
 
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_ALLY;
@@ -47,8 +46,8 @@ public class Player extends Entity {
     }
 
     @Override
-    public void render(Canvas canvas, Vector2D userPosition) {
-        super.render(canvas, userPosition);
+    public void render(Canvas canvas) {
+        super.render(canvas);
         if (visible) {
             hud.render(canvas);
         }

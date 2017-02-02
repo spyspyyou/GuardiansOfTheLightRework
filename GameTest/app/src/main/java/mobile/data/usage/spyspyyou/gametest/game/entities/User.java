@@ -81,8 +81,8 @@ public abstract class User extends Player {
     }
 
     @Override
-    public void render(Canvas canvas, Vector2D userPosition) {
-        super.render(canvas, userPosition);
+    public void render(Canvas canvas) {
+        super.render(canvas);
         if (!visible) hud.render(canvas);
     }
 

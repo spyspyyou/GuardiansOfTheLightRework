@@ -3,6 +3,7 @@ package mobile.data.usage.spyspyyou.gametest.game.entities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
@@ -16,6 +17,7 @@ public abstract class Entity {
     protected boolean visible = true;
 
     protected static Vector2D userPosition;
+    protected Paint drawPaint = new Paint();
 
     protected int width, height;
 
@@ -35,6 +37,7 @@ public abstract class Entity {
     }
 
     protected Entity(Vector2D entityPosition, int  bitmapID){
+        drawPaint.setAntiAlias(false);
         position = entityPosition;
         bitmap = BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID);
         width = height = SurfaceViewGame.getTileSide();
@@ -46,7 +49,7 @@ public abstract class Entity {
         if(visible){
             updateScreenPosition();
             rect.set(screenPosition.getIntX() - width / 2, screenPosition.getIntY() - height / 2, screenPosition.getIntX() + width / 2, screenPosition.getIntY() + height / 2);
-            canvas.drawBitmap(bitmap, null, rect, null);
+            canvas.drawBitmap(bitmap, null, rect, drawPaint);
         }
     }
 

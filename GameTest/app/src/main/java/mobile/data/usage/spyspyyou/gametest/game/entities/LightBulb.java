@@ -45,8 +45,8 @@ public class LightBulb extends Entity implements Tick {
     }
 
     @Override
-    public void render(Canvas canvas, Vector2D userPosition) {
-        super.render(canvas, userPosition);
+    public void render(Canvas canvas) {
+        super.render(canvas);
         if (isPicking)canvas.drawArc(rect, -90, pickingProgress, false, ringPaint);
     }
 

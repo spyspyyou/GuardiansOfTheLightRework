@@ -165,6 +165,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     }
 
     public void render(Canvas canvas){
+        long startTime = System.nanoTime();
         if (canvas != null){
             surfaceJoystick.render(canvas);
             for (VirtualButton button: buttons){
@@ -173,6 +174,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
             getHolder().unlockCanvasAndPost(canvas);
         }
+        Log.d("SVG-render", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
     public static double getUserDirection() {

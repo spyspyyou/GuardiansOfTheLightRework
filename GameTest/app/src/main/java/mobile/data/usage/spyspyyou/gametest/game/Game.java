@@ -61,6 +61,7 @@ public class Game {
     }
 
     protected void update() {
+        long startTime = System.nanoTime();
         while (!eventQueue.isEmpty()) {
             eventQueue.poll().apply(this);
         }
@@ -75,13 +76,16 @@ public class Game {
 
         lightBulbBlue.update(this);
         lightBulbGreen.update(this);
+        Log.d("Game-update", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
     private void render(){
+        long startTime = System.nanoTime();
         //draw to the main surface
         Canvas c = gameSurface.getCanvas();
         if (c != null) {
             synchronized (gameSurface.getHolder()) {
+                Log.d("Game-render", "start drawing");
                 //todo:remove after debugging the game
                 c.drawColor(Color.MAGENTA);
 
@@ -98,6 +102,7 @@ public class Game {
             }
         }
         gameSurface.render(c);
+        Log.d("Game-render", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
     public static void addEvent(GameEvent gameEvent){
@@ -187,6 +192,7 @@ public class Game {
         private boolean running, paused;
 
         private long tickStartTime = 0;
+
         private int
                 synchronizedTick = 0,
                 sleepTime = 0;
@@ -196,6 +202,10 @@ public class Game {
             running = true;
             paused = false;
 
+            Log.i("GameThread", "time per tick: " + TIME_PER_TICK);
+            int lagSum = 0;
+            int lagCount = 0;
+            long startTime = System.currentTimeMillis();
             while (running) {
                 while(paused && running){
                     try {
@@ -205,13 +215,20 @@ public class Game {
                     }
                 }
 
-                tickStartTime = System.currentTimeMillis();
+                tickStartTime = System.nanoTime();
+                Log.i("GameThread", "tick start ---------------------------------------------------------------------------------------");
 
                 update();
                 render();
                 ++synchronizedTick;
 
-                sleepTime = (int) (TIME_PER_TICK - (System.currentTimeMillis() - tickStartTime));
+                long tickTime = (System.nanoTime() - tickStartTime);
+
+                Log.d("GameThread", "tick took " + tickTime + " nanos, " + tickTime / 1000000 + " milis");
+
+                sleepTime = (int) ((TIME_PER_TICK - (System.nanoTime() - tickStartTime)) / 1000000.0);
+                Log.d("GameThread", "sleepTime " + sleepTime + " milis");
+
                 if (sleepTime > 0) {
                     try {
                         sleep(sleepTime);
@@ -219,7 +236,9 @@ public class Game {
                         e.printStackTrace();
                     }
                 }else{
-                    Log.d("GameThread", "lag");
+                    lagSum -= sleepTime;
+                    ++lagCount;
+                    Log.e("GameThread", "LAG:\nsum " + lagSum + "\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
                 }
             }
         }

@@ -42,7 +42,7 @@ public class Gum extends Entity {
     }
 
     @Override
-    public void render(Canvas canvas, Vector2D userPosition) {
-        super.render(canvas, userPosition);
+    public void render(Canvas canvas) {
+        super.render(canvas);
     }
 }

@@ -3,8 +3,8 @@ package mobile.data.usage.spyspyyou.gametest.game;
 import mobile.data.usage.spyspyyou.gametest.R;
 
 public interface Tick {
-    int TICK = 25;
-    int TIME_PER_TICK = 1000 / TICK;
+    int TICK = 50;
+    long TIME_PER_TICK = 1000000000 / TICK;
 
     int
             COLOR_VALUE_BAR_BACKGROUND = 0x50000000,
