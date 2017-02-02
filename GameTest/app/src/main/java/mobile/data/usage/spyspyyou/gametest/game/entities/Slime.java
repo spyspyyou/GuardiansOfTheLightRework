@@ -4,7 +4,6 @@ import android.util.Log;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.game.events.global.AddSlimeEvent;
-import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_SLIME;
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.TICK;
@@ -12,8 +11,8 @@ import static mobile.data.usage.spyspyyou.gametest.game.Tick.TICK;
 
 public class Slime extends User {
 
-    public Slime(Vector2D entityPosition) {
-        super(entityPosition, ID_SLIME, MAX_MANA / 5);
+    public Slime(boolean teamBlue) {
+        super(teamBlue, ID_SLIME, MAX_MANA / 5);
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.util.Log;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
+import mobile.data.usage.spyspyyou.gametest.game.GameWorld;
 import mobile.data.usage.spyspyyou.gametest.game.IdLinker;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
 import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
@@ -36,8 +37,9 @@ public class Player extends Entity {
 
     private Matrix rotationMatrix = new Matrix();
 
-    public Player(Vector2D entityPosition, String address, byte characterId) {
-        super(entityPosition, SurfaceViewGame.getTileSide(), SurfaceViewGame.getTileSide(), IdLinker.getBitmapId(characterId));
+    public Player(boolean teamBlue, boolean ally, String address, byte characterId) {
+        super(GameWorld.getSpawn(teamBlue), SurfaceViewGame.getTileSide(), SurfaceViewGame.getTileSide(), IdLinker.getBitmapId(characterId));
+        this.ally = ally;
         ADDRESS = address;
         CHARACTER = characterId;
         rawBitmap = BitmapFactory.decodeResource(GameActivity.getRec(), IdLinker.getBitmapId(characterId));

@@ -34,8 +34,9 @@ public abstract class User extends Player {
 
     private boolean falling = false;
 
-    protected User(Vector2D entityPosition, byte characterType, int abilityManaUsage) {
-        super(entityPosition, VARS.address, characterType);
+    protected User(boolean teamBlue, byte characterType, int abilityManaUsage) {
+        super(teamBlue, true, VARS.address, characterType);
+        userPosition = position;
         velocity = SurfaceViewGame.getUserVelocity();
         MANA_USAGE = abilityManaUsage;
     }

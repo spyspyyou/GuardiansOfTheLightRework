@@ -50,7 +50,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             margin;
 
     private static int
-            tileSide = 0;
+            tileSide = 20;
 
     private boolean
             created = false,

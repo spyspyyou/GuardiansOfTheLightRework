@@ -1,14 +1,13 @@
 package mobile.data.usage.spyspyyou.gametest.game.entities;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
-import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_FLUFFY;
 
 public class Fluffy extends User {
 
-    public Fluffy(Vector2D entityPosition) {
-        super(entityPosition, ID_FLUFFY, MAX_MANA);
+    public Fluffy(boolean teamBlue) {
+        super(teamBlue, ID_FLUFFY, MAX_MANA);
     }
 
     @Override

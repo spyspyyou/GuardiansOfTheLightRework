@@ -15,12 +15,14 @@ public abstract class Entity {
 
     protected boolean visible = true;
 
+    protected static Vector2D userPosition;
+
     protected int width, height;
 
     // center of the entity
     protected Vector2D
             position,
-            screenPosition;
+            screenPosition = new Vector2D(0, 0);
 
     protected RectF rect = new RectF();
     protected Bitmap bitmap;
@@ -40,9 +42,9 @@ public abstract class Entity {
 
     public abstract void update(Game game);
 
-    public void render(Canvas canvas, Vector2D userPosition){
+    public void render(Canvas canvas){
         if(visible){
-            updateScreenPosition(userPosition);
+            updateScreenPosition();
             rect.set(screenPosition.getIntX() - width / 2, screenPosition.getIntY() - height / 2, screenPosition.getIntX() + width / 2, screenPosition.getIntY() + height / 2);
             canvas.drawBitmap(bitmap, null, rect, null);
         }
@@ -52,7 +54,7 @@ public abstract class Entity {
         return position;
     }
 
-    protected void updateScreenPosition(Vector2D userPosition){
+    protected void updateScreenPosition(){
         screenPosition.set(
                 SurfaceViewGame.getCenter().x + (position.x - userPosition.x) * SurfaceViewGame.getTileSide(),
                 SurfaceViewGame.getCenter().y + (position.y - userPosition.y) * SurfaceViewGame.getTileSide()

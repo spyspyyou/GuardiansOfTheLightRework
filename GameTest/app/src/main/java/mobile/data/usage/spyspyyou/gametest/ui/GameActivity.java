@@ -5,10 +5,18 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import java.util.ArrayList;
+
 import mobile.data.usage.spyspyyou.gametest.R;
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.game.GameServer;
 import mobile.data.usage.spyspyyou.gametest.game.GameData;
+import mobile.data.usage.spyspyyou.gametest.game.PlayerData;
+import mobile.data.usage.spyspyyou.gametest.game.World;
+
+import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.TEST_WORLD;
+import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.USER_AD;
 
 public class GameActivity extends AppCompatActivity {
     private static Game game = null;
@@ -22,6 +30,13 @@ public class GameActivity extends AppCompatActivity {
         resources = getResources();
         //todo:decide server or not
         game = new GameServer(findViewById(R.id.relativeLayout_game));
+        ArrayList<String>addresses = new ArrayList<>();
+        addresses.add(USER_AD);
+        ArrayList<Boolean>teamBlue = new ArrayList<>();
+        teamBlue.add(true);
+        ArrayList<Byte>charIds = new ArrayList<>();
+        charIds.add(ID_FLUFFY);
+        prepareGame(new GameData(new World(TEST_WORLD), new PlayerData(addresses, teamBlue, charIds)));
     }
 
     @Override

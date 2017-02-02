@@ -24,6 +24,7 @@ import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.PREF_LAYOUT;
+import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.USER_AD;
 
 
 public class Game {
@@ -84,18 +85,16 @@ public class Game {
                 //todo:remove after debugging the game
                 c.drawColor(Color.MAGENTA);
 
-                gameWorld.render(c, user.getPosition());
+                gameWorld.render(c);
 
-                for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).render(c, user.getPosition());
+                for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).render(c);
+                for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).render(c);
+                for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).render(c);
 
-                for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).render(c, user.getPosition());
+                lightBulbBlue.render(c);
+                lightBulbGreen.render(c);
 
-                for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).render(c, user.getPosition());
-
-                lightBulbBlue.render(c, user.getPosition());
-                lightBulbGreen.render(c, user.getPosition());
-
-                for (Player player:players.values())player.render(c, user.getPosition());
+                for (Player player:players.values())player.render(c);
             }
         }
         gameSurface.render(c);
@@ -169,12 +168,15 @@ public class Game {
                 }
             }
 
-            gameWorld = new GameWorld(GAME_DATA.WORLD);
             players = GAME_DATA.PLAYER_DATA.generatePlayers();
+            user = (User) players.get(USER_AD);
+            gameWorld = new GameWorld(GAME_DATA.WORLD, user.getPosition());
             gameSurface.setup(PREF_LAYOUT, GAME_DATA.WORLD, players.values().toArray(new Player[players.size()]));
 
             lightBulbBlue = new LightBulb(gameWorld.getLightBulbStandBlue());
             lightBulbGreen = new LightBulb(gameWorld.getLightBulbStandGreen());
+
+            gameThread.start();
         }
     }
 
