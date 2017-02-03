@@ -13,7 +13,7 @@ public abstract class GameEvent extends Messenger {
         super(GAME_RECEPTORS);
     }
 
-    public GameEvent(String eventString) throws InvalidMessageException {
+    public GameEvent(String eventString) {
         super(eventString);
     }
 

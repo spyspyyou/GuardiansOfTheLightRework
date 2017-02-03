@@ -10,7 +10,7 @@ public abstract class GlobalEvent extends GameEvent {
 
     }
 
-    protected GlobalEvent(String eventString) throws InvalidMessageException {
+    protected GlobalEvent(String eventString) {
         super(eventString);
     }
 

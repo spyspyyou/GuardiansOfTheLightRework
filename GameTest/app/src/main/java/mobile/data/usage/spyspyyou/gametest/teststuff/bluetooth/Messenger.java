@@ -18,7 +18,9 @@ public abstract class Messenger {
     private final Map<String, Object> OBJECTS = new HashMap<>();
     protected String[] receptors;
 
-    public Messenger(String message) throws InvalidMessageException {
+    boolean corrupted = false;
+
+    public Messenger(String message) {
         receptors = null;
         int sepIndex;
         Class<?> c;
@@ -43,13 +45,18 @@ public abstract class Messenger {
                 }
             }catch (Exception e){
                 e.printStackTrace();
-                throw new InvalidMessageException("Failed reading the variables from the Message String.");
+                corrupted = true;
+                Log.e("Messenger", "message could not be read: " + message);
             }
         }
     }
 
     public Messenger(@Nullable String[]receptors){
         this.receptors = receptors;
+    }
+
+    /*package*/ void received(){
+        if (!corrupted)onReception();
     }
 
     protected abstract void onReception();
@@ -90,6 +97,13 @@ public abstract class Messenger {
         if (o instanceof String)
             return (String) o;
         return "";
+    }
+
+    protected boolean getBoolean(String key){
+        Object o = getObject(key);
+        if (o instanceof Boolean)
+            return (boolean) o;
+        return false;
     }
 
     /*package*/ String getMessageString(){

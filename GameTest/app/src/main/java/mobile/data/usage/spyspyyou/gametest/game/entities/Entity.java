@@ -21,7 +21,7 @@ public abstract class Entity {
     protected int width, height;
 
     // center of the entity
-    protected Vector2D
+    public Vector2D
             position,
             screenPosition = new Vector2D(0, 0);
 

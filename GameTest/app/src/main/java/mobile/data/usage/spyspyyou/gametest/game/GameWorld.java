@@ -23,8 +23,8 @@ public class GameWorld implements WorldVars{
             {R.drawable.void_tile},
             {R.drawable.floor_tile},
             {R.drawable.wall_tile},
-            {R.drawable.spawn_tile},
-            {R.drawable.light_bulb_tile}
+            {R.drawable.spawn_tile, R.drawable.spawn_tile},
+            {R.drawable.light_bulb_tile, R.drawable.light_bulb_tile}
     };
 
 
@@ -109,8 +109,14 @@ public class GameWorld implements WorldVars{
         return getTile(position.getIntX(), position.getIntY());
     }
 
+    public int size(){
+        return map.length;
+    }
+
     /*package*/ Tile getTile(int x, int y){
-        if (x < 0 || y < 0 || x >= map.length || y >= map[0].length) return voidTile;
+        if (x < 0 || y < 0 || x >= map.length || y >= map[0].length){
+            return voidTile;
+        }
         return map[x][y];
     }
 

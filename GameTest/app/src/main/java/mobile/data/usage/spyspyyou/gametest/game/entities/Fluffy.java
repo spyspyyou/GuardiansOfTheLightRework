@@ -17,7 +17,7 @@ public class Fluffy extends User {
 
     @Override
     protected void addMana() {
-        mana += velocity.getLength();
+        mana += VELOCITY.getLength();
     }
 
     @Override

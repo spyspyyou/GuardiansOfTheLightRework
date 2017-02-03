@@ -415,7 +415,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             for (Player player:players){
                 if (player instanceof User){
                     currentColor = colorUser;
-                } else if (player.isAlly()){
+                } else if (player.isTeamBlue()){
                     currentColor = colorAlly;
                 }else if (true){
                     currentColor = colorEnemy;

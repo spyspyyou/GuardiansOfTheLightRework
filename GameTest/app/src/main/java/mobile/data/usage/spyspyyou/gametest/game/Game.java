@@ -32,19 +32,24 @@ public class Game {
     public static boolean HOST = false;
 
     //todo:better entity encapsulation
-    private Map<String, Player> players = new LinkedHashMap<>();
-    private User user;
+    protected Map<String, Player> players = new LinkedHashMap<>();
+    protected User user;
     private LightBulb
             lightBulbBlue,
             lightBulbGreen;
 
-    private SparseArray<Sweet> sweets = new SparseArray<>();
-    private SparseArray<SlimeTrail> slimes = new SparseArray<>();
-    private SparseArray<Gum> gums = new SparseArray<>();
+    private int
+            nextGumId = 0,
+            nextSlimeTrailId = 0,
+            nextSweetId = 0;
+
+    protected SparseArray<Sweet> sweets = new SparseArray<>();
+    protected SparseArray<SlimeTrail> slimes = new SparseArray<>();
+    protected SparseArray<Gum> gums = new SparseArray<>();
 
     protected GameThread gameThread = new GameThread();
     private SurfaceViewGame gameSurface;
-    private GameWorld gameWorld;
+    protected GameWorld gameWorld;
 
     public Game(View rootView){
         HOST = this instanceof GameServer;
@@ -60,58 +65,28 @@ public class Game {
         gameThread.start();
     }
 
-    private long startS, startU, startE;
 
     protected void update() {
-        long startTime = System.nanoTime();
         while (!eventQueue.isEmpty()) {
             eventQueue.poll().apply(this);
         }
 
-        startS = System.nanoTime();
         gameSurface.update();
-        Log.d("Game-update", "GameSurface took " + (System.nanoTime() - startS) + " nanos, " + (int) ((System.nanoTime() - startS) / 1000000) + " milis");
-
-        startU = System.nanoTime();
         user.update(this);
-        Log.d("Game-update", "User took " + (System.nanoTime() - startU) + " nanos, " + (int) ((System.nanoTime() - startU) / 1000000) + " milis");
-
-        startE = System.nanoTime();
-        for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).update(this);
 
         for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).update(this);
-
+        for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).update(this);
         for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).update(this);
 
         lightBulbBlue.update(this);
         lightBulbGreen.update(this);
-        Log.d("Game-update", "Entities took " + (System.nanoTime() - startE) + " nanos, " + (int) ((System.nanoTime() - startE) / 1000000) + " milis");
-
-        if (System.nanoTime() - startTime < 5000000)Log.d("Game-update", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
-        else Log.e("Game-update", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
-    private int count = 0, count1 = 0, count2 = 0;
-    private long totalTime = 0, totalTime1 = 0, totalTime2 = 0;
-    long startTime, startTime1, startTime2, startTime3, startTime4, startTime5;
     private void render(){
-        startTime = System.nanoTime();
-
-        startTime1 = System.nanoTime();
         Canvas c = gameSurface.startDrawing();
-        ++count2;
-        totalTime2 += (System.nanoTime() - startTime1);
-        Log.d("Game-render", "StartDrawing took " + (System.nanoTime() - startTime1) + " nanos, " + (int) ((System.nanoTime() - startTime1) / 1000000) + " milis");
 
         if (c != null) {
-            startTime2 = System.nanoTime();
             gameWorld.render(c);
-            ++count;
-            totalTime += (System.nanoTime() - startTime2);
-
-            Log.d("Game-render", "GameWorld took " + (System.nanoTime() - startTime2) + " nanos, " + (int)((System.nanoTime() - startTime2) / 1000000) + " milis");
-
-            startTime3 = System.nanoTime();
             int i;
             for (i = 0; i < sweets.size(); ++i) sweets.valueAt(i).render(c);
             for (i = 0; i < gums.size(); ++i) gums.valueAt(i).render(c);
@@ -121,19 +96,10 @@ public class Game {
             lightBulbGreen.render(c);
 
             for (Player player : players.values()) player.render(c);
-            Log.d("Game-render", "Entities took " + (System.nanoTime() - startTime3) + " nanos, " + (int) ((System.nanoTime() - startTime3) / 1000000) + " milis");
 
-            startTime4 = System.nanoTime();
             gameSurface.render(c);
-            ++count1;
-            totalTime1 += (System.nanoTime() - startTime4);
-            Log.d("Game-render", "SVG took " + (System.nanoTime() - startTime4) + " nanos, " + (int)((System.nanoTime() - startTime4) / 1000000) + " milis");
         }
-        startTime5 = System.nanoTime();
         gameSurface.finishDrawing(c);
-        Log.d("Game-render", "FinishDrawing took " + (System.nanoTime() - startTime5) + " nanos, " + (int)((System.nanoTime() - startTime5) / 1000000) + " milis");
-
-        Log.d("Game-render", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
     public static void addEvent(GameEvent gameEvent){
@@ -149,7 +115,7 @@ public class Game {
     }
 
     public void shootParticle(){
-        user.shootGum();
+        user.shootGum(this);
     }
 
     public void addSlime(Vector2D vector2D, int birthTick, int id){
@@ -160,8 +126,10 @@ public class Game {
         slimes.remove(id);
     }
 
-    public void addGum(Vector2D position, Vector2D velocity, int id){
-        gums.put(id, new Gum(position, velocity));
+    public void addGum(Vector2D position, double direction, int shootTick, int id, boolean teamBlue){
+        Log.i("Game", "adding gum");
+        gums.put(id, new Gum(position, direction, teamBlue));
+        gums.get(id).jump(this, getSynchronizedTick() - shootTick);
     }
 
     public void removeGum(int id){
@@ -174,6 +142,18 @@ public class Game {
 
     public int getSynchronizedTick(){
         return gameThread.getSynchronizedTick();
+    }
+
+    public int nextGumId(){
+        return nextGumId++;
+    }
+
+    public int nextSlimeTrailId(){
+        return nextSlimeTrailId++;
+    }
+
+    public int nextSweetId(){
+        return nextSweetId++;
     }
 
     public void stopGame(){
@@ -270,12 +250,11 @@ public class Game {
                 }else{
                     lagSum -= sleepTime;
                     ++lagCount;
-                    Log.e("GameThread", "LAG:\nsum " + lagSum + " nanos\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
+                    Log.d("GameThread", "LAG:\nsum " + lagSum + " nanos\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
                 }
             }
             Log.i("GameThread", "exit");
-            Log.e("GameThread", "LAG:\nsum " + lagSum + " nanos, " + lagSum / 1000000 + " milis\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
-            Log.d("GameThread-averages", "StartDrawing: " + totalTime2 / count2 / 1000000 + "\nGameWorld: " + totalTime / count / 1000000 + "\nSVG: " + totalTime1 / count1 / 1000000);
+            Log.d("GameThread", "LAG:\nsum " + lagSum + " nanos, " + lagSum / 1000000 + " milis\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
         }
 
         private void pauseGame(){

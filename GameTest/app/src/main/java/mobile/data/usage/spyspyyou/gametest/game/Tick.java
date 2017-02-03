@@ -3,7 +3,7 @@ package mobile.data.usage.spyspyyou.gametest.game;
 import mobile.data.usage.spyspyyou.gametest.R;
 
 public interface Tick {
-    int TICK = 50;
+    int TICK = 20;
     long TIME_PER_TICK = 1000000000 / TICK;
 
     int

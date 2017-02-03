@@ -58,7 +58,7 @@ public class PlayerData {
                         break;
                 }
             }else{
-                players.put(addresses.get(i), new Player(teamBlue.get(i), teamBlue.get(i) == userTeamBlue, addresses.get(i), characterIds.get(i)));
+                players.put(addresses.get(i), new Player(teamBlue.get(i), addresses.get(i), characterIds.get(i)));
             }
         }
         return players;
