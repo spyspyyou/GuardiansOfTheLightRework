@@ -11,7 +11,6 @@ import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.game.GameWorld;
 import mobile.data.usage.spyspyyou.gametest.game.IdLinker;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
-import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.gametest.utils.paints.ColorPaint;
 
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_ALLY;
@@ -30,18 +29,18 @@ public class Player extends Entity {
 
     public final byte CHARACTER;
 
-    private final Bitmap rawBitmap;
+    private final Bitmap RAW_BITMAP;
 
     protected HUD hud;
 
     private Matrix rotationMatrix = new Matrix();
 
     public Player(boolean teamBlue, boolean ally, String address, byte characterId) {
-        super(GameWorld.getSpawn(teamBlue), SurfaceViewGame.getTileSide(), SurfaceViewGame.getTileSide(), IdLinker.getBitmapId(characterId));
+        super(GameWorld.getSpawn(teamBlue), IdLinker.getBitmapId(characterId));
         this.ally = ally;
         ADDRESS = address;
         CHARACTER = characterId;
-        rawBitmap = BitmapFactory.decodeResource(GameActivity.getRec(), IdLinker.getBitmapId(characterId));
+        RAW_BITMAP = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), IdLinker.getBitmapId(characterId)), width, height, false);
         hud = new HUD(this instanceof User);
     }
 
@@ -78,21 +77,14 @@ public class Player extends Entity {
         rotationMatrix.reset();
         rotationMatrix.postRotate((float) (direction / Math.PI * 360 / 2) - 90);
         if (direction == 0){
-            bitmap = rawBitmap;
+            bitmap = RAW_BITMAP;
             return;
         }
 
-        int initialSize = rawBitmap.getWidth();
+        int initialSize = RAW_BITMAP.getWidth();
 
         //rotate
-        bitmap = Bitmap.createBitmap(rawBitmap, 0, 0, initialSize, initialSize, rotationMatrix, true);
-
-        int
-                halfDifferenceWidth = (bitmap.getWidth() - initialSize) / 2,
-                halfDifferenceHeight = (bitmap.getHeight() - initialSize) / 2;
-
-        //crop away the unnecessary
-        bitmap = Bitmap.createBitmap(bitmap, halfDifferenceWidth, halfDifferenceHeight, initialSize, initialSize);
+        bitmap = Bitmap.createBitmap(RAW_BITMAP, 0, 0, initialSize, initialSize, rotationMatrix, true);
     }
 
     protected class HUD {

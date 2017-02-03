@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.gametest.R;
 import mobile.data.usage.spyspyyou.gametest.game.Game;
-import mobile.data.usage.spyspyyou.gametest.game.GameServer;
 import mobile.data.usage.spyspyyou.gametest.game.GameData;
+import mobile.data.usage.spyspyyou.gametest.game.GameServer;
 import mobile.data.usage.spyspyyou.gametest.game.PlayerData;
 import mobile.data.usage.spyspyyou.gametest.game.World;
 
@@ -19,6 +19,7 @@ import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.TEST_WORLD;
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.USER_AD;
 
 public class GameActivity extends AppCompatActivity {
+
     private static Game game = null;
     private static Resources resources;
 
@@ -28,6 +29,11 @@ public class GameActivity extends AppCompatActivity {
         hideSystemUI();
         setContentView(R.layout.activity_game);
         resources = getResources();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         //todo:decide server or not
         game = new GameServer(findViewById(R.id.relativeLayout_game));
         ArrayList<String>addresses = new ArrayList<>();

@@ -47,8 +47,10 @@ public abstract class User extends Player {
             fallingUpdate();
             return;
         }
+
         //update position + direction
         move();
+
         //checkFloor(game);
         addMana();
         if (mana > MAX_MANA)mana = MAX_MANA;

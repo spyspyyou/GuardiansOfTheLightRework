@@ -33,6 +33,7 @@ import mobile.data.usage.spyspyyou.gametest.utils.paints.FillPaint;
 import mobile.data.usage.spyspyyou.gametest.utils.paints.HolePaint;
 import mobile.data.usage.spyspyyou.gametest.utils.paints.SrcOutPaint;
 
+import static android.graphics.Bitmap.createBitmap;
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_ALLY;
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_ENEMY;
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_USER;
@@ -54,6 +55,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     private boolean
             created = false,
+            destroyed = false,
             setup = false,
             joyStickActive = false;
 
@@ -70,7 +72,6 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     private ArrayList<VirtualButton>
             buttons = new ArrayList<>();
-
     public SurfaceViewGame(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
@@ -99,7 +100,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        destroyed = true;
     }
 
     @Override
@@ -154,27 +155,33 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         //buttons.add(new FillingButton(new Rect(0, 0, 0, 0)));
     }
 
-    public Canvas getCanvas(){
-        Canvas canvas = null;
-        try {
-            canvas = getHolder().lockCanvas();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return canvas;
+    public void update(){
+        surfaceJoystick.updateData();
     }
 
-    public void render(Canvas canvas){
-        long startTime = System.nanoTime();
-        if (canvas != null){
-            surfaceJoystick.render(canvas);
-            for (VirtualButton button: buttons){
-                button.render(canvas);
-            }
-
-            getHolder().unlockCanvasAndPost(canvas);
+    public Canvas startDrawing() {
+        try {
+            return getHolder().lockCanvas();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Log.d("SVG-render", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
+        return null;
+    }
+
+    public void render(Canvas canvas) {
+        surfaceJoystick.render(canvas);
+        for (VirtualButton button : buttons) {
+            button.render(canvas);
+        }
+    }
+
+    public void finishDrawing(Canvas b){
+        if (destroyed)return;
+        try {
+            getHolder().unlockCanvasAndPost(b);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static double getUserDirection() {
@@ -230,8 +237,6 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             return POSITION.contains(position.getIntX(), position.getIntY());
         }
 
-        protected abstract boolean onTouchEvent(MotionEvent event);
-
         protected abstract void render(Canvas canvas);
     }
 
@@ -262,6 +267,8 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             paintJoystickCenter = new Paint();
             paintJoystickCenter.setColor(COLOR_VALUE_BAR_BACKGROUND);
             paintJoystickRing = new BorderPaint((int)(joystickRadius / 2), COLOR_VALUE_BAR_BACKGROUND);
+            paintJoystickCenter.setAntiAlias(false);
+            paintJoystickRing.setAntiAlias(false);
         }
 
         private boolean claimTouchSeries(MotionEvent event) {
@@ -285,7 +292,6 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             pointerID = -1;
         }
 
-        @Override
         protected boolean onTouchEvent(MotionEvent event) {
             if (!joyStickActive)return false;
             dataChanged = true;
@@ -295,8 +301,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         }
 
         public void render(Canvas canvas) {
-            updateData();
-            if (canvas != null && joyStickActive) {
+            if (joyStickActive) {
                 canvas.drawCircle(joystickPosition.getFloatX(), joystickPosition.getFloatY(), joystickRadius * 0.75f, paintJoystickRing);
                 canvas.drawCircle(joystickPosition.getFloatX() + centerDisplacement.getFloatX(), joystickPosition.getFloatY() + centerDisplacement.getFloatY(), joystickRadius / 2, paintJoystickCenter);
             }
@@ -331,7 +336,6 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             super(position);
         }
 
-        @Override
         protected boolean onTouchEvent(MotionEvent event) {
             if (isActionDown(event) && contains(getActionPosition(event))){
                 onClick();
@@ -373,20 +377,26 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
         private SurfaceMiniMap(Rect position, World world, Player[] mPlayers) {
             super(position);
+            size = (int) getResources().getDimension(R.dimen.mini_map_size);
+
             bitmap = world.getBitmapRepresentation();
             cross = BitmapFactory.decodeResource(GameActivity.getRec(), R.drawable.cross);
             players = mPlayers;
 
-            size = (int) getResources().getDimension(R.dimen.mini_map_size);
             bigRect = new Rect(halfWidth - getHeight() / 2 + margin, margin, halfWidth + getHeight() / 2 - margin, getHeight() - margin);
 
             miniMapTileSizeSmall = (1f * size) / bitmap.getWidth();
             miniMapTileSizeBig = (1f * (getHeight() - 2 * margin)) / bitmap.getWidth();
 
             paintMiniMapSmall.setAlpha(0xaa);
+            paintMiniMapSmall.setAntiAlias(false);
+            colorUser.setAntiAlias(false);
+            colorAlly.setAntiAlias(false);
+            colorEnemy.setAntiAlias(false);
         }
 
         public void render(Canvas canvas) {
+            long startTime = System.nanoTime();
             if (canvas != null) {
                 if (big) {
                     canvas.drawBitmap(bitmap, null, bigRect, null);
@@ -397,6 +407,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
                     drawPlayers(canvas, POSITION, miniMapTileSizeSmall);
                 }
             }
+            Log.d("SVG-render", "MiniMap took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
         }
 
         private void drawPlayers(Canvas canvas, Rect rect, float miniMapTileSide){
@@ -446,7 +457,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
         private FillingButton(Rect position, Bitmap icon, int fillColor) {
             super(position);
-            button = Bitmap.createBitmap(POSITION.width(),POSITION.height(), Bitmap.Config.ARGB_8888);
+            button = createBitmap(POSITION.width(),POSITION.height(), Bitmap.Config.ARGB_8888);
             bitmapEditor = new Canvas(button);
             rect = new Rect(0, 0, POSITION.width(), POSITION.height());
             bitmapRect = new Rect(POSITION.width() / 4, POSITION.height() / 4, POSITION.width() / 4 * 3, POSITION.height() / 4 * 3);
@@ -456,6 +467,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
         @Override
         protected void render(Canvas canvas) {
+            long startTime = System.nanoTime();
             updateFillLevel();
             rect.set(0, (int) (POSITION.height() / 1000.0 * (1000-level)), POSITION.width(), POSITION.height());
 
@@ -468,6 +480,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
             bitmapEditor.drawCircle(POSITION.width() / 2, POSITION.height() / 2, POSITION.width() / 2 - 4, paintStroke);
             if (icon != null)bitmapEditor.drawBitmap(icon, null, bitmapRect, null);
             canvas.drawBitmap(button, null, POSITION, null);
+            Log.d("SVG-render", "FillButton took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
         }
 
         protected abstract void updateFillLevel();

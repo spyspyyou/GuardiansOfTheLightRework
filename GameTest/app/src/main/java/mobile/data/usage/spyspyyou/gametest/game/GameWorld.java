@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Log;
 
 import mobile.data.usage.spyspyyou.gametest.R;
@@ -50,29 +51,37 @@ public class GameWorld implements WorldVars{
     private final int
             TILE_SIDE;
 
-    private int count = 0;
-    private long totalTime = 0;
-
     public GameWorld(World world, Vector2D userPosition) {
         this.userPosition = userPosition;
         startX = tileStartX = tileStartY = 0;
         TILE_SIDE = SurfaceViewGame.getTileSide();
         paint.setAntiAlias(false);
 
-        Tile[][] tiles = new Tile[LIGHT_BULB_STAND + 1][1];
+        Tile[][] tiles = new Tile[LIGHT_BULB_STAND + 1][2];
         tiles[VOID][0] = voidTile = new Tile(VOID, (byte) 0, false, false);
         tiles[FLOOR][0] = new Tile(FLOOR, (byte) 0, true, false);
         tiles[WALL][0] = new Tile(WALL, (byte) 0, true, true);
         tiles[SPAWN][0] = new Tile(SPAWN, (byte) 0, true, false);
+        tiles[SPAWN][1] = new Tile(SPAWN, (byte) 1, true, false);
         tiles[LIGHT_BULB_STAND][0] = new Tile(LIGHT_BULB_STAND, (byte) 0, true, true);
+        tiles[LIGHT_BULB_STAND][1] = new Tile(LIGHT_BULB_STAND, (byte) 1, true, true);
 
         int size = world.data.length;
         Log.d("World", "size " + size);
         map = new Tile[size][size];
 
+        Tile currentTile;
         for (int y = 0; y < size; ++y){
             for (int x = 0; x < size; ++x){
-                map[x][y] = tiles[world.data[x][y].first][world.data[x][y].second];
+                currentTile = tiles[world.data[x][y].first][world.data[x][y].second];
+                map[x][y] = currentTile;
+                if (currentTile.ID == SPAWN){
+                    if (currentTile.META == 0)spawnBlue.set(x + 0.5, y + 0.5);
+                    else spawnGreen.set(x + 0.5, y + 0.5);
+                }else if (currentTile.ID == LIGHT_BULB_STAND){
+                    if (currentTile.META == 0)lightBulbStandBlue.set(x + 0.5, y + 0.5);
+                    else lightBulbStandGreen.set(x + 0.5, y + 0.5);
+                }
             }
         }
     }
@@ -82,22 +91,18 @@ public class GameWorld implements WorldVars{
         screenPosition.set(startX, SurfaceViewGame.getCenter().y - (HALF_TILES_IN_HEIGHT + userPosition.y - userPosition.getIntY())* TILE_SIDE);
         tileStartX = userPosition.getIntX() - HALF_TILES_IN_WIDTH;
         tileStartY  = userPosition.getIntY() - HALF_TILES_IN_HEIGHT;
+        RectF rect = new RectF();
 
-        long startTime = System.nanoTime();
         for (int y = 0; y <= MAX_TILES_IN_HEIGHT + 1; ++y) {
             screenPosition.set(startX, screenPosition.y);
 
             for (int x = 0; x <= MAX_TILES_IN_WIDTH + 1; ++x) {
+                rect.set(screenPosition.getFloatX(), screenPosition.getFloatY(), screenPosition.getFloatX() + TILE_SIDE, screenPosition.getFloatY() + TILE_SIDE);
                 canvas.drawBitmap(getTile(tileStartX + x,tileStartY + y).BITMAP, screenPosition.getFloatX(), screenPosition.getFloatY(), paint);
                 screenPosition.add(TILE_SIDE, 0);
             }
             screenPosition.add(0, TILE_SIDE);
         }
-        long time = (System.nanoTime() - startTime);
-        ++count;
-        totalTime += time;
-        Log.d("GameWorld-render", "took " + time + " nanos, " + (int)(time / 1000000) + " milis" + "\naverage time " + (totalTime / count / 1000000) + " milis");
-
     }
 
     private Tile getTile(Vector2D position){
@@ -132,20 +137,20 @@ public class GameWorld implements WorldVars{
 
     }
 
-    /*package*/ class Tile {
+    private class Tile {
 
-        protected final Bitmap
+        private final Bitmap
                 BITMAP;
 
-        protected final byte
+        private final byte
                 ID,
                 META;
 
-        protected final boolean
+        private final boolean
                 SOLID,
                 IMPASSABLE;
 
-        protected Tile(byte id, byte meta, boolean solid, boolean impassable){
+        private Tile(byte id, byte meta, boolean solid, boolean impassable){
             int tileSide = SurfaceViewGame.getTileSide() + 1;
             ID = id;
             META = meta;
@@ -157,7 +162,7 @@ public class GameWorld implements WorldVars{
             options.inScaled = false;
             options.inPreferredConfig = Bitmap.Config.RGB_565;
             BITMAP = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), recID, options), tileSide, tileSide, false);
-            Log.e("Tile", "bitmap config" + BITMAP.getConfig());
+            Log.d("Tile", "bitmap config" + BITMAP.getConfig());
             SOLID = solid;
             IMPASSABLE = impassable;
         }

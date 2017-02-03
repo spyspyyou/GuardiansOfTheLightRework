@@ -2,7 +2,6 @@ package mobile.data.usage.spyspyyou.gametest.game;
 
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -50,6 +49,7 @@ public class Game {
     public Game(View rootView){
         HOST = this instanceof GameServer;
         gameSurface = (SurfaceViewGame) rootView.findViewById(R.id.surfaceView_game);
+        gameThread.setPriority(Thread.NORM_PRIORITY + 1);
     }
 
     public void prepare(GameData gameData){
@@ -60,14 +60,23 @@ public class Game {
         gameThread.start();
     }
 
+    private long startS, startU, startE;
+
     protected void update() {
         long startTime = System.nanoTime();
         while (!eventQueue.isEmpty()) {
             eventQueue.poll().apply(this);
         }
 
-        user.update(this);
+        startS = System.nanoTime();
+        gameSurface.update();
+        Log.d("Game-update", "GameSurface took " + (System.nanoTime() - startS) + " nanos, " + (int) ((System.nanoTime() - startS) / 1000000) + " milis");
 
+        startU = System.nanoTime();
+        user.update(this);
+        Log.d("Game-update", "User took " + (System.nanoTime() - startU) + " nanos, " + (int) ((System.nanoTime() - startU) / 1000000) + " milis");
+
+        startE = System.nanoTime();
         for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).update(this);
 
         for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).update(this);
@@ -76,32 +85,54 @@ public class Game {
 
         lightBulbBlue.update(this);
         lightBulbGreen.update(this);
-        Log.d("Game-update", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
+        Log.d("Game-update", "Entities took " + (System.nanoTime() - startE) + " nanos, " + (int) ((System.nanoTime() - startE) / 1000000) + " milis");
+
+        if (System.nanoTime() - startTime < 5000000)Log.d("Game-update", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
+        else Log.e("Game-update", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
+    private int count = 0, count1 = 0, count2 = 0;
+    private long totalTime = 0, totalTime1 = 0, totalTime2 = 0;
+    long startTime, startTime1, startTime2, startTime3, startTime4, startTime5;
     private void render(){
-        long startTime = System.nanoTime();
-        //draw to the main surface
-        Canvas c = gameSurface.getCanvas();
+        startTime = System.nanoTime();
+
+        startTime1 = System.nanoTime();
+        Canvas c = gameSurface.startDrawing();
+        ++count2;
+        totalTime2 += (System.nanoTime() - startTime1);
+        Log.d("Game-render", "StartDrawing took " + (System.nanoTime() - startTime1) + " nanos, " + (int) ((System.nanoTime() - startTime1) / 1000000) + " milis");
+
         if (c != null) {
-            synchronized (gameSurface.getHolder()) {
-                Log.d("Game-render", "start drawing");
-                //todo:remove after debugging the game
-                c.drawColor(Color.MAGENTA);
+            startTime2 = System.nanoTime();
+            gameWorld.render(c);
+            ++count;
+            totalTime += (System.nanoTime() - startTime2);
 
-                gameWorld.render(c);
+            Log.d("Game-render", "GameWorld took " + (System.nanoTime() - startTime2) + " nanos, " + (int)((System.nanoTime() - startTime2) / 1000000) + " milis");
 
-                for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).render(c);
-                for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).render(c);
-                for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).render(c);
+            startTime3 = System.nanoTime();
+            int i;
+            for (i = 0; i < sweets.size(); ++i) sweets.valueAt(i).render(c);
+            for (i = 0; i < gums.size(); ++i) gums.valueAt(i).render(c);
+            for (i = 0; i < slimes.size(); ++i) slimes.valueAt(i).render(c);
 
-                lightBulbBlue.render(c);
-                lightBulbGreen.render(c);
+            lightBulbBlue.render(c);
+            lightBulbGreen.render(c);
 
-                for (Player player:players.values())player.render(c);
-            }
+            for (Player player : players.values()) player.render(c);
+            Log.d("Game-render", "Entities took " + (System.nanoTime() - startTime3) + " nanos, " + (int) ((System.nanoTime() - startTime3) / 1000000) + " milis");
+
+            startTime4 = System.nanoTime();
+            gameSurface.render(c);
+            ++count1;
+            totalTime1 += (System.nanoTime() - startTime4);
+            Log.d("Game-render", "SVG took " + (System.nanoTime() - startTime4) + " nanos, " + (int)((System.nanoTime() - startTime4) / 1000000) + " milis");
         }
-        gameSurface.render(c);
+        startTime5 = System.nanoTime();
+        gameSurface.finishDrawing(c);
+        Log.d("Game-render", "FinishDrawing took " + (System.nanoTime() - startTime5) + " nanos, " + (int)((System.nanoTime() - startTime5) / 1000000) + " milis");
+
         Log.d("Game-render", "took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
     }
 
@@ -191,19 +222,20 @@ public class Game {
 
         private boolean running, paused;
 
-        private long tickStartTime = 0;
+        private long
+                tickStartTime = 0,
+                sleepTime = 0;
 
         private int
-                synchronizedTick = 0,
-                sleepTime = 0;
+                synchronizedTick = 0;
 
         @Override
         public void run() {
             running = true;
             paused = false;
 
-            Log.i("GameThread", "time per tick: " + TIME_PER_TICK);
-            int lagSum = 0;
+            Log.i("GameThread", "start with time per tick: " + TIME_PER_TICK);
+            long lagSum = 0;
             int lagCount = 0;
             long startTime = System.currentTimeMillis();
             while (running) {
@@ -216,7 +248,7 @@ public class Game {
                 }
 
                 tickStartTime = System.nanoTime();
-                Log.i("GameThread", "tick start ---------------------------------------------------------------------------------------");
+                Log.d("GameThread", "tick start ---------------------------------------------------------------------------------------");
 
                 update();
                 render();
@@ -226,21 +258,24 @@ public class Game {
 
                 Log.d("GameThread", "tick took " + tickTime + " nanos, " + tickTime / 1000000 + " milis");
 
-                sleepTime = (int) ((TIME_PER_TICK - (System.nanoTime() - tickStartTime)) / 1000000.0);
-                Log.d("GameThread", "sleepTime " + sleepTime + " milis");
+                sleepTime = (TIME_PER_TICK - (System.nanoTime() - tickStartTime));
+                Log.d("GameThread", "sleepTime " + sleepTime + " nanos, " + sleepTime / 1000000 + " milis");
 
                 if (sleepTime > 0) {
                     try {
-                        sleep(sleepTime);
+                        sleep(sleepTime / 1000000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }else{
                     lagSum -= sleepTime;
                     ++lagCount;
-                    Log.e("GameThread", "LAG:\nsum " + lagSum + "\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
+                    Log.e("GameThread", "LAG:\nsum " + lagSum + " nanos\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
                 }
             }
+            Log.i("GameThread", "exit");
+            Log.e("GameThread", "LAG:\nsum " + lagSum + " nanos, " + lagSum / 1000000 + " milis\ncount " + lagCount + ",\nrun seconds " + (System.currentTimeMillis() - startTime) / 1000);
+            Log.d("GameThread-averages", "StartDrawing: " + totalTime2 / count2 / 1000000 + "\nGameWorld: " + totalTime / count / 1000000 + "\nSVG: " + totalTime1 / count1 / 1000000);
         }
 
         private void pauseGame(){

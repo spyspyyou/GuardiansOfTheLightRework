@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
@@ -26,12 +25,12 @@ public abstract class Entity {
             position,
             screenPosition = new Vector2D(0, 0);
 
-    protected RectF rect = new RectF();
     protected Bitmap bitmap;
 
     protected Entity(Vector2D entityPosition, int width, int height, int  bitmapID){
+        drawPaint.setAntiAlias(false);
         position = entityPosition;
-        bitmap = BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID);
+        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), width, height, false);
         this.width = width;
         this.height = height;
     }
@@ -39,8 +38,8 @@ public abstract class Entity {
     protected Entity(Vector2D entityPosition, int  bitmapID){
         drawPaint.setAntiAlias(false);
         position = entityPosition;
-        bitmap = BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID);
         width = height = SurfaceViewGame.getTileSide();
+        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), width, height, false);
     }
 
     public abstract void update(Game game);
@@ -48,8 +47,7 @@ public abstract class Entity {
     public void render(Canvas canvas){
         if(visible){
             updateScreenPosition();
-            rect.set(screenPosition.getIntX() - width / 2, screenPosition.getIntY() - height / 2, screenPosition.getIntX() + width / 2, screenPosition.getIntY() + height / 2);
-            canvas.drawBitmap(bitmap, null, rect, drawPaint);
+            canvas.drawBitmap(bitmap, screenPosition.getIntX() - bitmap.getWidth() / 2, screenPosition.getIntY() - bitmap.getHeight() / 2, drawPaint);
         }
     }
 
