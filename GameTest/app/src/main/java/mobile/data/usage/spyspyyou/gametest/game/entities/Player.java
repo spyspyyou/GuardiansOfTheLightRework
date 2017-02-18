@@ -61,7 +61,7 @@ public class Player extends Entity {
     }
 
     public float getRadius(){
-        return width / 2 / SurfaceViewGame.getTileSide();
+        return SurfaceViewGame.getTileSide() / 2;
     }
 
     protected void setRadius(int radius){

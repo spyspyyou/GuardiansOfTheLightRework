@@ -438,60 +438,75 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
     private abstract class FillingButton extends VirtualButton{
 
+        protected final float MAX_LEVEL = 1000;
         protected int level = 400;
+        private static final float DARKEN = 0.8f;
 
         private Rect
-                bitmapRect,
                 rect;
         private Bitmap
-                button,
-                icon = null;
-        private Canvas
+                button;
+
+        protected Canvas
                 bitmapEditor;
         private Paint
                 paintFill = new FillPaint(Color.MAGENTA),
                 paintSrcOut,
+                paintSrcOutReady,
                 paintStroke = new BorderPaint(6, Color.BLACK),
                 holePaint = new HolePaint();
 
 
-        private FillingButton(Rect position, Bitmap icon, int fillColor) {
+        private FillingButton(Rect position, int fillColor) {
             super(position);
             button = createBitmap(POSITION.width(),POSITION.height(), Bitmap.Config.ARGB_8888);
             bitmapEditor = new Canvas(button);
             rect = new Rect(0, 0, POSITION.width(), POSITION.height());
-            bitmapRect = new Rect(POSITION.width() / 4, POSITION.height() / 4, POSITION.width() / 4 * 3, POSITION.height() / 4 * 3);
-            paintSrcOut = new SrcOutPaint(fillColor);
-            this.icon = icon;
+            paintSrcOutReady = new SrcOutPaint(fillColor);
+            paintSrcOut = new SrcOutPaint(Color.rgb((int) (Color.red(fillColor) * DARKEN), (int) (Color.green(fillColor) * DARKEN), (int) (Color.blue(fillColor) * DARKEN)));
         }
 
         @Override
         protected void render(Canvas canvas) {
             long startTime = System.nanoTime();
             updateFillLevel();
-            rect.set(0, (int) (POSITION.height() / 1000.0 * (1000-level)), POSITION.width(), POSITION.height());
+            rect.set(0, (int) (POSITION.height() / MAX_LEVEL * (MAX_LEVEL-level)), POSITION.width(), POSITION.height());
 
             bitmapEditor.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
             bitmapEditor.drawRect(rect, paintFill);
             bitmapEditor.drawCircle(POSITION.width() / 2, POSITION.height() / 2, POSITION.width() / 2 - 2, holePaint);
-            bitmapEditor.drawRect(rect, paintSrcOut);
+            if (isReady()){
+                bitmapEditor.drawRect(rect, paintSrcOutReady);
+            }else{
+                bitmapEditor.drawRect(rect, paintSrcOut);
+            }
 
             bitmapEditor.drawCircle(POSITION.width() / 2, POSITION.height() / 2, POSITION.width() / 2 - 4, paintStroke);
-            if (icon != null)bitmapEditor.drawBitmap(icon, null, bitmapRect, null);
             canvas.drawBitmap(button, null, POSITION, null);
             Log.d("SVG-render", "FillButton took " + (System.nanoTime() - startTime) + " nanos, " + (int)((System.nanoTime() - startTime) / 1000000) + " milis");
         }
 
         protected abstract void updateFillLevel();
+
+        protected abstract boolean isReady();
     }
 
     private class SkillButton extends FillingButton{
 
-        private byte change = -10;
+        private final Bitmap ICON;
+        private Rect bitmapRect;
 
         private SkillButton(Rect position) {
-            super(position, BitmapFactory.decodeResource(GameActivity.getRec(), R.drawable.slime_trail), Color.CYAN);
+            super(position, Color.CYAN);
+            ICON = BitmapFactory.decodeResource(GameActivity.getRec(), R.drawable.slime_trail);
+            bitmapRect = new Rect(POSITION.width() / 4 + POSITION.left, POSITION.height() / 4 + POSITION.top, POSITION.right - POSITION.width() / 4, POSITION.bottom - POSITION.height() / 4);
+        }
+
+        @Override
+        protected void render(Canvas canvas) {
+            super.render(canvas);
+            canvas.drawBitmap(ICON, null, bitmapRect, null);
         }
 
         @Override
@@ -502,18 +517,19 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
         @Override
         protected void updateFillLevel() {
-            level += change;
-            if (level < 0)change = 10;
-            if (level > 1000)change = -10;
+            level = (int) (MAX_LEVEL * (User.mana / User.MAX_MANA));
+        }
+
+        @Override
+        protected boolean isReady() {
+            return User.mana >= User.MANA_USAGE;
         }
     }
 
     private class GumButton extends FillingButton{
 
-        private byte change = -10;
-
         private GumButton(Rect position) {
-            super(position, null, Color.RED);
+            super(position, Color.RED);
         }
 
         @Override
@@ -524,9 +540,12 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
 
         @Override
         protected void updateFillLevel() {
-            level += change;
-            if (level < 0)change = 10;
-            if (level > 1000)change = -10;
+            level = (int) (MAX_LEVEL * ((User.GUM_COOL_DOWN - User.ticksTillNextShot) / User.GUM_COOL_DOWN));
+        }
+
+        @Override
+        protected boolean isReady() {
+            return level >= MAX_LEVEL;
         }
     }
 

@@ -14,24 +14,23 @@ import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
 public abstract class User extends Player {
 
-    protected static final int
+    public static final int
             MAX_MANA = 1000;
     //number is seconds
-    private static final int
-            PARTICLE_COOL_DOWN = (int)(0.5 * Tick.TICK);
-
+    public static final int
+            GUM_COOL_DOWN = (int) (0.5f * Tick.TICK);
     private static final float
             FLOOR_CHECK_RATIO = 0.75f;
-    private long
-            nextParticleEjection = 0;
-    private final int
+    public static float
+            ticksTillNextShot = 0;
+    public static int
             MANA_USAGE;
 
     private double direction = -Math.PI / 2;
 
     protected final UserVelocityVector2D VELOCITY;
 
-    protected int mana = 0;
+    public static float mana = 0;
 
     private boolean falling = false;
 
@@ -48,6 +47,7 @@ public abstract class User extends Player {
             fallingUpdate();
             return;
         }
+        --ticksTillNextShot;
 
         //update position + direction
         move();
@@ -64,7 +64,6 @@ public abstract class User extends Player {
         }
 
         position.add(VELOCITY.getVelocity(slimy));
-        //todo:hit box
     }
 
     private void checkFloor(Game game){
@@ -93,8 +92,8 @@ public abstract class User extends Player {
     }
 
     public void shootGum(Game game){
-        if (nextParticleEjection < game.getSynchronizedTick()){
-            nextParticleEjection = game.getSynchronizedTick() + PARTICLE_COOL_DOWN;
+        if (ticksTillNextShot <= 0){
+            ticksTillNextShot = GUM_COOL_DOWN;
             new GumClientEvent(position, direction, game.getSynchronizedTick(), teamBlue).send();
         }
     }

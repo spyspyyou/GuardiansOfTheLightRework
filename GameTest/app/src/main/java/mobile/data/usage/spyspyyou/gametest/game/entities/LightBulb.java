@@ -33,9 +33,8 @@ public class LightBulb extends Entity implements Tick {
     private RectF rect = new RectF();
 
     public LightBulb(Vector2D entityPosition) {
-        super(entityPosition, (int) (SurfaceViewGame.getTileSide() * 0.5), SurfaceViewGame.getTileSide(), R.drawable.light_bulb_on_square);
+        super(entityPosition, SurfaceViewGame.getTileSide(), SurfaceViewGame.getTileSide(), R.drawable.light_bulb_on_square);
         ringPaint = new BorderPaint(15, Color.YELLOW);
-        ringPaint.setAntiAlias(false);
         HALF_TILE_SIDE = SurfaceViewGame.getTileSide() / 2;
     }
 

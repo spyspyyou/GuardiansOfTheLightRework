@@ -28,7 +28,6 @@ public abstract class Entity {
     protected Bitmap bitmap;
 
     protected Entity(Vector2D entityPosition, int width, int height, int  bitmapID){
-        drawPaint.setAntiAlias(false);
         position = entityPosition;
         bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), width, height, false);
         this.width = width;
@@ -36,7 +35,6 @@ public abstract class Entity {
     }
 
     protected Entity(Vector2D entityPosition, int  bitmapID){
-        drawPaint.setAntiAlias(false);
         position = entityPosition;
         width = height = SurfaceViewGame.getTileSide();
         bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), width, height, false);
