@@ -6,6 +6,7 @@ public interface VARS {
     byte PREF_LAYOUT = SurfaceViewGame.LEFT;
     String address = "hallo, @see VARS in teststuff";
     String USER_AD = "addresse";
+    String UserName = "My Name";
     String TEST_WORLD =
                     "2020202020202020202020202020202020202020"+
                     "2030101010101010101010101010101010101020"+

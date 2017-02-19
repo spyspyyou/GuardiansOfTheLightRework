@@ -162,7 +162,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
     public Canvas startDrawing() {
         try {
             return getHolder().lockCanvas();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
         return null;

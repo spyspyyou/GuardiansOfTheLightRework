@@ -45,7 +45,7 @@ public abstract class Entity {
     public void render(Canvas canvas){
         if(visible){
             updateScreenPosition();
-            canvas.drawBitmap(bitmap, screenPosition.getIntX() - bitmap.getWidth() / 2, screenPosition.getIntY() - bitmap.getHeight() / 2, drawPaint);
+            canvas.drawBitmap(bitmap, (float) (screenPosition.x - bitmap.getWidth() / 2.0), (float) (screenPosition.y - bitmap.getHeight() / 2.0), drawPaint);
         }
     }
 

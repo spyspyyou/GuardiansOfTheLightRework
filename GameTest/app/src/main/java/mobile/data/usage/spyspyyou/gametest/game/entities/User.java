@@ -1,9 +1,9 @@
 package mobile.data.usage.spyspyyou.gametest.game.entities;
 
 import android.graphics.Canvas;
-import android.util.Log;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
+import mobile.data.usage.spyspyyou.gametest.game.GameWorld;
 import mobile.data.usage.spyspyyou.gametest.game.Tick;
 import mobile.data.usage.spyspyyou.gametest.game.UserVelocityVector2D;
 import mobile.data.usage.spyspyyou.gametest.game.events.server.GumClientEvent;
@@ -52,7 +52,7 @@ public abstract class User extends Player {
         //update position + direction
         move();
 
-        //checkFloor(game);
+        checkFloor();
         addMana();
         if (mana > MAX_MANA)mana = MAX_MANA;
     }
@@ -64,25 +64,81 @@ public abstract class User extends Player {
         }
 
         position.add(VELOCITY.getVelocity(slimy));
+        hitBoxResolution();
     }
 
-    private void checkFloor(Game game){
-        float tileRad = (1f*getRadius())/SurfaceViewGame.getTileSide();
-        Vector2D pointing = new Vector2D((int) (position.x - tileRad * FLOOR_CHECK_RATIO), (int) (position.y - tileRad * FLOOR_CHECK_RATIO));
-        String s = "";
-        boolean b = true;
-        for (; pointing.y < position.y + tileRad * FLOOR_CHECK_RATIO + 1; ++pointing.y){
-            for (pointing.x = (int) (position.x - tileRad * FLOOR_CHECK_RATIO); pointing.x < position.x + tileRad * FLOOR_CHECK_RATIO + 1; ++pointing.x){
-                s+= "fall check on x" + pointing.x + "y" + pointing.y + '\n';
-                if (game.getWorld().isSolid(pointing))b = false;
-            }
+    private void hitBoxResolution(){
+        Vector2D vector2D = new Vector2D(position.getIntX(), position.getIntY());
+        vector2D.add(1, 0);
+        if (GameWorld.isImpassable(vector2D) && position.x - position.getIntX() > 0.5){
+            position.set(position.getIntX() + 0.5, position.y);
         }
-        Log.i("User", s);
-        falling = b;
+        vector2D.add(-1, 1);
+        if (GameWorld.isImpassable(vector2D) && position.y - position.getIntY() > 0.5){
+            position.set(position.x, position.getIntY() + 0.5);
+        }
+        vector2D.add(-1, -1);
+        if (GameWorld.isImpassable(vector2D) && position.x - position.getIntX() < 0.5){
+            position.set(position.getIntX() + 0.5, position.y);
+        }
+        vector2D.add(1, -1);
+        if (GameWorld.isImpassable(vector2D) && position.y - position.getIntY() < 0.5){
+            position.set(position.x, position.getIntY() + 0.5);
+        }
+
+        Vector2D con;
+        double d2;
+
+        vector2D.set(position.getIntX(), position.getIntY());
+        d2 = vector2D.squareDistance(position);
+        vector2D.add(-1, -1);
+        if (GameWorld.isImpassable(vector2D) && d2 < 0.5 * 0.5){
+            vector2D.add(1, 1);
+            con = new Vector2D(vector2D.x - position.x, vector2D.y - position.y);
+            con.scaleTo(0.5);
+            position.set(position.getIntX() + (1 - con.x) - 1, position.getIntY() + (1 - con.y) - 1);
+        }
+
+        vector2D.set(position.getIntX() + 1, position.getIntY());
+        d2 = vector2D.squareDistance(position);
+        vector2D.add(0, -1);
+        if (GameWorld.isImpassable(vector2D) && d2 < 0.5 * 0.5){
+            vector2D.add(0, 1);
+            con = new Vector2D(vector2D.x - position.x, vector2D.y - position.y);
+            con.scaleTo(0.5);
+            position.set(position.getIntX() + (1 - con.x), position.getIntY() + (1 - con.y) - 1);
+        }
+
+        vector2D.set(position.getIntX(), position.getIntY() + 1);
+        d2 = vector2D.squareDistance(position);
+        vector2D.add(-1, 0);
+        if (GameWorld.isImpassable(vector2D) && d2 < 0.5 * 0.5){
+            vector2D.add(1, 0);
+            con = new Vector2D(vector2D.x - position.x, vector2D.y - position.y);
+            con.scaleTo(0.5);
+            position.set(position.getIntX() + (1 - con.x) - 1, position.getIntY() + (1 - con.y));
+        }
+
+        vector2D.set(position.getIntX() + 1, position.getIntY() + 1);
+        d2 = vector2D.squareDistance(position);
+        if (GameWorld.isImpassable(vector2D) && d2 < 0.5 * 0.5){
+            con = new Vector2D(vector2D.x - position.x, vector2D.y - position.y);
+            con.scaleTo(0.5);
+            position.set(position.getIntX() + (1 - con.x), position.getIntY() + (1 - con.y));
+        }
+    }
+
+    private void checkFloor(){
+        if (!GameWorld.isSolid(position))falling = true;
     }
 
     private void fallingUpdate(){
-        setRadius(--width/2);
+        height = --width;
+        if (width <= 0){
+            falling = false;
+            width = height = SurfaceViewGame.getTileSide();
+            position.set(GameWorld.getSpawn(teamBlue).x, GameWorld.getSpawn(teamBlue).y);
+        }
     }
 
     @Override

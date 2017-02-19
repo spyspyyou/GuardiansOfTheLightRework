@@ -44,8 +44,8 @@ public class GameWorld implements WorldVars{
             screenPosition = new Vector2D(0, 0),
             userPosition = new Vector2D(0, 0);
 
-    private Tile[][] map;
-    private Tile voidTile;
+    private static Tile[][] map;
+    private static Tile voidTile;
 
     private Paint paint = new Paint();
     private final int
@@ -105,7 +105,7 @@ public class GameWorld implements WorldVars{
         }
     }
 
-    private Tile getTile(Vector2D position){
+    private static Tile getTile(Vector2D position){
         return getTile(position.getIntX(), position.getIntY());
     }
 
@@ -113,7 +113,7 @@ public class GameWorld implements WorldVars{
         return map.length;
     }
 
-    /*package*/ Tile getTile(int x, int y){
+    /*package*/ static Tile getTile(int x, int y){
         if (x < 0 || y < 0 || x >= map.length || y >= map[0].length){
             return voidTile;
         }
@@ -122,23 +122,23 @@ public class GameWorld implements WorldVars{
 
 
     public Vector2D getLightBulbStandBlue() {
-        return lightBulbStandBlue;
+        return lightBulbStandBlue.copy();
     }
 
     public Vector2D getLightBulbStandGreen() {
-        return lightBulbStandGreen;
+        return lightBulbStandGreen.copy();
     }
 
     public static Vector2D getSpawn(boolean teamBlue) {
-        if (teamBlue) return spawnBlue;
-        else return spawnGreen;
+        if (teamBlue) return spawnBlue.copy();
+        else return spawnGreen.copy();
     }
 
-    public boolean isSolid(Vector2D position) {
+    public static boolean isSolid(Vector2D position) {
         return getTile(position).SOLID;
     }
 
-    public boolean isImpassable(Vector2D position) {
+    public static boolean isImpassable(Vector2D position) {
         return getTile(position).IMPASSABLE;
 
     }
