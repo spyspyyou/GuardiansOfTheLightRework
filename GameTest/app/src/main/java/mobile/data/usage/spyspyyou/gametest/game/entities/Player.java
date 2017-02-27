@@ -17,6 +17,7 @@ import mobile.data.usage.spyspyyou.gametest.teststuff.VARS;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
 import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
+import mobile.data.usage.spyspyyou.gametest.utils.paints.BorderPaint;
 import mobile.data.usage.spyspyyou.gametest.utils.paints.ColorPaint;
 
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_ALLY;
@@ -111,7 +112,8 @@ public class Player extends Entity {
         private Paint
                 barBackgroundColor = new ColorPaint(COLOR_VALUE_BAR_BACKGROUND),
                 healthBarColor = new ColorPaint(COLOR_VALUE_ENEMY),
-                playerNamePaint = new TextPaint();
+                playerNamePaint = new TextPaint(),
+                borderPaint = new BorderPaint(4, Color.BLACK);
 
         public HUD(boolean user){
             if (user) healthBarColor.setColor(COLOR_VALUE_USER);
@@ -131,6 +133,9 @@ public class Player extends Entity {
 
             healthBar.set(healthBar.left, healthBar.top, healthBar.left + healthBar.width() * strength / MAX_STRENGTH, healthBar.bottom);
             canvas.drawRect(healthBar, healthBarColor);
+            healthBar.set(hudPosition.getFloatX(), hudPosition.getFloatY(), hudPosition.getFloatX() + HEALTH_BAR_WIDTH, hudPosition.getFloatY() + HEALTH_BAR_HEIGHT);
+            canvas.drawRect(healthBar, borderPaint);
+
 
             playerNamePaint.setColor(Color.BLACK);
             canvas.drawText(VARS.UserName, hudPosition.getFloatX(), hudPosition.getFloatY() - MARGIN, playerNamePaint);

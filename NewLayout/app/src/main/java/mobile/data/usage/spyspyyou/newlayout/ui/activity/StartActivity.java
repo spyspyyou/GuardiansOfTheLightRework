@@ -1,7 +1,8 @@
-package mobile.data.usage.spyspyyou.newlayout;
+package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -18,6 +19,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import mobile.data.usage.spyspyyou.newlayout.R;
+import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -178,6 +183,16 @@ public class StartActivity extends AppCompatActivity {
     }
 
     public static class SearchFragment extends Fragment {
+
+        private ListView gameList;
+        private GameInformationAdapter adapter;
+
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            adapter = new GameInformationAdapter();
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.tab_search, container, false);

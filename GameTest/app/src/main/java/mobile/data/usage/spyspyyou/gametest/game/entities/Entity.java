@@ -43,8 +43,8 @@ public abstract class Entity {
     public abstract void update(Game game);
 
     public void render(Canvas canvas){
+        updateScreenPosition();
         if(visible){
-            updateScreenPosition();
             canvas.drawBitmap(bitmap, (float) (screenPosition.x - bitmap.getWidth() / 2.0), (float) (screenPosition.y - bitmap.getHeight() / 2.0), drawPaint);
         }
     }

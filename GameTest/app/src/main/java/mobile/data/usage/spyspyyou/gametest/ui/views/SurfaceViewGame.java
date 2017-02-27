@@ -23,6 +23,7 @@ import mobile.data.usage.spyspyyou.gametest.game.UserVelocityVector2D;
 import mobile.data.usage.spyspyyou.gametest.game.World;
 import mobile.data.usage.spyspyyou.gametest.game.entities.Player;
 import mobile.data.usage.spyspyyou.gametest.game.entities.User;
+import mobile.data.usage.spyspyyou.gametest.game.events.global.PauseEvent;
 import mobile.data.usage.spyspyyou.gametest.game.events.local.GumButtonClickedEvent;
 import mobile.data.usage.spyspyyou.gametest.game.events.local.SkillActivationEvent;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
@@ -137,6 +138,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         buttons.add(new SurfaceMiniMap(new Rect(getWidth() - margin - miniMapSize, margin, getWidth() - margin, margin + miniMapSize), world, players));
         buttons.add(new SkillButton(new Rect(getWidth() - margin - buttonSize, getHeight() - margin - buttonSize, getWidth() - margin, getHeight() - margin)));
         buttons.add(new GumButton(new Rect(getWidth() - margin - buttonSize, getHeight() - 2*margin - 2*buttonSize, getWidth() - margin, getHeight() - 2*margin - buttonSize)));
+        //buttons.add(new PauseButton(new Rect(0, 0, buttonSize, buttonSize)));
     }
 
     private void createRight(World world, Player[] players){
@@ -347,6 +349,27 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         protected abstract void onClick();
     }
 
+    private class PauseButton extends VirtualButton {
+
+        private final Bitmap bitmap;
+
+        private PauseButton(Rect position) {
+            super(position);
+            bitmap = BitmapFactory.decodeResource(GameActivity.getRec(), R.drawable.ic_pause_black_24dp);
+        }
+
+        @Override
+        protected void render(Canvas canvas) {
+            canvas.drawBitmap(bitmap, null, POSITION, null);
+        }
+
+        @Override
+        protected void onClick() {
+            new PauseEvent().send();
+        }
+
+    }
+
     private class SurfaceMiniMap extends VirtualButton{
 
         private int
@@ -506,7 +529,7 @@ public class SurfaceViewGame extends SurfaceView implements SurfaceHolder.Callba
         @Override
         protected void render(Canvas canvas) {
             super.render(canvas);
-            canvas.drawBitmap(ICON, null, bitmapRect, null);
+            if (isReady())canvas.drawBitmap(ICON, null, bitmapRect, null);
         }
 
         @Override

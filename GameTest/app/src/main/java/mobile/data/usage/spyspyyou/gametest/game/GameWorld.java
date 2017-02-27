@@ -35,8 +35,8 @@ public class GameWorld implements WorldVars{
     private double startX;
 
     private static Vector2D
-            spawnBlue = new Vector2D(0, 0),
-            spawnGreen = new Vector2D(0, 0),
+            spawnBlue = new Vector2D(-1, -1),
+            spawnGreen = new Vector2D(-1, -1),
             lightBulbStandBlue = new Vector2D(0, 0),
             lightBulbStandGreen = new Vector2D(0, 0);
 
@@ -76,10 +76,10 @@ public class GameWorld implements WorldVars{
                 currentTile = tiles[world.data[x][y].first][world.data[x][y].second];
                 map[x][y] = currentTile;
                 if (currentTile.ID == SPAWN){
-                    if (currentTile.META == 0)spawnBlue.set(x + 0.5, y + 0.5);
+                    if (currentTile.META == BLUE)spawnBlue.set(x + 0.5, y + 0.5);
                     else spawnGreen.set(x + 0.5, y + 0.5);
                 }else if (currentTile.ID == LIGHT_BULB_STAND){
-                    if (currentTile.META == 0)lightBulbStandBlue.set(x + 0.5, y + 0.5);
+                    if (currentTile.META == BLUE)lightBulbStandBlue.set(x + 0.5, y + 0.5);
                     else lightBulbStandGreen.set(x + 0.5, y + 0.5);
                 }
             }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        app:srcCompat="@drawable/test_map_3"
+        android:id="@+id/imageView"
+        android:layout_height="385dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imageView"
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView_gameInfo_name"
+        android:text="Default Name"
+        android:textAllCaps="false"
+        android:textStyle="normal|bold"
+        android:layout_margin="@dimen/activity_margin"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"/>
+</RelativeLayout>
