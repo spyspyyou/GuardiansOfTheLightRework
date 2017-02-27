@@ -19,15 +19,6 @@ import static mobile.data.usage.spyspyyou.gametest.game.Tick.MAX_TILES_IN_WIDTH;
 
 public class GameWorld implements WorldVars{
 
-    private static final int[][] DRAWABLE_RESOURCES = {
-            {R.drawable.void_tile},
-            {R.drawable.floor_tile},
-            {R.drawable.wall_tile},
-            {R.drawable.spawn_tile, R.drawable.spawn_tile},
-            {R.drawable.light_bulb_tile, R.drawable.light_bulb_tile}
-    };
-
-
     private int
             tileStartX,
             tileStartY;

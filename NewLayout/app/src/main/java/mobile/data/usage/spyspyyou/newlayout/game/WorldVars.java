@@ -1,6 +1,6 @@
-package mobile.data.usage.spyspyyou.gametest.game;
+package mobile.data.usage.spyspyyou.newlayout.game;
 
-import mobile.data.usage.spyspyyou.gametest.R;
+import mobile.data.usage.spyspyyou.newlayout.R;
 
 public interface WorldVars {
 
