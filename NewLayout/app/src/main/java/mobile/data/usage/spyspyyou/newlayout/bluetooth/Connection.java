@@ -53,7 +53,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
      * this method reads from the connection's InputStream until it gets at most MAX_EVENTS_PER_CALL Events or the stream has no more data
      * @return events - a list of Events from the InputStream
      */
-    /*package*/ ArrayList<Messenger> readEvents(){
+    /*package*/ ArrayList<Messenger> readMessage(){
         ArrayList<Messenger> messengers = new ArrayList<>();
         String eventString = "";
         char nextChar;

@@ -2,7 +2,6 @@ package mobile.data.usage.spyspyyou.newlayout.bluetooth;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -11,11 +10,14 @@ import java.util.Map;
 public abstract class Messenger {
 
     private static final char SEPARATION_CHAR = '\1';
+    public static final char SUB_SEPARATION_CHAR = '\2';
 
     private final Map<String, Object> OBJECTS = new HashMap<>();
-    private String[] receptors;
+    protected String[] receptors;
 
-    public Messenger(String message) throws InvalidMessageException {
+    boolean corrupted = false;
+
+    public Messenger(String message) {
         receptors = null;
         int sepIndex;
         Class<?> c;
@@ -40,19 +42,23 @@ public abstract class Messenger {
                 }
             }catch (Exception e){
                 e.printStackTrace();
-                throw new InvalidMessageException("Failed reading the variables from the Message String.");
+                corrupted = true;
+                Log.e("Messenger", "message could not be read: " + message);
             }
         }
     }
 
-    @SafeVarargs
-    public Messenger(@Nullable String[]receptors, Pair<String, Object>... objects){
+    public Messenger(@Nullable String[]receptors){
         this.receptors = receptors;
-        synchronized (OBJECTS) {
-            for (Pair<String, Object> p : objects)
-                OBJECTS.put(p.first, p.second);
-        }
     }
+
+    public Messenger(){}
+
+    /*package*/ void received(){
+        if (!corrupted)onReception();
+    }
+
+    protected abstract void onReception();
 
     public void clearObjects(){
         synchronized (OBJECTS) {
@@ -69,6 +75,13 @@ public abstract class Messenger {
     @Nullable
     protected Object getObject(String key) {
         return OBJECTS.get(key);
+    }
+
+    protected boolean getBoolean(String key){
+        Object o = getObject(key);
+        if (o instanceof Boolean)
+            return (boolean) o;
+        return false;
     }
 
     protected int getInt(String key){
@@ -92,8 +105,6 @@ public abstract class Messenger {
         return "";
     }
 
-    protected abstract void onReception();
-
     /*package*/ String getMessageString(){
         String messageString = getClass().getSimpleName();
         synchronized (OBJECTS) {
@@ -114,7 +125,7 @@ public abstract class Messenger {
             Log.w("Messenger", "tried sending to null receptors");
             return;
         }
-        ConnectionManager.EventSenderThread.send(this);
+        ConnectionManager.MessageSenderThread.send(this);
     }
 
     @NonNull
@@ -125,7 +136,7 @@ public abstract class Messenger {
             return c.getConstructor(String.class).newInstance(message.substring(sepPos + 1));
         }catch (Exception e){
             e.printStackTrace();
-            throw new InvalidMessageException("Can't read Message String");
+            throw new InvalidMessageException("Invalid Message String");
         }
     }
 

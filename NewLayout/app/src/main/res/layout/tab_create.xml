@@ -11,11 +11,12 @@
             android:orientation="vertical"
             >
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:elevation="2dp"
                 android:background="@drawable/background_rounded"
                 android:padding="@dimen/activity_padding"
+                android:orientation="vertical"
                 android:layout_margin="@dimen/activity_margin"
                 android:layout_height="wrap_content">
 
@@ -23,42 +24,182 @@
                     android:text="Worlds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true"
                     android:id="@+id/textView"
                     android:textSize="12sp"
                     android:textColor="@color/colorAccent"
                     android:background="@drawable/background_rounded"/>
 
-                <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:layout_below="@+id/textView"
-                    android:layout_alignParentStart="true"
-                    android:id="@+id/imageView_create"
-                    android:layout_margin="@dimen/activity_margin"
-                    android:padding="1dp"
-                    android:antialias="true"/>
-
-                <ImageButton
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_create_black_24dp"
-                    android:layout_alignBottom="@+id/imageView_create"
-                    android:layout_alignEnd="@+id/imageView_create"
-                    android:id="@+id/imageButton"
-                    android:background="@drawable/background_transparent"
-                    android:padding="@dimen/activity_padding"/>
+                    android:padding="@dimen/activity_padding">
 
-            </RelativeLayout>
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/toggleButton2"
+                        android:layout_weight="1"
+                        android:background="@drawable/background_button"
+                        android:layout_marginRight="@dimen/activity_margin"
+                        android:layout_marginEnd="@dimen/activity_margin"
+                        android:textOff="Random"
+                        android:textOn="Random"
+                        android:textAllCaps="false"/>
 
-            <RelativeLayout
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/toggleButton"
+                        android:layout_weight="1"
+                        android:background="@drawable/background_button"
+                        android:textOff="List"
+                        android:textOn="List"
+                        android:textAllCaps="false"
+                        android:checked="true"/>
+                </LinearLayout>
+
+                <ViewSwitcher
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/activity_padding">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="@dimen/activity_padding">
+
+                            <TextView
+                                android:text="Size: "
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView18"
+                                />
+
+                            <TextView
+                                android:text="27"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView2"
+                                />
+
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/seekBar4"
+                            android:layout_weight="1"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="@dimen/activity_padding">
+
+                            <TextView
+                                android:text="Wall Ratio: "
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView20"
+                                />
+
+                            <TextView
+                                android:text="21"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView19"
+                                />
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/seekBar5"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="@dimen/activity_padding">
+
+                            <TextView
+                                android:text="Void Ratio: "
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView22"
+                                />
+
+                            <TextView
+                                android:text="182"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textView21"
+                                />
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/seekBar6"/>
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/activity_padding"
+                        >
+
+                        <mobile.data.usage.spyspyyou.newlayout.ui.views.SquareImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentStart="true"
+                            android:background="@android:color/holo_green_dark"
+                            />
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/imageButton10"
+                            android:padding="@dimen/activity_padding"
+                            app:srcCompat="@drawable/ic_create_black_24dp"
+                            android:background="@drawable/background_button"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_margin="@dimen/activity_margin"/>
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/ic_list_black_24dp"
+                            android:layout_alignParentStart="true"
+                            android:id="@+id/imageButton11"
+                            android:layout_margin="@dimen/activity_margin"
+                            android:background="@drawable/background_button"
+                            android:padding="@dimen/activity_padding"/>
+
+                    </RelativeLayout>
+
+                </ViewSwitcher>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:padding="@dimen/activity_padding"
                 android:elevation="2dp"
                 android:background="@drawable/background_rounded"
-                android:layout_margin="@dimen/activity_margin">
+                android:layout_margin="@dimen/activity_margin"
+                android:orientation="vertical">
 
                 <TextView
                     android:text="Characters"
@@ -66,30 +207,222 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/textView3"
                     android:textSize="12sp"
-                    android:textColor="@color/colorAccent"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true"/>
+                    android:textColor="@color/colorAccent"/>
 
-            </RelativeLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_padding">
 
-            <RelativeLayout
+                    <TextView
+                        android:text="Unique Characters"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView5"
+                        android:gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/activity_margin"/>
+
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/switch_tabSearch_uniqueCharacter"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_padding">
+
+                    <ImageButton
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/imageButton"
+                        android:background="@drawable/fluffy"
+                        android:layout_weight="1"/>
+
+                    <ImageButton
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/imageButton2"
+                        android:background="@drawable/slime"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginStart="@dimen/activity_margin"/>
+
+                    <ImageButton
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/imageButton3"
+                        android:background="@drawable/ghost"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginStart="@dimen/activity_margin"
+                        android:layout_weight="1"/>
+
+                    <ImageButton
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/imageButton4"
+                        android:background="@android:color/background_dark"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginStart="@dimen/activity_margin"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_padding">
+
+                    <TextView
+                        android:text="Player Maximum: "
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView17"
+                        />
+
+                    <TextView
+                        android:text="5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView16"
+                        />
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 android:elevation="2dp"
                 android:background="@drawable/background_rounded"
                 android:padding="@dimen/activity_padding"
-                android:layout_margin="@dimen/activity_margin">
+                android:layout_margin="@dimen/activity_margin"
+                android:orientation="vertical">
 
                 <TextView
                     android:text="Advanced"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true"
                     android:id="@+id/textView4"
                     android:textSize="12sp"
                     android:textColor="@color/colorAccent"/>
-            </RelativeLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_padding">
+
+                    <TextView
+                        android:text="Sweet Regeneration: "
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView6"
+                        />
+
+                    <TextView
+                        android:text="50"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView7"
+                        />
+
+                    <TextView
+                        android:text=" Sweets/s"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView8"
+                        />
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/seekBar"
+                    android:progress="50"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/activity_padding">
+
+                    <TextView
+                        android:text="Mana Regeneration: "
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView11"/>
+
+                    <TextView
+                        android:text="60"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView10"/>
+
+                    <TextView
+                        android:text="%"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView9"/>
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/seekBar2"
+                    android:layout_weight="1"
+                    android:progress="35"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/activity_padding">
+
+                    <TextView
+                        android:text="Selection Time: "
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView14"
+                        />
+
+                    <TextView
+                        android:text="20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView13"
+                        />
+
+                    <TextView
+                        android:text="s"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/textView12"
+                        />
+                </LinearLayout>
+
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/seekBar3"
+                    android:progress="82"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 </ScrollView>

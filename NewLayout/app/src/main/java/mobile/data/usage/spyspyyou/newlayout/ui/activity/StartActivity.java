@@ -1,5 +1,6 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,19 +15,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
+import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends GotLActivity {
 
-    DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
+    PagerAdapter mPagerAdapter;
     ViewPager mViewPager;
     ActionBarDrawerToggle mDrawerToggle;
 
@@ -43,9 +46,7 @@ public class StartActivity extends AppCompatActivity {
         fabCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //todo:start  the lobby
-                Snackbar.make(view, "Starting the game lobby", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(getBaseContext(), ServerLobbyActivity.class));
             }
         });
 
@@ -61,9 +62,10 @@ public class StartActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar == null)return;
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -97,9 +99,9 @@ public class StartActivity extends AppCompatActivity {
 
         // ViewPager and its adapters use support library
         // fragments, so use getSupportFragmentManager.
-        mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.start_pager);
-        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -126,29 +128,27 @@ public class StartActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState)
-    {
+    protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
     }
 
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
 
-    public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
+    public class PagerAdapter extends FragmentStatePagerAdapter {
         private String[] tabNames = {
                 "Create",
                 "Search",
                 "Worlds"
         };
 
-        /*package*/ DemoCollectionPagerAdapter(FragmentManager fm) {
+        /*package*/ PagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -186,31 +186,101 @@ public class StartActivity extends AppCompatActivity {
 
         private ListView gameList;
         private GameInformationAdapter adapter;
+        private TextView textViewInfo;
+        private ImageButton imageButtonSearch;
+        private SwipeRefreshLayout swipeRefreshLayout;
 
         @Override
         public void onActivityCreated(@Nullable Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            adapter = new GameInformationAdapter();
+            adapter = new GameInformationAdapter(getActivity().getApplicationContext());
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.tab_search, container, false);
-            final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh);
+
+            swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout_tabSearch);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    Snackbar.make(swipeRefreshLayout, "On Refresh", Snackbar.LENGTH_LONG)
-                            .setAction("Stop Refresh", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    swipeRefreshLayout.setRefreshing(false);
-                                }
-                            }).show();
+                refresh();
                 }
             });
             swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
+            gameList = (ListView) v.findViewById(R.id.listView_tabSearch);
+            gameList.setAdapter(adapter);
+
+            AppBluetoothManager.addBluetoothListener(new AppBluetoothManager.BluetoothActionListener() {
+
+                @Override
+                public void onStart() {
+
+                }
+
+                @Override
+                public void onStop() {
+
+                }
+
+                @Override
+                public void onGameSearchStarted() {
+                    swipeRefreshLayout.setRefreshing(true);
+                }
+
+                @Override
+                public void onGameSearchFinished() {
+                    swipeRefreshLayout.setRefreshing(false);
+                    if (adapter.getCount() == 0){
+                        Snackbar.make(swipeRefreshLayout, "No Games Found", Snackbar.LENGTH_LONG)
+                                .setAction("Retry", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        refresh();
+                                    }
+                                }).show();
+                        showStartSearch();
+                    }
+                }
+
+                @Override
+                public void onConnectionEstablished(String address) {
+
+                }
+            });
+
+            imageButtonSearch = (ImageButton) v.findViewById(R.id.imageButton_tabSearch);
+            imageButtonSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    refresh();
+                }
+            });
+
+            textViewInfo = (TextView) v.findViewById(R.id.textView_tabSearch);
             return v;
+        }
+
+        private void refresh(){
+            if (adapter.setData(AppBluetoothManager.searchGames(getActivity()))) {
+                adapter.notifyDataSetChanged();
+                hideStartSearch();
+            }else{
+                showStartSearch();
+            }
+        }
+
+        private void showStartSearch(){
+            gameList.setVisibility(View.INVISIBLE);
+            imageButtonSearch.setVisibility(View.VISIBLE);
+            textViewInfo.setVisibility(View.VISIBLE);
+        }
+
+        private void hideStartSearch(){
+            gameList.setVisibility(View.VISIBLE);
+            imageButtonSearch.setVisibility(View.INVISIBLE);
+            textViewInfo.setVisibility(View.INVISIBLE);
         }
     }
 

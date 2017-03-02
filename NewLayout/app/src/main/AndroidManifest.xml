@@ -2,6 +2,7 @@
 <manifest package="mobile.data.usage.spyspyyou.newlayout"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
@@ -18,6 +19,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activity.LobbyActivity"
+            android:label="@string/title_activity_lobby">
+        </activity>
+        <activity
+            android:name=".ui.activity.ServerLobbyActivity"
+            android:label="@string/title_activity_lobby">
         </activity>
     </application>
 

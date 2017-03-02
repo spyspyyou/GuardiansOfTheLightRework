@@ -40,6 +40,18 @@ public class AppBluetoothManager {
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver = null;
     private static ArrayList<GameInformation> gameList = new ArrayList<>();
     private static final ArrayList<BluetoothActionListener> listeners = new ArrayList<>();
+    private static final ConnectionListener connectionListenerSearch = new ConnectionListener() {
+
+        @Override
+        public void onConnectionEstablished() {
+
+        }
+
+        @Override
+        public void onConnectionFailed() {}
+        @Override
+        public void onConnectionClosed() {}
+    };
 
     /**
      * Called when an Activity uses Bluetooth
@@ -113,6 +125,10 @@ public class AppBluetoothManager {
         synchronized (listeners) {
             listeners.remove(listener);
         }
+    }
+
+    public static void addGame(GameInformation gameInformation){
+        gameList.add(gameInformation);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -331,7 +347,9 @@ public class AppBluetoothManager {
             }
 
             Log.d("ABManager", "Found a Device: " + '"' + deviceName + '"');
-            if (isHosting(device) && !deviceAlreadyOnList(device)) gameList.add(new GameInformation(device.getAddress()));
+            if (isHosting(deviceName) && !deviceAlreadyOnList(device)) {
+                new GameInformationRequest(device.getAddress(), getLocalAddress()).send();
+            }
         }
 
         private void register(Context context){
@@ -348,14 +366,13 @@ public class AppBluetoothManager {
 
         private boolean deviceAlreadyOnList(BluetoothDevice bluetoothDevice){
             for (GameInformation gameInformation: gameList){
-                if (gameInformation.getHostAddress().equals(bluetoothDevice.getAddress()))return true;
+                if (gameInformation.HOST_ADDRESS.equals(bluetoothDevice.getAddress()))return true;
             }
             return false;
         }
 
-        private boolean isHosting(BluetoothDevice bluetoothDevice){
-            String name = bluetoothDevice.getName();
-            return name.startsWith(APP_IDENTIFIER) && !bluetoothDevice.getName().endsWith(NOT_HOSTING_STRING);
+        private boolean isHosting(String name){
+            return name.startsWith(APP_IDENTIFIER) && !name.endsWith(NOT_HOSTING_STRING);
         }
     }
 

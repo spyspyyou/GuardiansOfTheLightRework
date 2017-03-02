@@ -92,8 +92,8 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
     /*package*/ static void addConnection(Connection connection){
         Log.i("ConnectionManager", "adding a connection");
         connections.put(connection.getAddress(), connection);
-        new EventSenderThread();
-        new EventReceiverThread();
+        new MessageSenderThread();
+        new MessageReceiverThread();
     }
 
     /*package*/ static void removeClosedConnection(Connection connection){
@@ -202,7 +202,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
         }
     }
 
-    /*package*/ static class EventSenderThread extends Thread {
+    /*package*/ static class MessageSenderThread extends Thread {
 
         private static final int
                 /**
@@ -216,7 +216,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
         private static boolean
                 activeSenderThread = false;
 
-        private EventSenderThread(){
+        private MessageSenderThread(){
             start();
         }
 
@@ -259,7 +259,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
         }
     }
 
-    private static class EventReceiverThread extends Thread {
+    private static class MessageReceiverThread extends Thread {
 
         private static final int
                 SLEEP_TIME = 100;
@@ -267,7 +267,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
         private static boolean
                 activeReceiverThread = false;
 
-        private EventReceiverThread(){
+        private MessageReceiverThread(){
             start();
         }
 
@@ -283,7 +283,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
                 for (String address:connections.keySet()) {
                     connection = connections.get(address);
                     if (connection == null)continue;
-                    for (Messenger messenger :connection.readEvents()){
+                    for (Messenger messenger :connection.readMessage()){
                         received = true;
                         messenger.onReception();
                     }
