@@ -237,7 +237,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
 
                 if (messenger != null) {
                     try {
-                        data = messenger.toString().getBytes(TEXT_ENCODING);
+                        data = messenger.getMessageString().getBytes(TEXT_ENCODING);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                         continue;

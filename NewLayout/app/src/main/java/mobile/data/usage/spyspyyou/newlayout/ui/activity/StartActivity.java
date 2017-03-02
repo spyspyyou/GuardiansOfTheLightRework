@@ -19,12 +19,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+import android.widget.ViewSwitcher;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
 
 public class StartActivity extends GotLActivity {
@@ -176,9 +184,77 @@ public class StartActivity extends GotLActivity {
     // Instances of this class are fragments representing a single
     // object in our collection.
     public static class CreateFragment extends Fragment {
+
+        private ToggleButton
+                toggleButtonRandom,
+                toggleButtonLibrary;
+
+        private SeekBar
+                seekBarSize,
+                seekBarWallRatio,
+                seekBarVoidRatio,
+                seekBarPlayerMaximum,
+                seekBarSweetRegen,
+                seekBarManaRegen,
+                seekBarSelectionTime;
+
+        private TextView
+                textViewSize,
+                textViewWallRatio,
+                textViewVoidRatio,
+                textViewPlayerMaximum,
+                textViewSweetRegen,
+                textViewManaRegen,
+                textViewSelectionTime;
+
+        private Switch switchUniqueCharacters;
+
+        private ImageButton
+                imageButtonFluffy,
+                imageButtonSlime,
+                imageButtonGhost,
+                imageButtonNox;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.tab_create, container, false);
+            final View view = inflater.inflate(R.layout.tab_create, container, false);
+
+            toggleButtonRandom = (ToggleButton) view.findViewById(R.id.toggleButton_tabCreate_random);
+            toggleButtonLibrary = (ToggleButton) view.findViewById(R.id.toggleButton_tabCreate_library);
+            final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.viewSwitcher_tabCreate);
+
+            Animation in = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_in_left);
+            Animation out = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_out_right);
+            viewSwitcher.setInAnimation(in);
+            viewSwitcher.setOutAnimation(out);
+
+            toggleButtonRandom.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked){
+                        toggleButtonLibrary.setChecked(false);
+                        viewSwitcher.showPrevious();
+                    }
+                    else if (!toggleButtonLibrary.isChecked())toggleButtonRandom.setChecked(true);
+                }
+            });
+
+            toggleButtonLibrary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked){
+                        toggleButtonRandom.setChecked(false);
+                        viewSwitcher.showNext();
+                    }
+                    else if (!toggleButtonRandom.isChecked())toggleButtonLibrary.setChecked(true);
+                }
+            });
+
+            return view;
+        }
+
+        public GameInformation getGameInformation(){
+            return null;
         }
     }
 
