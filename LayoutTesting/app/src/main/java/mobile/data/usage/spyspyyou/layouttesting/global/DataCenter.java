@@ -23,7 +23,6 @@ public class DataCenter implements GlobalTrigger{
             GAME_NAME = "gameName",
             MAP_WIDTH = "mapWidth",
             MAP_HEIGHT = "mapHeight",
-            //MAP_DATA = "mapData",
             FLUFFY_ALLOWED = "fluffyAllowed",
             SLIME_ALLOWED = "slimeAllowed",
             GHOST_ALLOWED = "ghostAllowed",

@@ -1,6 +1,8 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,20 +21,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import android.widget.ViewSwitcher;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
+import mobile.data.usage.spyspyyou.newlayout.game.World;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
 
 public class StartActivity extends GotLActivity {
@@ -185,6 +186,13 @@ public class StartActivity extends GotLActivity {
     // object in our collection.
     public static class CreateFragment extends Fragment {
 
+        private static final String
+                CREATE_PREFS = "createPrefs",
+                PREF_WORLD = "worldPref",
+                PREF_SIZE = "size",
+                PREF_WALL_RATIO = "wallRatio",
+                PREF_VOID_RATIO = "voidRatio";
+
         private ToggleButton
                 toggleButtonRandom,
                 toggleButtonLibrary;
@@ -215,25 +223,31 @@ public class StartActivity extends GotLActivity {
                 imageButtonGhost,
                 imageButtonNox;
 
+        private SharedPreferences sharedPreferences;
+        private SharedPreferences.Editor editor;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(CREATE_PREFS, Activity.MODE_PRIVATE);
+            editor = sharedPreferences.edit();
+
             final View view = inflater.inflate(R.layout.tab_create, container, false);
 
             toggleButtonRandom = (ToggleButton) view.findViewById(R.id.toggleButton_tabCreate_random);
             toggleButtonLibrary = (ToggleButton) view.findViewById(R.id.toggleButton_tabCreate_library);
-            final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.viewSwitcher_tabCreate);
-
-            Animation in = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_in_left);
-            Animation out = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_out_right);
-            viewSwitcher.setInAnimation(in);
-            viewSwitcher.setOutAnimation(out);
+            final LinearLayout
+                    linearLayoutRandom = (LinearLayout) view.findViewById(R.id.linearLayout_tabCreate_random),
+                    linearLayoutList = (LinearLayout) view.findViewById(R.id.linearLayout_tabCreate_list);
 
             toggleButtonRandom.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked){
                         toggleButtonLibrary.setChecked(false);
-                        viewSwitcher.showPrevious();
+                        linearLayoutRandom.setVisibility(View.VISIBLE);
+                        linearLayoutList.setVisibility(View.GONE);
+                        editor.putBoolean(PREF_WORLD, false);
+                        editor.apply();
                     }
                     else if (!toggleButtonLibrary.isChecked())toggleButtonRandom.setChecked(true);
                 }
@@ -244,11 +258,161 @@ public class StartActivity extends GotLActivity {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked){
                         toggleButtonRandom.setChecked(false);
-                        viewSwitcher.showNext();
+                        linearLayoutRandom.setVisibility(View.GONE);
+                        linearLayoutList.setVisibility(View.VISIBLE);
+                        editor.putBoolean(PREF_WORLD, true);
+                        editor.apply();
                     }
                     else if (!toggleButtonRandom.isChecked())toggleButtonLibrary.setChecked(true);
                 }
             });
+
+            if (!sharedPreferences.getBoolean(PREF_WORLD, false)){
+                toggleButtonRandom.setChecked(true);
+            }else{
+                toggleButtonLibrary.setChecked(true);
+            }
+
+            textViewSize = (TextView) view.findViewById(R.id.textView_tabCreate_size);
+            seekBarSize = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_size);
+            seekBarSize.setMax(World.MAX_SIZE - World.MIN_SIZE);
+            seekBarSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewSize.setText("" + (progress + World.MIN_SIZE));
+                    editor.putInt(PREF_SIZE, progress);
+                    editor.apply();
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+            seekBarSize.setProgress(sharedPreferences.getInt(PREF_SIZE, 40));
+
+            textViewWallRatio = (TextView) view.findViewById(R.id.textView_tabCreate_wallRatio);
+            seekBarWallRatio = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_wallRatio);
+            seekBarWallRatio.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewWallRatio.setText("" + progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            textViewVoidRatio = (TextView) view.findViewById(R.id.textView_tabCreate_voidRatio);
+            seekBarVoidRatio = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_voidRatio);
+            seekBarVoidRatio.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewVoidRatio.setText(""+progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            textViewPlayerMaximum = (TextView) view.findViewById(R.id.textView_tabCreate_playerMaximum);
+            seekBarPlayerMaximum = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_playerMaximum);
+            seekBarPlayerMaximum.setMax(7);
+            seekBarPlayerMaximum.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewPlayerMaximum.setText("" + (progress + 1));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            textViewSweetRegen = (TextView) view.findViewById(R.id.textView_tabCreate_sweetRegen);
+            seekBarSweetRegen = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_sweetRegen);
+            seekBarSweetRegen.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewSweetRegen.setText("" + progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            textViewManaRegen = (TextView) view.findViewById(R.id.textView_tabCreate_manaRegen);
+            seekBarManaRegen = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_manaRegen);
+            seekBarManaRegen.setMax(200);
+            seekBarManaRegen.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewManaRegen.setText("" + progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            textViewSelectionTime = (TextView) view.findViewById(R.id.textView_tabCreate_selectionTime);
+            seekBarSelectionTime = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_selectionTime);
+            seekBarSelectionTime.setMax(20);
+            seekBarSelectionTime.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    textViewSelectionTime.setText("" + progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
 
             return view;
         }

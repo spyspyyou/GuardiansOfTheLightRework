@@ -69,11 +69,11 @@ public class GameInformationAdapter extends BaseAdapter {
         if (gameInformation.ALLOWED_NOX)imageViewNox.setImageResource(R.drawable.ic_close_black_24dp);
 
         TextView textViewSweetRegen = (TextView) view.findViewById(R.id.textView_gameInformation_sweetRegen);
-        textViewSweetRegen.setText(gameInformation.SWEET_REGEN);
+        textViewSweetRegen.setText(""+gameInformation.SWEET_REGEN);
         TextView textViewManaRegen = (TextView) view.findViewById(R.id.textView_gameInformation_manaRegen);
-        textViewManaRegen.setText(gameInformation.MANA_REGEN);
+        textViewManaRegen.setText(""+gameInformation.MANA_REGEN);
         TextView textViewSelectionTime = (TextView) view.findViewById(R.id.textView_gameInformation_selectionTime);
-        textViewSelectionTime.setText(gameInformation.SELECTION_TIME);
+        textViewSelectionTime.setText(""+gameInformation.SELECTION_TIME);
 
         return view;
     }

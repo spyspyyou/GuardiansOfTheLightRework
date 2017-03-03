@@ -9,6 +9,11 @@ import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.ui.activity.GotLActivity;
 
 public class World implements WorldVars {
+
+    public static final int
+            MIN_SIZE = 22,
+            MAX_SIZE = 70;
+
     //for every tile there are two numbers between 0 and 9
     //weather the id nor the meta may have more than one digit
     //the first one indicates the tile, the second one is additional information, ex. team or wall color etc...

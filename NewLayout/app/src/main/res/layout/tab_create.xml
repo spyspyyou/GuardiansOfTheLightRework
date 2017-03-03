@@ -29,6 +29,33 @@
                     android:textColor="@color/colorAccent"
                     android:background="@drawable/background_rounded"/>
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/activity_padding"
+                    >
+
+                    <mobile.data.usage.spyspyyou.newlayout.ui.views.SquareImageView
+                        android:id="@+id/squareImageView_tabCreate_world"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@android:color/holo_green_dark"/>
+
+                    <ImageButton
+                        android:id="@+id/imageButton_tabCreate_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="@dimen/activity_margin"
+                        android:background="@drawable/background_button"
+                        android:padding="@dimen/activity_padding"
+                        app:srcCompat="@drawable/ic_create_black_24dp"/>
+
+                </RelativeLayout>
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -36,17 +63,17 @@
                     android:padding="@dimen/activity_padding">
 
                     <ToggleButton
+                        android:id="@+id/toggleButton_tabCreate_random"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/toggleButton_tabCreate_random"
-                        android:layout_weight="1"
-                        android:layout_marginRight="@dimen/activity_margin"
                         android:layout_marginEnd="@dimen/activity_margin"
-                        android:textOff="Random"
-                        android:textOn="Random"
-                        android:textAllCaps="false"
+                        android:layout_marginRight="@dimen/activity_margin"
+                        android:layout_weight="1"
                         android:background="@drawable/background_toggle"
-                        android:checked="true"/>
+                        android:checked="false"
+                        android:textAllCaps="false"
+                        android:textOff="Random"
+                        android:textOn="Random"/>
 
                     <ToggleButton
                         android:layout_width="wrap_content"
@@ -60,134 +87,120 @@
 
                 </LinearLayout>
 
-                <ViewSwitcher
+                <LinearLayout
+                    android:id="@+id/linearLayout_tabCreate_random"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/viewSwitcher_tabCreate">
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/squareImageView_tabCreate_world"
+                    android:orientation="vertical"
+                    android:padding="@dimen/activity_padding"
+                    >
 
                     <LinearLayout
-                        android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:padding="@dimen/activity_padding">
 
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="@dimen/activity_padding">
-
-                            <TextView
-                                android:text="Size: "
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                />
-
-                            <TextView
-                                android:text="27"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/textView_tabCreate_size"
-                                />
-
-                        </LinearLayout>
-
-                        <SeekBar
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/seekBar_tabCreate_size"
-                            android:layout_weight="1"/>
+                            android:text="Size: "
+                            />
 
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="@dimen/activity_padding">
-
-                            <TextView
-                                android:text="Wall Ratio: "
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                />
-
-                            <TextView
-                                android:text="21"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/textView_tabCreate_wallRatio"
-                                />
-                        </LinearLayout>
-
-                        <SeekBar
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:id="@+id/textView_tabCreate_size"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:id="@+id/seekBar_tabCreate_wallRatio"/>
-
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="@dimen/activity_padding">
-
-                            <TextView
-                                android:text="Void Ratio: "
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                />
-
-                            <TextView
-                                android:text="182"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/textView_tabCreate_voidRatio"
-                                />
-                        </LinearLayout>
-
-                        <SeekBar
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/seekBar_tabCreate_voidRatio"/>
+                            android:text="27"
+                            />
 
                     </LinearLayout>
 
-                    <RelativeLayout
+                    <SeekBar
+                        android:id="@+id/seekBar_tabCreate_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/activity_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Wall Ratio: "
+                            />
+
+                        <TextView
+                            android:id="@+id/textView_tabCreate_wallRatio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="21"
+                            />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekBar_tabCreate_wallRatio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/activity_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Void Ratio: "
+                            />
+
+                        <TextView
+                            android:id="@+id/textView_tabCreate_voidRatio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="182"
+                            />
+                    </LinearLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekBar_tabCreate_voidRatio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageButton
+                        android:id="@+id/imageButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/activity_margin"
+                        android:background="@drawable/background_button"
                         android:padding="@dimen/activity_padding"
-                        >
+                        app:srcCompat="@drawable/ic_autorenew_black_24dp"/>
 
-                        <mobile.data.usage.spyspyyou.newlayout.ui.views.SquareImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentStart="true"
-                            android:background="@android:color/holo_green_dark"
-                            android:id="@+id/squareImageView_tabCreate_world"/>
+                </LinearLayout>
 
-                        <ImageButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/imageButton_tabCreate_edit"
-                            android:padding="@dimen/activity_padding"
-                            app:srcCompat="@drawable/ic_create_black_24dp"
-                            android:background="@drawable/background_button"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
-                            android:layout_margin="@dimen/activity_margin"/>
+                <LinearLayout
+                    android:id="@+id/linearLayout_tabCreate_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                        <ImageButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:srcCompat="@drawable/ic_list_black_24dp"
-                            android:layout_alignParentStart="true"
-                            android:id="@+id/imageButton_tabCreate_list"
-                            android:layout_margin="@dimen/activity_margin"
-                            android:background="@drawable/background_button"
-                            android:padding="@dimen/activity_padding"/>
+                    <SearchView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
 
-                    </RelativeLayout>
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"/>
 
-                </ViewSwitcher>
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -339,7 +352,7 @@
                         />
 
                     <TextView
-                        android:text=" Sweets/s"
+                        android:text=" Sweets/min"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         />

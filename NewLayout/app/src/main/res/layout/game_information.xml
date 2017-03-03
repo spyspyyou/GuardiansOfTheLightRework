@@ -135,7 +135,7 @@
                 android:textSize="18sp"/>
 
             <TextView
-                android:text=" Sweets/s"
+                android:text=" Sweets/min"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"/>
