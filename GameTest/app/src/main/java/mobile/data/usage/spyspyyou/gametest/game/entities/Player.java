@@ -78,12 +78,9 @@ public class Player extends Entity {
         //reset all
         rotationMatrix.reset();
         rotationMatrix.postRotate((float) (direction / Math.PI * 360 / 2) - 90);
-        if (direction == 0){
-            bitmap = RAW_BITMAP;
-            return;
-        }
         //rotate
         bitmap = Bitmap.createBitmap(RAW_BITMAP, 0, 0, RAW_BITMAP.getWidth(), RAW_BITMAP.getHeight(), rotationMatrix, false);
+
         Log.d("Game-update", "setDirection took " + (System.nanoTime() - startTime) + " nanos, " + (int) ((System.nanoTime() - startTime) / 1000000) + " milis");
         if ((System.nanoTime() - startTime) > 3000000)Log.d("Game-update", "direction = " + direction);
     }

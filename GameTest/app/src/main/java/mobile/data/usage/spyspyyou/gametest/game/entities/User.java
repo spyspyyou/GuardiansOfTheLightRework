@@ -82,9 +82,7 @@ public abstract class User extends Player {
         falling = b;
     }
 
-    private void fallingUpdate(){
-        setRadius(--width/2);
-    }
+    private void fallingUpdate(){}
 
     @Override
     public void render(Canvas canvas) {
@@ -97,6 +95,10 @@ public abstract class User extends Player {
             nextParticleEjection = game.getSynchronizedTick() + PARTICLE_COOL_DOWN;
             new GumClientEvent(position, direction, game.getSynchronizedTick(), teamBlue).send();
         }
+    }
+
+    public Vector2D getPosition(){
+        return position;
     }
 
     protected abstract void addMana();

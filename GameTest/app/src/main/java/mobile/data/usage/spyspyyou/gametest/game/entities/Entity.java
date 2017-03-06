@@ -18,8 +18,6 @@ public abstract class Entity {
     protected static Vector2D userPosition;
     protected Paint drawPaint = new Paint();
 
-    protected int width, height;
-
     // center of the entity
     public Vector2D
             position,
@@ -31,15 +29,13 @@ public abstract class Entity {
         drawPaint.setAntiAlias(false);
         position = entityPosition;
         bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), width, height, false);
-        this.width = width;
-        this.height = height;
     }
 
     protected Entity(Vector2D entityPosition, int  bitmapID){
+        int size = SurfaceViewGame.getTileSide();
         drawPaint.setAntiAlias(false);
         position = entityPosition;
-        width = height = SurfaceViewGame.getTileSide();
-        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), width, height, false);
+        bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(GameActivity.getRec(), bitmapID), size, size, false);
     }
 
     public abstract void update(Game game);
@@ -49,10 +45,6 @@ public abstract class Entity {
             updateScreenPosition();
             canvas.drawBitmap(bitmap, screenPosition.getIntX() - bitmap.getWidth() / 2, screenPosition.getIntY() - bitmap.getHeight() / 2, drawPaint);
         }
-    }
-
-    public Vector2D getPosition(){
-        return position;
     }
 
     protected void updateScreenPosition(){
