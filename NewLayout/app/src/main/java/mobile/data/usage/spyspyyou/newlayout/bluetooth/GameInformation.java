@@ -13,6 +13,7 @@ public class GameInformation extends Messenger{
             KEY_ALLOWED_SLIME = "as",
             KEY_ALLOWED_GHOST = "ag",
             KEY_ALLOWED_NOX = "an",
+            KEY_PLAYER_MAX = "pm",
             KEY_SWEET_REGEN = "sr",
             KEY_MANA_REGEN = "mr",
             KEY_SELECTION_TIME = "st";
@@ -27,11 +28,12 @@ public class GameInformation extends Messenger{
             ALLOWED_GHOST,
             ALLOWED_NOX;
     public final int
+            PLAYER_MAX,
             SWEET_REGEN,
             MANA_REGEN,
             SELECTION_TIME;
 
-    public GameInformation(String address, String gameName, World world, boolean charactersUnique, boolean allowedFluffy, boolean allowedSlime, boolean allowedGhost, boolean allowedNox, int sweetRegen, int manaRegen, int selectionTime){
+    public GameInformation(String address, String gameName, World world, boolean charactersUnique, boolean allowedFluffy, boolean allowedSlime, boolean allowedGhost, boolean allowedNox, int playerMax, int sweetRegen, int manaRegen, int selectionTime){
         HOST_ADDRESS = address;
         GAME_NAME = gameName;
         WORLD = world;
@@ -40,6 +42,7 @@ public class GameInformation extends Messenger{
         ALLOWED_SLIME = allowedSlime;
         ALLOWED_GHOST = allowedGhost;
         ALLOWED_NOX = allowedNox;
+        PLAYER_MAX = playerMax;
         SWEET_REGEN = sweetRegen;
         MANA_REGEN = manaRegen;
         SELECTION_TIME = selectionTime;
@@ -55,6 +58,7 @@ public class GameInformation extends Messenger{
         ALLOWED_SLIME = getBoolean(KEY_ALLOWED_SLIME);
         ALLOWED_GHOST = getBoolean(KEY_ALLOWED_GHOST);
         ALLOWED_NOX = getBoolean(KEY_ALLOWED_NOX);
+        PLAYER_MAX = getInt(KEY_PLAYER_MAX);
         SWEET_REGEN = getInt(KEY_SWEET_REGEN);
         MANA_REGEN = getInt(KEY_MANA_REGEN);
         SELECTION_TIME = getInt(KEY_SELECTION_TIME);
@@ -70,6 +74,7 @@ public class GameInformation extends Messenger{
         putObect(KEY_ALLOWED_SLIME, ALLOWED_SLIME);
         putObect(KEY_ALLOWED_GHOST, ALLOWED_GHOST);
         putObect(KEY_ALLOWED_NOX, ALLOWED_NOX);
+        putObect(KEY_PLAYER_MAX, PLAYER_MAX);
         putObect(KEY_SWEET_REGEN, SWEET_REGEN);
         putObect(KEY_MANA_REGEN, MANA_REGEN);
         putObect(KEY_SELECTION_TIME, SELECTION_TIME);

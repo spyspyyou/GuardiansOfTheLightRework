@@ -1,5 +1,8 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 
 public class ServerLobbyActivity extends LobbyActivity {
@@ -8,10 +11,9 @@ public class ServerLobbyActivity extends LobbyActivity {
     private static GameInformation gameInformation = null;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        //todo:gameInfo set
-        gameInformation = null;
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        gameInformation = StartActivity.getGameInformation();
     }
 
     @Override

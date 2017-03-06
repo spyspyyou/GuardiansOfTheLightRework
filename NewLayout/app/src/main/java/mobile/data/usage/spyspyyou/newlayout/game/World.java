@@ -46,10 +46,14 @@ public class World implements WorldVars {
     }
 
     public Bitmap getBitmapRepresentation(){
-        int bitmapSize = (int) GotLActivity.getRec().getDimension(R.dimen.world_size);
+        return getBitmapRepresentation((int) GotLActivity.getRec().getDimension(R.dimen.world_size));
+    }
+
+    public Bitmap getBitmapRepresentation(int bitmapSize){
         Bitmap worldRepresentation = Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888);
         Canvas drawer = new Canvas(worldRepresentation);
         int tileSize = worldRepresentation.getWidth() / SIZE;
+
         Bitmap[][] tileBitmaps = new Bitmap[DRAWABLE_RESOURCES.length][DRAWABLE_RESOURCES[0].length];
         for (int j = 0; j < DRAWABLE_RESOURCES[0].length; ++j){
             for (int i = 0; i < DRAWABLE_RESOURCES.length; ++i){
@@ -57,9 +61,9 @@ public class World implements WorldVars {
             }
         }
 
-        for (int y = 0; y < SIZE; ++y){
-            for (int x = 0; x < SIZE; ++x){
-                drawer.drawBitmap(tileBitmaps[data[x][y].first][data[x][y].second], x * tileSize, y * tileSize, null);
+        for (int y = 0; y < data.length; ++y){
+            for (int x = 0; x < data.length; ++x){
+                //drawer.drawBitmap(tileBitmaps[data[x][y].first][data[x][y].second], x * tileSize, y * tileSize, null);
             }
         }
         return worldRepresentation;

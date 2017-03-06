@@ -23,13 +23,12 @@
         app:fabSize="mini"/>
 
     <mobile.data.usage.spyspyyou.newlayout.ui.views.SquareImageView
-        android:layout_width="match_parent"
-        app:srcCompat="@drawable/test_map_3"
         android:id="@+id/imageView_gameInformation_world"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:background="@color/colorPrimary"/>
+        android:layout_alignParentTop="true"
+        android:background="@android:color/holo_green_dark"/>
 
     <TextView
         android:layout_width="wrap_content"

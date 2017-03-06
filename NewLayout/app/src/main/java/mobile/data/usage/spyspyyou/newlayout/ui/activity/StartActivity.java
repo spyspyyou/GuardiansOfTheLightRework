@@ -18,13 +18,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -34,27 +39,31 @@ import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 import mobile.data.usage.spyspyyou.newlayout.game.World;
+import mobile.data.usage.spyspyyou.newlayout.game.WorldVars;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
+import mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton;
 
 public class StartActivity extends GotLActivity {
 
-    PagerAdapter mPagerAdapter;
-    ViewPager mViewPager;
-    ActionBarDrawerToggle mDrawerToggle;
-
+    private PagerAdapter mPagerAdapter;
+    private ViewPager mViewPager;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private static GameInformation gameInformation;
+    private CreateFragment createFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_activityStart);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout_activityStart);
 
 
         final FloatingActionButton fabCreate = (FloatingActionButton) findViewById(R.id.fab_create);
         fabCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                gameInformation = createFragment.getGameInformation();
                 startActivity(new Intent(getBaseContext(), ServerLobbyActivity.class));
             }
         });
@@ -63,9 +72,8 @@ public class StartActivity extends GotLActivity {
         fabWorlds.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //todo:start  the lobby
-                Snackbar.make(view, "Create a new World", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //todo:start world edit
+                Snackbar.make(view, "Create a new World", Snackbar.LENGTH_LONG).show();
             }
         });
 
@@ -106,10 +114,8 @@ public class StartActivity extends GotLActivity {
         drawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.start_pager);
+        mViewPager = (ViewPager) findViewById(R.id.viewPager_activityStart);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -135,13 +141,11 @@ public class StartActivity extends GotLActivity {
         tabLayout.setupWithViewPager(mViewPager);
     }
 
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
     }
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -149,8 +153,7 @@ public class StartActivity extends GotLActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-
-    public class PagerAdapter extends FragmentStatePagerAdapter {
+    private class PagerAdapter extends FragmentStatePagerAdapter {
         private String[] tabNames = {
                 "Create",
                 "Search",
@@ -164,7 +167,7 @@ public class StartActivity extends GotLActivity {
         @Override
         public Fragment getItem(int i) {
             if (i == 0)
-                return new CreateFragment();
+                return createFragment = new CreateFragment();
             else if (i == 1)
                 return new SearchFragment();
             return new WorldsFragment();
@@ -182,16 +185,24 @@ public class StartActivity extends GotLActivity {
         }
     }
 
-    // Instances of this class are fragments representing a single
-    // object in our collection.
     public static class CreateFragment extends Fragment {
 
         private static final String
                 CREATE_PREFS = "createPrefs",
+                PREF_GAME_NAME = "gameName",
                 PREF_WORLD = "worldPref",
                 PREF_SIZE = "size",
                 PREF_WALL_RATIO = "wallRatio",
-                PREF_VOID_RATIO = "voidRatio";
+                PREF_VOID_RATIO = "voidRatio",
+                PREF_UNIQUE_CHAR = "uniqueChar",
+                PREF_ALLOWED_FLUFFY = "allowedFluffy",
+                PREF_ALLOWED_SLIME = "allowedSlime",
+                PREF_ALLOWED_GHOST = "allowedGhost",
+                PREF_ALLOWED_NOX = "allowedNox",
+                PREF_PLAYER_MAX = "playerMax",
+                PREF_SWEET_REGEN = "sweetRegen",
+                PREF_MANA_REGEN = "manaRegen",
+                PREF_SELECTION_TIME = "selectionTime";
 
         private ToggleButton
                 toggleButtonRandom,
@@ -215,16 +226,64 @@ public class StartActivity extends GotLActivity {
                 textViewManaRegen,
                 textViewSelectionTime;
 
-        private Switch switchUniqueCharacters;
+        private Switch
+                switchUniqueCharacters;
 
         private ImageButton
+                imageButtonRefresh,
+                imageButtonEditWorld;
+
+        private ToggleImageButton
                 imageButtonFluffy,
                 imageButtonSlime,
                 imageButtonGhost,
                 imageButtonNox;
 
-        private SharedPreferences sharedPreferences;
-        private SharedPreferences.Editor editor;
+        private ImageView
+                imageViewWorld;
+
+        private EditText
+                editTextGameName;
+
+        private ProgressBar
+                progressBarWorldLoading;
+
+        private LinearLayout
+                linearLayoutRandom,
+                linearLayoutList;
+
+        private SharedPreferences
+                sharedPreferences;
+
+        private SharedPreferences.Editor
+                editor;
+
+        private World
+                world;
+
+        private Runnable
+                worldGenerator = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        world = new World(WorldVars.TEST_WORLD);
+                        getActivity().runOnUiThread(setWorldImage);
+                    }
+                },
+                setWorldImage = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (toggleButtonRandom.isChecked()){
+                            Snackbar.make(linearLayoutList, "random World updated.", Snackbar.LENGTH_LONG).show();
+                            imageViewWorld.setImageBitmap(world.getBitmapRepresentation());
+                            progressBarWorldLoading.setVisibility(View.GONE);
+                        }
+                    }
+                };
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -235,41 +294,86 @@ public class StartActivity extends GotLActivity {
 
             toggleButtonRandom = (ToggleButton) view.findViewById(R.id.toggleButton_tabCreate_random);
             toggleButtonLibrary = (ToggleButton) view.findViewById(R.id.toggleButton_tabCreate_library);
-            final LinearLayout
-                    linearLayoutRandom = (LinearLayout) view.findViewById(R.id.linearLayout_tabCreate_random),
-                    linearLayoutList = (LinearLayout) view.findViewById(R.id.linearLayout_tabCreate_list);
+
+            imageViewWorld = (ImageView) view.findViewById(R.id.worldView_tabCreate_world);
+
+            linearLayoutRandom = (LinearLayout) view.findViewById(R.id.linearLayout_tabCreate_random);
+            linearLayoutList = (LinearLayout) view.findViewById(R.id.linearLayout_tabCreate_list);
+
+            imageButtonEditWorld = (ImageButton) view.findViewById(R.id.imageButton_tabCreate_edit);
+
+            editTextGameName = (EditText) view.findViewById(R.id.editText_tabCreate_gameName);
+            String name = sharedPreferences.getString(PREF_GAME_NAME, "\3");
+            if (!name.equals("\3")){
+                editTextGameName.setText(name);
+            }
+            editTextGameName.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    editor.putString(PREF_GAME_NAME, String.valueOf(s));
+                    editor.apply();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            progressBarWorldLoading = (ProgressBar) view.findViewById(R.id.progressBar_tabCreate_worldRefresh);
+            progressBarWorldLoading.setVisibility(View.GONE);
+
+            imageButtonRefresh = (ImageButton) view.findViewById(R.id.imageButton_tabCreate_refreshWorld);
+            imageButtonRefresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    progressBarWorldLoading.setVisibility(View.VISIBLE);
+                    new Thread(worldGenerator).start();
+                }
+            });
+
+
+            imageButtonEditWorld.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Snackbar.make(imageButtonEditWorld, "in dev", Snackbar.LENGTH_SHORT).show();
+                }
+            });
 
             toggleButtonRandom.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked){
+                    if (isChecked) {
                         toggleButtonLibrary.setChecked(false);
-                        linearLayoutRandom.setVisibility(View.VISIBLE);
-                        linearLayoutList.setVisibility(View.GONE);
+                        showRandom();
                         editor.putBoolean(PREF_WORLD, false);
                         editor.apply();
-                    }
-                    else if (!toggleButtonLibrary.isChecked())toggleButtonRandom.setChecked(true);
+                    } else if (!toggleButtonLibrary.isChecked()) toggleButtonRandom.setChecked(true);
                 }
             });
 
             toggleButtonLibrary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked){
+                    if (isChecked) {
                         toggleButtonRandom.setChecked(false);
-                        linearLayoutRandom.setVisibility(View.GONE);
-                        linearLayoutList.setVisibility(View.VISIBLE);
+                        showLibrary();
                         editor.putBoolean(PREF_WORLD, true);
                         editor.apply();
-                    }
-                    else if (!toggleButtonRandom.isChecked())toggleButtonLibrary.setChecked(true);
+                    } else if (!toggleButtonRandom.isChecked()) toggleButtonLibrary.setChecked(true);
                 }
             });
 
-            if (!sharedPreferences.getBoolean(PREF_WORLD, false)){
+            if (!sharedPreferences.getBoolean(PREF_WORLD, false)) {
                 toggleButtonRandom.setChecked(true);
-            }else{
+                new Thread(worldGenerator).start();
+                progressBarWorldLoading.setVisibility(View.VISIBLE);
+            } else {
                 toggleButtonLibrary.setChecked(true);
             }
 
@@ -302,6 +406,8 @@ public class StartActivity extends GotLActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textViewWallRatio.setText("" + progress);
+                    editor.putInt(PREF_WALL_RATIO, progress);
+                    editor.apply();
                 }
 
                 @Override
@@ -314,13 +420,16 @@ public class StartActivity extends GotLActivity {
 
                 }
             });
+            seekBarWallRatio.setProgress(sharedPreferences.getInt(PREF_WALL_RATIO, 50));
 
             textViewVoidRatio = (TextView) view.findViewById(R.id.textView_tabCreate_voidRatio);
             seekBarVoidRatio = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_voidRatio);
             seekBarVoidRatio.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    textViewVoidRatio.setText(""+progress);
+                    textViewVoidRatio.setText("" + progress);
+                    editor.putInt(PREF_VOID_RATIO, progress);
+                    editor.apply();
                 }
 
                 @Override
@@ -333,6 +442,7 @@ public class StartActivity extends GotLActivity {
 
                 }
             });
+            seekBarVoidRatio.setProgress(sharedPreferences.getInt(PREF_VOID_RATIO, 40));
 
             textViewPlayerMaximum = (TextView) view.findViewById(R.id.textView_tabCreate_playerMaximum);
             seekBarPlayerMaximum = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_playerMaximum);
@@ -341,6 +451,8 @@ public class StartActivity extends GotLActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textViewPlayerMaximum.setText("" + (progress + 1));
+                    editor.putInt(PREF_PLAYER_MAX, progress);
+                    editor.apply();
                 }
 
                 @Override
@@ -353,6 +465,7 @@ public class StartActivity extends GotLActivity {
 
                 }
             });
+            seekBarPlayerMaximum.setProgress(sharedPreferences.getInt(PREF_PLAYER_MAX, 7));
 
             textViewSweetRegen = (TextView) view.findViewById(R.id.textView_tabCreate_sweetRegen);
             seekBarSweetRegen = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_sweetRegen);
@@ -360,6 +473,8 @@ public class StartActivity extends GotLActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textViewSweetRegen.setText("" + progress);
+                    editor.putInt(PREF_SWEET_REGEN, progress);
+                    editor.apply();
                 }
 
                 @Override
@@ -372,6 +487,7 @@ public class StartActivity extends GotLActivity {
 
                 }
             });
+            seekBarSweetRegen.setProgress(sharedPreferences.getInt(PREF_SWEET_REGEN, 15));
 
             textViewManaRegen = (TextView) view.findViewById(R.id.textView_tabCreate_manaRegen);
             seekBarManaRegen = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_manaRegen);
@@ -380,6 +496,8 @@ public class StartActivity extends GotLActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textViewManaRegen.setText("" + progress);
+                    editor.putInt(PREF_MANA_REGEN, progress);
+                    editor.apply();
                 }
 
                 @Override
@@ -392,6 +510,7 @@ public class StartActivity extends GotLActivity {
 
                 }
             });
+            seekBarManaRegen.setProgress(sharedPreferences.getInt(PREF_SWEET_REGEN, 100));
 
             textViewSelectionTime = (TextView) view.findViewById(R.id.textView_tabCreate_selectionTime);
             seekBarSelectionTime = (SeekBar) view.findViewById(R.id.seekBar_tabCreate_selectionTime);
@@ -400,6 +519,8 @@ public class StartActivity extends GotLActivity {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     textViewSelectionTime.setText("" + progress);
+                    editor.putInt(PREF_SELECTION_TIME, progress);
+                    editor.apply();
                 }
 
                 @Override
@@ -412,13 +533,79 @@ public class StartActivity extends GotLActivity {
 
                 }
             });
+            seekBarSelectionTime.setProgress(sharedPreferences.getInt(PREF_SELECTION_TIME, 10));
 
+            imageButtonFluffy = (ToggleImageButton) view.findViewById(R.id.imageButton_tabCreate_fluffy);
+            imageButtonFluffy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    imageButtonFluffy.clicked();
+                    editor.putBoolean(PREF_ALLOWED_FLUFFY, imageButtonFluffy.getChecked());
+                    editor.apply();
+                }
+            });
+            imageButtonFluffy.setChecked(sharedPreferences.getBoolean(PREF_ALLOWED_FLUFFY, false));
+
+            imageButtonSlime = (ToggleImageButton) view.findViewById(R.id.imageButton_tabCreate_slime);
+            imageButtonSlime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    imageButtonSlime.clicked();
+                    editor.putBoolean(PREF_ALLOWED_SLIME, imageButtonSlime.getChecked());
+                    editor.apply();
+                }
+            });
+            imageButtonSlime.setChecked(sharedPreferences.getBoolean(PREF_ALLOWED_SLIME, false));
+
+            imageButtonGhost = (ToggleImageButton) view.findViewById(R.id.imageButton_tabCreate_ghost);
+            imageButtonGhost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    imageButtonGhost.clicked();
+                    editor.putBoolean(PREF_ALLOWED_GHOST, imageButtonGhost.getChecked());
+                    editor.apply();
+                }
+            });
+            imageButtonGhost.setChecked(sharedPreferences.getBoolean(PREF_ALLOWED_GHOST, false));
+
+            imageButtonNox = (ToggleImageButton) view.findViewById(R.id.imageButton_tabCreate_nox);
+            imageButtonNox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    imageButtonNox.clicked();
+                    editor.putBoolean(PREF_ALLOWED_NOX, imageButtonNox.getChecked());
+                    editor.apply();
+                }
+            });
+            imageButtonNox.setChecked(sharedPreferences.getBoolean(PREF_ALLOWED_NOX, false));
+
+            switchUniqueCharacters = (Switch) view.findViewById(R.id.switch_tabSearch_uniqueCharacter);
+            switchUniqueCharacters.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    editor.putBoolean(PREF_UNIQUE_CHAR, isChecked);
+                    editor.apply();
+                }
+            });
+            switchUniqueCharacters.setChecked(sharedPreferences.getBoolean(PREF_UNIQUE_CHAR, false));
 
             return view;
         }
 
-        public GameInformation getGameInformation(){
-            return null;
+        private void showRandom() {
+            linearLayoutRandom.setVisibility(View.VISIBLE);
+            linearLayoutList.setVisibility(View.GONE);
+            imageButtonRefresh.setVisibility(View.VISIBLE);
+        }
+
+        private void showLibrary() {
+            linearLayoutRandom.setVisibility(View.GONE);
+            linearLayoutList.setVisibility(View.VISIBLE);
+            imageButtonRefresh.setVisibility(View.GONE);
+        }
+
+        public GameInformation getGameInformation() {
+            return new GameInformation(AppBluetoothManager.getLocalAddress(), editTextGameName.getText().toString(), world, switchUniqueCharacters.isChecked(), imageButtonFluffy.getChecked(), imageButtonSlime.getChecked(), imageButtonGhost.getChecked(), imageButtonNox.getChecked(), seekBarPlayerMaximum.getProgress() + 1, seekBarSweetRegen.getProgress(), seekBarManaRegen.getProgress(), seekBarSelectionTime.getProgress());
         }
     }
 
@@ -529,5 +716,9 @@ public class StartActivity extends GotLActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             return inflater.inflate(R.layout.tab_worlds, container, false);
         }
+    }
+
+    public static GameInformation getGameInformation(){
+        return gameInformation;
     }
 }

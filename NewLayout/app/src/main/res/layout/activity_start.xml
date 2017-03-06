@@ -6,12 +6,12 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_activityStart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:theme="?attr/actionBarTheme"
         android:height="?attr/actionBarSize"
-        android:id="@+id/toolbar"/>
+        android:background="?attr/colorPrimary"
+        android:theme="?attr/actionBarTheme"/>
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
@@ -37,25 +37,25 @@
         android:visibility="invisible"/>
 
     <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout_activityStart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/drawer_layout"
         android:layout_marginTop="?attr/actionBarSize">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appbar">
+            android:layout_below="@+id/appbar"
+            android:orientation="vertical">
 
 
             <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tabs"
                 android:background="@color/colorPrimary"
-                app:tabTextColor="#ffffff"
-                app:tabSelectedTextColor="#ffffff">
+                app:tabSelectedTextColor="#ffffff"
+                app:tabTextColor="#ffffff">
 
                 <android.support.design.widget.TabItem
                     android:layout_width="wrap_content"
@@ -72,7 +72,7 @@
             </android.support.design.widget.TabLayout>
 
             <android.support.v4.view.ViewPager
-                android:id="@+id/start_pager"
+                android:id="@+id/viewPager_activityStart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 

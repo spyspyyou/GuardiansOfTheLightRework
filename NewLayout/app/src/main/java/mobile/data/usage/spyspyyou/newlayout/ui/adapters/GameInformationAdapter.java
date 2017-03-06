@@ -47,7 +47,7 @@ public class GameInformationAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         GameInformation gameInformation = games.get(position);
-        if(view == null) view = RelativeLayout.inflate(appContext, R.layout.game_information, parent);
+        if(view == null) view = RelativeLayout.inflate(appContext, R.layout.list_game, parent);
 
         ImageView imageViewWorld = (ImageView) view.findViewById(R.id.imageView_gameInformation_world);
         imageViewWorld.setImageBitmap(gameInformation.WORLD.getBitmapRepresentation());

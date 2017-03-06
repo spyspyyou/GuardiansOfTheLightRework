@@ -1,16 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/activity_margin"
+                android:background="@drawable/background_rounded"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="@dimen/activity_padding">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Game"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/editText_tabCreate_gameName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Game Name"
+                    android:imeOptions="actionDone"
+                    android:imeActionLabel="Done"
+                    android:inputType="textPersonName"
+                    android:maxLines="1"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/activity_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Player Maximum: "
+                        />
+
+                    <TextView
+                        android:id="@+id/textView_tabCreate_playerMaximum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5"
+                        />
+
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/seekBar_tabCreate_playerMaximum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -22,12 +77,11 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:text="Worlds"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:text="World"
                     android:textColor="@color/colorAccent"
-                    android:background="@drawable/background_rounded"/>
+                    android:textSize="12sp"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -36,7 +90,7 @@
                     >
 
                     <mobile.data.usage.spyspyyou.newlayout.ui.views.SquareImageView
-                        android:id="@+id/squareImageView_tabCreate_world"
+                        android:id="@+id/worldView_tabCreate_world"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -53,6 +107,27 @@
                         android:background="@drawable/background_button"
                         android:padding="@dimen/activity_padding"
                         app:srcCompat="@drawable/ic_create_black_24dp"/>
+
+                    <ImageButton
+                        android:id="@+id/imageButton_tabCreate_refreshWorld"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/background_button"
+                        android:padding="@dimen/activity_padding"
+                        app:srcCompat="@drawable/ic_autorenew_black_24dp"
+                        android:layout_below="@+id/imageButton_tabCreate_edit"
+                        android:layout_alignStart="@+id/imageButton_tabCreate_edit"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_tabCreate_worldRefresh"
+                        style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:padding="@dimen/activity_padding"
+                        android:visibility="gone"/>
 
                 </RelativeLayout>
 
@@ -91,7 +166,6 @@
                     android:id="@+id/linearLayout_tabCreate_random"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/squareImageView_tabCreate_world"
                     android:orientation="vertical"
                     android:padding="@dimen/activity_padding"
                     >
@@ -120,7 +194,7 @@
                     <SeekBar
                         android:id="@+id/seekBar_tabCreate_size"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
                         android:layout_weight="1"/>
 
                     <LinearLayout
@@ -172,16 +246,6 @@
                         android:id="@+id/seekBar_tabCreate_voidRatio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
-
-                    <ImageButton
-                        android:id="@+id/imageButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="@dimen/activity_margin"
-                        android:background="@drawable/background_button"
-                        android:padding="@dimen/activity_padding"
-                        app:srcCompat="@drawable/ic_autorenew_black_24dp"/>
 
                 </LinearLayout>
 
@@ -248,71 +312,53 @@
                     android:layout_height="wrap_content"
                     android:padding="@dimen/activity_padding">
 
-                    <ImageButton
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                    <mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton
                         android:id="@+id/imageButton_tabCreate_fluffy"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/fluffy"
-                        android:layout_weight="1"
-                        android:padding="@dimen/activity_padding"/>
+                        android:scaleType="centerCrop"
+                        android:tint="@android:color/holo_red_dark"
+                        app:srcCompat="@drawable/ic_close_black_24dp"/>
 
-                    <ImageButton
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                    <mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton
                         android:id="@+id/imageButton_tabCreate_slime"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginStart="@dimen/activity_margin"
+                        android:layout_weight="1"
                         android:background="@drawable/slime"
-                        android:layout_weight="1"
-                        android:layout_marginLeft="@dimen/activity_margin"
-                        android:layout_marginStart="@dimen/activity_margin"
-                        android:padding="@dimen/activity_padding"/>
+                        android:scaleType="centerCrop"
+                        android:tint="@android:color/holo_red_dark"
+                        app:srcCompat="@drawable/ic_close_black_24dp"/>
 
-                    <ImageButton
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                    <mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton
                         android:id="@+id/imageButton_tabCreate_ghost"
-                        android:background="@drawable/ghost"
-                        android:layout_marginLeft="@dimen/activity_margin"
-                        android:layout_marginStart="@dimen/activity_margin"
-                        android:layout_weight="1"
-                        android:padding="@dimen/activity_padding"/>
-
-                    <ImageButton
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:id="@+id/imageButton_tabCreate_nox"
-                        android:background="@android:color/background_dark"
                         android:layout_marginLeft="@dimen/activity_margin"
                         android:layout_marginStart="@dimen/activity_margin"
                         android:layout_weight="1"
-                        android:padding="@dimen/activity_padding"/>
+                        android:background="@drawable/ghost"
+                        android:scaleType="centerCrop"
+                        android:tint="@android:color/holo_red_dark"
+                        app:srcCompat="@drawable/ic_close_black_24dp"/>
+
+                    <mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton
+                        android:id="@+id/imageButton_tabCreate_nox"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginStart="@dimen/activity_margin"
+                        android:layout_weight="1"
+                        android:background="@android:color/background_dark"
+                        android:scaleType="centerCrop"
+                        android:tint="@android:color/holo_red_dark"
+                        app:srcCompat="@drawable/ic_close_black_24dp"/>
 
                 </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/activity_padding">
-
-                    <TextView
-                        android:text="Player Maximum: "
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:text="5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/textView_tabCreate_playerMaximum"
-                        />
-
-                </LinearLayout>
-
-                <SeekBar
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/seekBar_tabCreate_playerMaximum"/>
 
             </LinearLayout>
 

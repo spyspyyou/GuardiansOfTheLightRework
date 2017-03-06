@@ -212,7 +212,7 @@ public class AppBluetoothManager {
         bluetoothAdapter.setName(bluetoothName);
     }
 
-    /*package*/ static String getLocalAddress(){
+    public static String getLocalAddress(){
         return localAddress;
     }
 
