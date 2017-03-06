@@ -25,6 +25,6 @@ public class GumDeathEvent extends GlobalEvent {
 
     @Override
     public void apply(Game game) {
-        game.removeGum(ID);
+        game.removeGum();
     }
 }

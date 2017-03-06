@@ -3,44 +3,42 @@ package mobile.data.usage.spyspyyou.gametest.game.events.global;
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
-public class AddSlimeEvent extends GlobalEvent {
+import static mobile.data.usage.spyspyyou.gametest.game.Tick.TICK;
+
+public class SlimeEvent extends GlobalEvent {
+
+    private static final int LIFE_SPAN_TICKS = 5 * TICK;
 
     private static final String
             KEY_X = "x",
             KEY_Y = "y",
-            KEY_BT = "bt",
-            KEY_ID = "id";
+            KEY_DT = "dt";
 
-    private final int
-            BIRTH_TICK,
-            ID;
+    private final int DEATH_TICK;
 
     private final Vector2D POSITION;
 
-    public AddSlimeEvent(String dataString) throws InvalidMessageException {
+    public SlimeEvent(String dataString) throws InvalidMessageException {
         super(dataString);
         POSITION = new Vector2D(getDouble(KEY_X), getDouble(KEY_Y));
-        BIRTH_TICK = getInt(KEY_BT);
-        ID = getInt(KEY_ID);
+        DEATH_TICK = getInt(KEY_DT);
     }
 
-    public AddSlimeEvent(Vector2D position, int birthTick, int id) {
+    public SlimeEvent(Vector2D position, int birthTick) {
         POSITION = position;
-        BIRTH_TICK = birthTick;
-        ID = id;
+        DEATH_TICK = birthTick + LIFE_SPAN_TICKS;
     }
 
     @Override
     public void send() {
         putObject(KEY_X, POSITION.x);
         putObject(KEY_Y, POSITION.y);
-        putObject(KEY_BT, BIRTH_TICK);
-        putObject(KEY_ID, ID);
+        putObject(KEY_DT, DEATH_TICK);
         super.send();
     }
 
     @Override
     public void apply(Game game) {
-        game.addSlime(POSITION, BIRTH_TICK, ID);
+        game.addSlimeTrail(POSITION, DEATH_TICK);
     }
 }

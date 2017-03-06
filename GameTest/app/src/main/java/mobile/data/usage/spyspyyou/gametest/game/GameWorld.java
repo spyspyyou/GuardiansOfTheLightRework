@@ -19,15 +19,6 @@ import static mobile.data.usage.spyspyyou.gametest.game.Tick.MAX_TILES_IN_WIDTH;
 
 public class GameWorld implements WorldVars{
 
-    private static final int[][] DRAWABLE_RESOURCES = {
-            {R.drawable.void_tile},
-            {R.drawable.floor_tile},
-            {R.drawable.wall_tile},
-            {R.drawable.spawn_tile, R.drawable.spawn_tile},
-            {R.drawable.light_bulb_tile, R.drawable.light_bulb_tile}
-    };
-
-
     private int
             tileStartX,
             tileStartY;
@@ -35,8 +26,8 @@ public class GameWorld implements WorldVars{
     private double startX;
 
     private static Vector2D
-            spawnBlue = new Vector2D(0, 0),
-            spawnGreen = new Vector2D(0, 0),
+            spawnBlue = new Vector2D(-1, -1),
+            spawnGreen = new Vector2D(-1, -1),
             lightBulbStandBlue = new Vector2D(0, 0),
             lightBulbStandGreen = new Vector2D(0, 0);
 
@@ -44,8 +35,8 @@ public class GameWorld implements WorldVars{
             screenPosition = new Vector2D(0, 0),
             userPosition = new Vector2D(0, 0);
 
-    private Tile[][] map;
-    private Tile voidTile;
+    private static Tile[][] map;
+    private static Tile voidTile;
 
     private Paint paint = new Paint();
     private final int
@@ -76,10 +67,10 @@ public class GameWorld implements WorldVars{
                 currentTile = tiles[world.data[x][y].first][world.data[x][y].second];
                 map[x][y] = currentTile;
                 if (currentTile.ID == SPAWN){
-                    if (currentTile.META == 0)spawnBlue.set(x + 0.5, y + 0.5);
+                    if (currentTile.META == BLUE)spawnBlue.set(x + 0.5, y + 0.5);
                     else spawnGreen.set(x + 0.5, y + 0.5);
                 }else if (currentTile.ID == LIGHT_BULB_STAND){
-                    if (currentTile.META == 0)lightBulbStandBlue.set(x + 0.5, y + 0.5);
+                    if (currentTile.META == BLUE)lightBulbStandBlue.set(x + 0.5, y + 0.5);
                     else lightBulbStandGreen.set(x + 0.5, y + 0.5);
                 }
             }
@@ -105,7 +96,7 @@ public class GameWorld implements WorldVars{
         }
     }
 
-    private Tile getTile(Vector2D position){
+    private static Tile getTile(Vector2D position){
         return getTile(position.getIntX(), position.getIntY());
     }
 
@@ -113,7 +104,7 @@ public class GameWorld implements WorldVars{
         return map.length;
     }
 
-    /*package*/ Tile getTile(int x, int y){
+    /*package*/ static Tile getTile(int x, int y){
         if (x < 0 || y < 0 || x >= map.length || y >= map[0].length){
             return voidTile;
         }
@@ -122,23 +113,23 @@ public class GameWorld implements WorldVars{
 
 
     public Vector2D getLightBulbStandBlue() {
-        return lightBulbStandBlue;
+        return lightBulbStandBlue.copy();
     }
 
     public Vector2D getLightBulbStandGreen() {
-        return lightBulbStandGreen;
+        return lightBulbStandGreen.copy();
     }
 
     public static Vector2D getSpawn(boolean teamBlue) {
-        if (teamBlue) return spawnBlue;
-        else return spawnGreen;
+        if (teamBlue) return spawnBlue.copy();
+        else return spawnGreen.copy();
     }
 
-    public boolean isSolid(Vector2D position) {
+    public static boolean isSolid(Vector2D position) {
         return getTile(position).SOLID;
     }
 
-    public boolean isImpassable(Vector2D position) {
+    public static boolean isImpassable(Vector2D position) {
         return getTile(position).IMPASSABLE;
 
     }

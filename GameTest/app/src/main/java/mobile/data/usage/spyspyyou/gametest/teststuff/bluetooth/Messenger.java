@@ -78,6 +78,13 @@ public abstract class Messenger {
         return OBJECTS.get(key);
     }
 
+    protected boolean getBoolean(String key){
+        Object o = getObject(key);
+        if (o instanceof Boolean)
+            return (boolean) o;
+        return false;
+    }
+
     protected int getInt(String key){
         Object o = getObject(key);
         if (o instanceof Integer)
@@ -97,13 +104,6 @@ public abstract class Messenger {
         if (o instanceof String)
             return (String) o;
         return "";
-    }
-
-    protected boolean getBoolean(String key){
-        Object o = getObject(key);
-        if (o instanceof Boolean)
-            return (boolean) o;
-        return false;
     }
 
     /*package*/ String getMessageString(){
@@ -139,7 +139,7 @@ public abstract class Messenger {
             return c.getConstructor(String.class).newInstance(message.substring(sepPos + 1));
         }catch (Exception e){
             e.printStackTrace();
-            throw new InvalidMessageException("Can't read Message String");
+            throw new InvalidMessageException("Invalid Message String");
         }
     }
 

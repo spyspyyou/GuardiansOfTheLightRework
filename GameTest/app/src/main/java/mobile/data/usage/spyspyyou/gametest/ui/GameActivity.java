@@ -14,7 +14,7 @@ import mobile.data.usage.spyspyyou.gametest.game.GameServer;
 import mobile.data.usage.spyspyyou.gametest.game.PlayerData;
 import mobile.data.usage.spyspyyou.gametest.game.World;
 
-import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_FLUFFY;
+import static mobile.data.usage.spyspyyou.gametest.game.Tick.ID_GHOST;
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.TEST_WORLD;
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.USER_AD;
 
@@ -41,7 +41,7 @@ public class GameActivity extends AppCompatActivity {
         ArrayList<Boolean>teamBlue = new ArrayList<>();
         teamBlue.add(true);
         ArrayList<Byte>charIds = new ArrayList<>();
-        charIds.add(ID_FLUFFY);
+        charIds.add(ID_GHOST);
         prepareGame(new GameData(new World(TEST_WORLD), new PlayerData(addresses, teamBlue, charIds)));
     }
 

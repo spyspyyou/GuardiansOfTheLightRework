@@ -1,6 +1,6 @@
 package mobile.data.usage.spyspyyou.gametest.game;
 
-import android.graphics.Color;
+import mobile.data.usage.spyspyyou.gametest.R;
 
 public interface WorldVars {
 
@@ -15,11 +15,11 @@ public interface WorldVars {
             BLUE = 0,
             GREEN = 1;
 
-    int[] PIXEL_COLORS = {
-            Color.BLACK,
-            Color.WHITE,
-            Color.RED,
-            Color.GRAY,
-            Color.YELLOW
+    int[][] DRAWABLE_RESOURCES = {
+            {R.drawable.void_tile},
+            {R.drawable.floor_tile},
+            {R.drawable.wall_tile},
+            {R.drawable.spawn_tile, R.drawable.spawn_tile},
+            {R.drawable.light_bulb_tile, R.drawable.light_bulb_tile}
     };
 }

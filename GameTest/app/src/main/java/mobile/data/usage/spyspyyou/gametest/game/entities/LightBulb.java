@@ -19,7 +19,7 @@ public class LightBulb extends Entity implements Tick {
             PROGRESS_PER_TICK = PICKING_COMPLETE / (8f * TICK),
             PICKUP_DISTANCE_SQUARE = 2.1f;
 
-    private final int HALF_TILE_SIDE;
+    private final float HALF_TILE_SIDE;
 
     private boolean
             isPicking = false;
@@ -33,10 +33,9 @@ public class LightBulb extends Entity implements Tick {
     private RectF rect = new RectF();
 
     public LightBulb(Vector2D entityPosition) {
-        super(entityPosition, (int) (SurfaceViewGame.getTileSide() * 0.5), SurfaceViewGame.getTileSide(), R.drawable.light_bulb_on_square);
+        super(entityPosition, SurfaceViewGame.getTileSide(), SurfaceViewGame.getTileSide(), R.drawable.light_bulb_on_square);
         ringPaint = new BorderPaint(15, Color.YELLOW);
-        ringPaint.setAntiAlias(false);
-        HALF_TILE_SIDE = SurfaceViewGame.getTileSide() / 2;
+        HALF_TILE_SIDE = SurfaceViewGame.getTileSide() / 2f;
     }
 
     @Override
@@ -55,7 +54,7 @@ public class LightBulb extends Entity implements Tick {
     @Override
     public void render(Canvas canvas) {
         super.render(canvas);
-        rect.set(screenPosition.getIntX() - HALF_TILE_SIDE, screenPosition.getIntY() - HALF_TILE_SIDE, screenPosition.getIntX() + HALF_TILE_SIDE, screenPosition.getIntY() + HALF_TILE_SIDE);
+        rect.set((float) (screenPosition.x - HALF_TILE_SIDE), (float) (screenPosition.y - HALF_TILE_SIDE), (float) (screenPosition.x + HALF_TILE_SIDE), (float) (screenPosition.y + HALF_TILE_SIDE));
         if (isPicking)canvas.drawArc(rect, -90, pickingProgress, false, ringPaint);
     }
 

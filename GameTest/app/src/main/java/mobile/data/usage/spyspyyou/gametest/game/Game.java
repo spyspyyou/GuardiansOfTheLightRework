@@ -6,6 +6,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -22,6 +24,7 @@ import mobile.data.usage.spyspyyou.gametest.game.events.GameEvent;
 import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
 import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
 
+import static android.R.attr.id;
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.PREF_LAYOUT;
 import static mobile.data.usage.spyspyyou.gametest.teststuff.VARS.USER_AD;
 
@@ -31,7 +34,6 @@ public class Game {
     private static Queue<GameEvent> eventQueue = new LinkedBlockingQueue<>();
     public static boolean HOST = false;
 
-    //todo:better entity encapsulation
     protected Map<String, Player> players = new LinkedHashMap<>();
     protected User user;
     private LightBulb
@@ -40,11 +42,10 @@ public class Game {
 
     private int
             nextGumId = 0,
-            nextSlimeTrailId = 0,
             nextSweetId = 0;
 
     protected SparseArray<Sweet> sweets = new SparseArray<>();
-    protected SparseArray<SlimeTrail> slimes = new SparseArray<>();
+    protected ArrayList<SlimeTrail> slimeTrails = new ArrayList<>();
     protected SparseArray<Gum> gums = new SparseArray<>();
 
     protected GameThread gameThread = new GameThread();
@@ -53,8 +54,8 @@ public class Game {
 
     public Game(View rootView){
         HOST = this instanceof GameServer;
-        gameSurface = (SurfaceViewGame) rootView.findViewById(R.id.surfaceView_game);
         gameThread.setPriority(Thread.NORM_PRIORITY + 1);
+        gameSurface = (SurfaceViewGame) rootView.findViewById(R.id.surfaceView_game);
     }
 
     public void prepare(GameData gameData){
@@ -76,7 +77,14 @@ public class Game {
 
         for (int i = 0; i < gums.size(); ++i)gums.valueAt(i).update(this);
         for (int i = 0; i < sweets.size(); ++i)sweets.valueAt(i).update(this);
-        for (int i = 0; i < slimes.size(); ++i)slimes.valueAt(i).update(this);
+
+        Iterator<SlimeTrail> slimeTrailIterator = slimeTrails.iterator();
+        SlimeTrail slimeTrail;
+        while (slimeTrailIterator.hasNext()){
+            slimeTrail = slimeTrailIterator.next();
+            slimeTrail.update(this);
+            if (slimeTrail.isDead(getSynchronizedTick()))slimeTrailIterator.remove();
+        }
 
         lightBulbBlue.update(this);
         lightBulbGreen.update(this);
@@ -90,7 +98,7 @@ public class Game {
             int i;
             for (i = 0; i < sweets.size(); ++i) sweets.valueAt(i).render(c);
             for (i = 0; i < gums.size(); ++i) gums.valueAt(i).render(c);
-            for (i = 0; i < slimes.size(); ++i) slimes.valueAt(i).render(c);
+            for (SlimeTrail slimeTrail:slimeTrails) slimeTrail.render(c);
 
             lightBulbBlue.render(c);
             lightBulbGreen.render(c);
@@ -118,12 +126,13 @@ public class Game {
         user.shootGum(this);
     }
 
-    public void addSlime(Vector2D vector2D, int birthTick, int id){
-        slimes.put(id, new SlimeTrail(vector2D, birthTick));
+    public void addSlimeTrail(Vector2D vector2D, int birthTick){
+        Log.i("Game", "adding SlimeTrail to List");
+        slimeTrails.add(new SlimeTrail(vector2D, birthTick));
     }
 
-    public void removeSlime(int id){
-        slimes.remove(id);
+    public void removeSlime(SlimeTrail slimeTrail){
+        slimeTrails.remove(slimeTrail);
     }
 
     public void addGum(Vector2D position, double direction, int shootTick, int id, boolean teamBlue){
@@ -132,7 +141,7 @@ public class Game {
         gums.get(id).jump(this, getSynchronizedTick() - shootTick);
     }
 
-    public void removeGum(int id){
+    public void removeGum(){
         gums.remove(id);
     }
 
@@ -148,16 +157,24 @@ public class Game {
         return nextGumId++;
     }
 
-    public int nextSlimeTrailId(){
-        return nextSlimeTrailId++;
-    }
-
     public int nextSweetId(){
         return nextSweetId++;
     }
 
     public void stopGame(){
         if (gameThread != null)gameThread.quitGame();
+    }
+
+    public void pause(){
+        gameThread.pauseGame();
+    }
+
+    public void resume(){
+        gameThread.resumeGame();
+    }
+
+    public boolean isPaused(){
+        return gameThread.paused;
     }
 
     public GameWorld getWorld(){
@@ -186,8 +203,8 @@ public class Game {
 
             players = GAME_DATA.PLAYER_DATA.generatePlayers();
             user = (User) players.get(USER_AD);
-            gameWorld = new GameWorld(GAME_DATA.WORLD, user.getPosition());
             gameSurface.setup(PREF_LAYOUT, GAME_DATA.WORLD, players.values().toArray(new Player[players.size()]));
+            gameWorld = new GameWorld(GAME_DATA.WORLD, user.getPosition());
 
             lightBulbBlue = new LightBulb(gameWorld.getLightBulbStandBlue());
             lightBulbGreen = new LightBulb(gameWorld.getLightBulbStandGreen());
@@ -258,6 +275,7 @@ public class Game {
         }
 
         private void pauseGame(){
+            //todo:make better pause
             paused = true;
         }
 

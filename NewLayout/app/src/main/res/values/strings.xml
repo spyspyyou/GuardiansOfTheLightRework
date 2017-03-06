@@ -2,4 +2,6 @@
     <string name="app_name">NewLayout</string>
     <string name="title_activity_start">Guardians of the Light</string>
     <string name="hello_world">test</string>
+    <string name="search_info">Click to search for Games nearby.</string>
+    <string name="title_activity_lobby">Lobby</string>
 </resources>

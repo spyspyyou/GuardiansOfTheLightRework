@@ -3,15 +3,21 @@ package mobile.data.usage.spyspyyou.gametest.game.entities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.text.TextPaint;
 import android.util.Log;
 
 import mobile.data.usage.spyspyyou.gametest.game.Game;
 import mobile.data.usage.spyspyyou.gametest.game.GameWorld;
 import mobile.data.usage.spyspyyou.gametest.game.IdLinker;
+import mobile.data.usage.spyspyyou.gametest.teststuff.VARS;
 import mobile.data.usage.spyspyyou.gametest.ui.GameActivity;
 import mobile.data.usage.spyspyyou.gametest.ui.views.SurfaceViewGame;
+import mobile.data.usage.spyspyyou.gametest.utils.Vector2D;
+import mobile.data.usage.spyspyyou.gametest.utils.paints.BorderPaint;
 import mobile.data.usage.spyspyyou.gametest.utils.paints.ColorPaint;
 
 import static mobile.data.usage.spyspyyou.gametest.game.Tick.COLOR_VALUE_ALLY;
@@ -25,6 +31,10 @@ public class Player extends Entity {
     protected boolean
             slimy = false,
             teamBlue = false;
+
+    private static final int MAX_STRENGTH = 1000;
+
+    private float strength = MAX_STRENGTH * 0.68f;
 
     public final String ADDRESS;
 
@@ -61,7 +71,7 @@ public class Player extends Entity {
     }
 
     public float getRadius(){
-        return width / 2 / SurfaceViewGame.getTileSide();
+        return SurfaceViewGame.getTileSide() / 2;
     }
 
     protected void setRadius(int radius){
@@ -91,19 +101,41 @@ public class Player extends Entity {
 
     protected class HUD {
 
-        private static final int margin = 10;
+        private final int MARGIN;
+        private final int HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH;
+        private RectF healthBar = new RectF();
+        private Vector2D hudPosition = new Vector2D(0, 0);
 
         private Paint
                 barBackgroundColor = new ColorPaint(COLOR_VALUE_BAR_BACKGROUND),
-                healthBarColor = new ColorPaint(COLOR_VALUE_ENEMY);
+                healthBarColor = new ColorPaint(COLOR_VALUE_ENEMY),
+                playerNamePaint = new TextPaint(),
+                borderPaint = new BorderPaint(4, Color.BLACK);
 
         public HUD(boolean user){
             if (user) healthBarColor.setColor(COLOR_VALUE_USER);
             else if (teamBlue)healthBarColor.setColor(COLOR_VALUE_ALLY);
+            HEALTH_BAR_WIDTH = SurfaceViewGame.getTileSide();
+            HEALTH_BAR_HEIGHT = HEALTH_BAR_WIDTH / 4;
+            MARGIN = HEALTH_BAR_HEIGHT / 3;
+            playerNamePaint.setTextSize(30);
+            playerNamePaint.setFakeBoldText(true);
         }
 
         public void render(Canvas canvas){
+            hudPosition.set(screenPosition.x - SurfaceViewGame.getTileSide() / 2f, screenPosition.y - SurfaceViewGame.getTileSide() / 2f - MARGIN - HEALTH_BAR_HEIGHT);
 
+            healthBar.set(hudPosition.getFloatX(), hudPosition.getFloatY(), hudPosition.getFloatX() + HEALTH_BAR_WIDTH, hudPosition.getFloatY() + HEALTH_BAR_HEIGHT);
+            canvas.drawRect(healthBar, barBackgroundColor);
+
+            healthBar.set(healthBar.left, healthBar.top, healthBar.left + healthBar.width() * strength / MAX_STRENGTH, healthBar.bottom);
+            canvas.drawRect(healthBar, healthBarColor);
+            healthBar.set(hudPosition.getFloatX(), hudPosition.getFloatY(), hudPosition.getFloatX() + HEALTH_BAR_WIDTH, hudPosition.getFloatY() + HEALTH_BAR_HEIGHT);
+            canvas.drawRect(healthBar, borderPaint);
+
+
+            playerNamePaint.setColor(Color.BLACK);
+            canvas.drawText(VARS.UserName, hudPosition.getFloatX(), hudPosition.getFloatY() - MARGIN, playerNamePaint);
         }
     }
 }
