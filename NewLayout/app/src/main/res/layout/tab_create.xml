@@ -34,6 +34,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="Game Name"
+                    android:focusable="false"
                     android:imeOptions="actionDone"
                     android:imeActionLabel="Done"
                     android:inputType="textPersonName"
@@ -95,7 +96,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
-                        android:background="@android:color/holo_green_dark"/>
+                        android:background="@android:color/holo_green_dark"
+                        android:layout_alignParentLeft="true"/>
 
                     <ImageButton
                         android:id="@+id/imageButton_tabCreate_edit"
@@ -106,7 +108,9 @@
                         android:layout_margin="@dimen/activity_margin"
                         android:background="@drawable/background_button"
                         android:padding="@dimen/activity_padding"
-                        app:srcCompat="@drawable/ic_create_black_24dp"/>
+                        app:srcCompat="@drawable/ic_create_black_24dp"
+                        android:contentDescription="edit"
+                        android:layout_alignParentLeft="true"/>
 
                     <ImageButton
                         android:id="@+id/imageButton_tabCreate_refreshWorld"
@@ -117,7 +121,9 @@
                         android:padding="@dimen/activity_padding"
                         app:srcCompat="@drawable/ic_autorenew_black_24dp"
                         android:layout_below="@+id/imageButton_tabCreate_edit"
-                        android:layout_alignStart="@+id/imageButton_tabCreate_edit"/>
+                        android:layout_alignStart="@+id/imageButton_tabCreate_edit"
+                        android:layout_alignLeft="@+id/imageButton_tabCreate_edit"
+                        android:contentDescription="refresh"/>
 
                     <ProgressBar
                         android:id="@+id/progressBar_tabCreate_worldRefresh"
@@ -127,7 +133,8 @@
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentEnd="true"
                         android:padding="@dimen/activity_padding"
-                        android:visibility="gone"/>
+                        android:visibility="gone"
+                        android:layout_alignParentRight="true"/>
 
                 </RelativeLayout>
 
@@ -296,7 +303,8 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:layout_weight="1"
-                        android:layout_marginEnd="@dimen/activity_margin"/>
+                        android:layout_marginEnd="@dimen/activity_margin"
+                        android:layout_marginRight="@dimen/activity_margin"/>
 
                     <Switch
                         android:layout_width="wrap_content"

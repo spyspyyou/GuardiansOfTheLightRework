@@ -44,7 +44,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
         AppBluetoothManager.notifyConnectionEstablished(new Connection(bluetoothSocket, null).getAddress());
         if (listener != null) {
             listeners.add(listener);
-            listener.onConnectionEstablished();
+            listener.onConnectionEstablished(BLUETOOTH_SOCKET.getRemoteDevice());
         }
         Log.i("Connection", "successfully established a connection to: " + BLUETOOTH_SOCKET.getRemoteDevice().getAddress());
     }
@@ -98,7 +98,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
 
         Iterator<AppBluetoothManager.ConnectionListener> i = listeners.iterator();
         while (i.hasNext()){
-            i.next().onConnectionClosed();
+            i.next().onConnectionClosed(BLUETOOTH_SOCKET.getRemoteDevice());
         }
 
         try {

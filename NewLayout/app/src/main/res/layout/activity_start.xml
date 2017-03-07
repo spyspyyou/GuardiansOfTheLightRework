@@ -13,29 +13,6 @@
         android:background="?attr/colorPrimary"
         android:theme="?attr/actionBarTheme"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="normal"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_play_arrow_black_24dp"
-        android:id="@+id/fab_create"
-        android:tint="@android:color/white"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="normal"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_black_24dp"
-        android:id="@+id/fab_worlds"
-        android:tint="@android:color/white"
-        android:visibility="invisible"/>
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawerLayout_activityStart"
         android:layout_width="match_parent"
@@ -82,5 +59,28 @@
         <include layout="@layout/drawer_profile"/>
 
     </android.support.v4.widget.DrawerLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="normal"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_play_arrow_black_24dp"
+        android:id="@+id/fab_create"
+        android:tint="@android:color/white"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="normal"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_add_black_24dp"
+        android:id="@+id/fab_worlds"
+        android:tint="@android:color/white"
+        android:visibility="invisible"/>
 
 </android.support.design.widget.CoordinatorLayout>

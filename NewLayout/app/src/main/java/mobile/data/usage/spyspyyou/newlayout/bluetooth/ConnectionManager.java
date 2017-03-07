@@ -54,7 +54,6 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
     }
 
     /*package*/ static void stopServer(){
-        if (!serverActive)return;
         serverActive = false;
         while(!acceptConnectionThreads.isEmpty()){
             acceptConnectionThreads.remove(0).cancelAvailability();
@@ -143,7 +142,7 @@ import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEXT_ENCODING
 
             if (bluetoothSocket == null) {
                 Log.e("CCThread", "Failed to connect to " + BLUETOOTH_DEVICE.getName() + ", MAC = " + BLUETOOTH_DEVICE.getAddress());
-                if (LISTENER != null)LISTENER.onConnectionFailed();
+                if (LISTENER != null)LISTENER.onConnectionFailed(BLUETOOTH_DEVICE);
             }
             activeCreateConnectionThreads.remove(BLUETOOTH_DEVICE.getAddress());
         }

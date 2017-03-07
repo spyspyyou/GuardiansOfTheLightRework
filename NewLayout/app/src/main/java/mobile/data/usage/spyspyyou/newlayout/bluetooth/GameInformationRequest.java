@@ -23,5 +23,6 @@ public class GameInformationRequest extends Messenger {
     protected void onReception() {
         GameInformation gameInformation = ServerLobbyActivity.getGameInformation();
         if (gameInformation != null)gameInformation.send(REQUEST_ADDRESS);
+        else ConnectionManager.disconnect(REQUEST_ADDRESS);
     }
 }

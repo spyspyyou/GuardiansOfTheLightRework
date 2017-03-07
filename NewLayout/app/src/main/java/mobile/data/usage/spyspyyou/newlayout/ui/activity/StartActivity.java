@@ -1,10 +1,14 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,6 +24,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
@@ -50,6 +56,7 @@ public class StartActivity extends GotLActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private static GameInformation gameInformation;
     private CreateFragment createFragment;
+    private SearchFragment searchFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,9 +149,32 @@ public class StartActivity extends GotLActivity {
     }
 
     @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        if (fragment instanceof CreateFragment) createFragment = (CreateFragment) fragment;
+        if (fragment instanceof SearchFragment) searchFragment = (SearchFragment) fragment;
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.e("StartActivity", "activity result");
+        if (requestCode == AppBluetoothManager.REQUEST_BLUETOOTH){
+            if (resultCode == RESULT_CANCELED)
+                Toast.makeText(getBaseContext(), "Bluetooth is required.", Toast.LENGTH_LONG).show();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == AppBluetoothManager.REQUEST_CL_PERMISSION && grantResults.length > 0 && permissions.length > 0 && permissions[0].equals(Manifest.permission.ACCESS_COARSE_LOCATION) && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            searchFragment.refresh();
     }
 
     @Override
@@ -167,7 +197,7 @@ public class StartActivity extends GotLActivity {
         @Override
         public Fragment getItem(int i) {
             if (i == 0)
-                return createFragment = new CreateFragment();
+                return new CreateFragment();
             else if (i == 1)
                 return new SearchFragment();
             return new WorldsFragment();
@@ -271,7 +301,8 @@ public class StartActivity extends GotLActivity {
                             e.printStackTrace();
                         }
                         world = new World(WorldVars.TEST_WORLD);
-                        getActivity().runOnUiThread(setWorldImage);
+                        Activity activity = getActivity();
+                        if (activity != null) activity.runOnUiThread(setWorldImage);
                     }
                 },
                 setWorldImage = new Runnable() {
@@ -616,6 +647,44 @@ public class StartActivity extends GotLActivity {
         private TextView textViewInfo;
         private ImageButton imageButtonSearch;
         private SwipeRefreshLayout swipeRefreshLayout;
+        private AppBluetoothManager.BluetoothActionListener listener = new AppBluetoothManager.BluetoothActionListener() {
+
+            @Override
+            public void onStart() {
+                refresh();
+            }
+
+            @Override
+            public void onStop() {
+                showStartSearch();
+            }
+
+            @Override
+            public void onGameSearchStarted() {
+                swipeRefreshLayout.setRefreshing(true);
+            }
+
+            @Override
+            public void onGameSearchFinished() {
+                swipeRefreshLayout.setRefreshing(false);
+                if (adapter.getCount() == 0){
+                    Snackbar.make(swipeRefreshLayout, "No Games Found", Snackbar.LENGTH_LONG)
+                            .setAction("Retry", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    refresh();
+                                }
+                            }).show();
+                    showStartSearch();
+                }
+            }
+
+            @Override
+            public void onConnectionEstablished(String address) {
+
+            }
+        };
+
 
         @Override
         public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -639,44 +708,6 @@ public class StartActivity extends GotLActivity {
             gameList = (ListView) v.findViewById(R.id.listView_tabSearch);
             gameList.setAdapter(adapter);
 
-            AppBluetoothManager.addBluetoothListener(new AppBluetoothManager.BluetoothActionListener() {
-
-                @Override
-                public void onStart() {
-
-                }
-
-                @Override
-                public void onStop() {
-
-                }
-
-                @Override
-                public void onGameSearchStarted() {
-                    swipeRefreshLayout.setRefreshing(true);
-                }
-
-                @Override
-                public void onGameSearchFinished() {
-                    swipeRefreshLayout.setRefreshing(false);
-                    if (adapter.getCount() == 0){
-                        Snackbar.make(swipeRefreshLayout, "No Games Found", Snackbar.LENGTH_LONG)
-                                .setAction("Retry", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        refresh();
-                                    }
-                                }).show();
-                        showStartSearch();
-                    }
-                }
-
-                @Override
-                public void onConnectionEstablished(String address) {
-
-                }
-            });
-
             imageButtonSearch = (ImageButton) v.findViewById(R.id.imageButton_tabSearch);
             imageButtonSearch.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -689,8 +720,21 @@ public class StartActivity extends GotLActivity {
             return v;
         }
 
+        @Override
+        public void onAttach(Context context) {
+            super.onAttach(context);
+            AppBluetoothManager.addBluetoothListener(listener);
+
+        }
+
+        @Override
+        public void onDetach() {
+            super.onDetach();
+            AppBluetoothManager.removeBluetoothListener(listener);
+        }
+
         private void refresh(){
-            if (adapter.setData(AppBluetoothManager.searchGames(getActivity()))) {
+            if (adapter.setData(AppBluetoothManager.searchGames(getActivity(), adapter))) {
                 adapter.notifyDataSetChanged();
                 hideStartSearch();
             }else{
