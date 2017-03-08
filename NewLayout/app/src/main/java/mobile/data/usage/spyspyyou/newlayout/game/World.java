@@ -5,10 +5,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Pair;
 
+import java.io.Serializable;
+
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.ui.activity.GotLActivity;
 
-public class World implements WorldVars {
+public class World implements Serializable, WorldVars {
 
     public static final int
             MIN_SIZE = 22,

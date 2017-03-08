@@ -1,9 +1,4 @@
-public class ObiThread extends ReturnTest1{
+public class ObiThread extends Thread{
 
-    @Override
-    public void ma(Class c) {
-        super.ma(c);
-        if (c == super.getClass())System.out.print("\nstill equal");
-    }
 
 }

@@ -24,7 +24,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,8 +161,13 @@ public class StartActivity extends GotLActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        AppBluetoothManager.releaseRequirements(getBaseContext());
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("StartActivity", "activity result");
         if (requestCode == AppBluetoothManager.REQUEST_BLUETOOTH){
             if (resultCode == RESULT_CANCELED)
                 Toast.makeText(getBaseContext(), "Bluetooth is required.", Toast.LENGTH_LONG).show();

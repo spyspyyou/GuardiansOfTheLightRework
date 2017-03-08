@@ -2,21 +2,12 @@ package mobile.data.usage.spyspyyou.newlayout.bluetooth;
 
 import mobile.data.usage.spyspyyou.newlayout.ui.activity.ServerLobbyActivity;
 
-public class GameInformationRequest extends Messenger {
-
-    private static final String KEY_REQUEST_ADDRESS = "ra";
+public class GameInformationRequest extends Message {
 
     private final String REQUEST_ADDRESS;
 
-    public GameInformationRequest(String message){
-        super(message);
-        REQUEST_ADDRESS = getString(KEY_REQUEST_ADDRESS);
-    }
-
-    public GameInformationRequest(String receptor, String requestAddress){
-        super(new String[]{receptor});
+    public GameInformationRequest(String requestAddress){
         REQUEST_ADDRESS = requestAddress;
-        putObect(KEY_REQUEST_ADDRESS, REQUEST_ADDRESS);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
@@ -90,6 +92,23 @@ public class LobbyActivity extends GotLActivity {
     protected void onStop() {
         super.onStop();
         AppBluetoothManager.removeBluetoothListener(listener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Abort Game!")
+                .setMessage("Are you sure that you want to leave the lobby?")
+                .setPositiveButton("Yep", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).setNegativeButton("Nopes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {}
+                }
+        ).show();
     }
 
     @Override
