@@ -50,7 +50,7 @@ public class GameInformationAdapter extends BaseAdapter {
         if(view == null) view = RelativeLayout.inflate(appContext, R.layout.list_game, parent);
 
         ImageView imageViewWorld = (ImageView) view.findViewById(R.id.imageView_gameInformation_world);
-        imageViewWorld.setImageBitmap(gameInformation.WORLD.getBitmapRepresentation());
+        //imageViewWorld.setImageBitmap(gameInformation.WORLD.getBitmapRepresentation());
         TextView textViewName = (TextView) view.findViewById(R.id.textView_gameInformation_name);
         textViewName.setText(gameInformation.GAME_NAME);
 

@@ -71,6 +71,10 @@ import java.util.concurrent.TimeUnit;
         cCThread.connectionQueue.add(new ConnectionRequest(bluetoothDevice, listener));
     }
 
+    /*package*/ static void clearConnectionQueue(){
+        if (clientActive)cCThread.connectionQueue.clear();
+    }
+
     /*package*/ static void disconnect(String address) {
         if (connections.containsKey(address)){
             connections.get(address).close();
@@ -81,6 +85,7 @@ import java.util.concurrent.TimeUnit;
     }
 
     /*package*/ static void disconnect(){
+        if (clientActive)cCThread.cancel();
         for (String address:connections.keySet()){
             connections.get(address).close();
         }
@@ -113,7 +118,7 @@ import java.util.concurrent.TimeUnit;
                 }
                 if (element == null)continue;
                 if (connections.containsKey(element.BLUETOOTH_DEVICE.getAddress())) {
-                    Log.e("CCThread", "Already connected to device\nName: " + element.BLUETOOTH_DEVICE.getName() + "\nAddress: " + element.BLUETOOTH_DEVICE.getAddress());
+                    Log.w("CCThread", "Already connected to device\nName: " + element.BLUETOOTH_DEVICE.getName() + "\nAddress: " + element.BLUETOOTH_DEVICE.getAddress());
                     continue;
                 }
 
@@ -178,8 +183,6 @@ import java.util.concurrent.TimeUnit;
     }
 
     private static class ACThread extends Thread {
-
-        private int acceptTime = TIME_OUT_LONG * 10;
 
         private Map<UUID, BluetoothServerSocket> bluetoothServerSockets = new LinkedHashMap<>();
         private volatile ArrayList<UUID> freeUUIDS = new ArrayList<>();
@@ -246,12 +249,15 @@ import java.util.concurrent.TimeUnit;
         private final ObjectOutputStream OUTPUT_STREAM;
         private final BluetoothSocket BLUETOOTH_SOCKET;
 
+        private final Handshake HANDSHAKE = new Handshake();
+
         private Connection(BluetoothSocket bluetoothSocket, UUID uuid, @Nullable AppBluetoothManager.ConnectionListener listener) throws IOException {
             BLUETOOTH_SOCKET = bluetoothSocket;
             UUID = uuid;
 
             try {
                 OUTPUT_STREAM = new ObjectOutputStream(bluetoothSocket.getOutputStream());
+                OUTPUT_STREAM.writeObject(HANDSHAKE);
                 OUTPUT_STREAM.flush();
                 Log.d("Connection", "Got the ObjectStream out");
                 INPUT_STREAM = new ObjectInputStream(bluetoothSocket.getInputStream());
@@ -259,7 +265,7 @@ import java.util.concurrent.TimeUnit;
             }catch (Exception e){
                 BLUETOOTH_SOCKET.close();
                 e.printStackTrace();
-                throw e;
+                throw new IOException("Failed to obtain the object streams");
             }
 
             Log.d("Connection", "successfully got streams, adding/handling Connection");
@@ -274,40 +280,41 @@ import java.util.concurrent.TimeUnit;
                 listeners.add(listener);
                 listener.onConnectionEstablished(BLUETOOTH_SOCKET.getRemoteDevice());
             }
-            Log.i("Connection", "successfully established a connection to\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\n Address: " + getAddress());
+            Log.i("Connection", "successfully established a connection to\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\nAddress: " + getAddress());
         }
 
         private void performReadWrite(){
             try {
                 Message message = messageQueue.poll(TIME_OUT_SHORT, TimeUnit.MILLISECONDS);
-                if (message != null){
-                    Log.d("Connection", "sending message of type " + message.getClass().getSimpleName());
+                if (message == null)message = HANDSHAKE;
+                    Log.v("Connection", "sending message of type " + message.getClass().getSimpleName());
                     OUTPUT_STREAM.writeObject(message);
-                    Log.d("Connection", "finished writing message");
-                }else{
-                    Log.v("Connection", "message writing skipped");
-                }
-                if (INPUT_STREAM.available() > 0) {
-                    Log.d("Connection", "reading message");
+                    OUTPUT_STREAM.flush();
+                    Log.v("Connection", "finished writing message");
+                //todo:improve
+                if (true) {
+                    Log.v("Connection", "reading message");
                     ((Message) INPUT_STREAM.readObject()).onReception();
-                    Log.d("Connection", "finished reading message");
+                    Log.v("Connection", "finished reading message");
                 }else{
                     Log.v("Connection", "message reading skipped");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.w("Connection", "failed sending data, connection broken?");
+                Log.e("Connection", "failed read/write, connection broken");
+                close();
             } catch (Exception e) {
-                Log.e("Connection", "Received invalid Message");
+                Log.w("Connection", "Received invalid Message");
             }
         }
 
         /*package*/ synchronized void send(Message message) {
             if (!messageQueue.offer(message)) Log.w("Connection", "Message Queue full for Connection to " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
+            else Log.i("Connection", "added message of type " + message.getClass().getSimpleName());
         }
 
         /*package*/ void close(){
-            Log.w("Connection", "Closing connection\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\n Address: " + getAddress());
+            Log.w("Connection", "Closing connection\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\nAddress: " + getAddress());
 
             for (AppBluetoothManager.ConnectionListener listener : listeners)
                 listener.onConnectionClosed(BLUETOOTH_SOCKET.getRemoteDevice());

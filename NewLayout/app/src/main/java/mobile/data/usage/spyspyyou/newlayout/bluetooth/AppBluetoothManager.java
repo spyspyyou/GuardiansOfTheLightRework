@@ -49,7 +49,7 @@ public class AppBluetoothManager {
 
         @Override
         public void onConnectionEstablished(BluetoothDevice bluetoothDevice) {
-            new GameInformationRequest(bluetoothDevice.getAddress(), getLocalAddress()).send();
+            new GameInformationRequest(getLocalAddress()).send(bluetoothDevice.getAddress());
         }
 
         @Override
@@ -64,12 +64,14 @@ public class AppBluetoothManager {
      */
     public static void initialize(Context context){
         if (bluetoothAdapter != null)return;
+        Log.i("ABManager", "initialization");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null){
             handleNonBluetoothDevice(context);
             return;
         }
         localAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+        if (localAddress == null)localAddress = bluetoothAdapter.getAddress();
         bluetoothBroadcastReceiver = new BluetoothBroadcastReceiver();
     }
 
@@ -80,6 +82,7 @@ public class AppBluetoothManager {
     //----------------------------------------------------------------------------------------------
 
     public static void releaseRequirements(Context context){
+        Log.d("ABManager", "releasing all requirements");
         bluetoothBroadcastReceiver.unregister(context);
         bluetoothAdapter.cancelDiscovery();
         ConnectionManager.disconnect();
@@ -118,7 +121,7 @@ public class AppBluetoothManager {
 
     public static void joinGame(String gameAddress, @Nullable ConnectionListener listener){
         bluetoothAdapter.cancelDiscovery();
-        ConnectionManager.connect(gameAddress, listener);
+        ConnectionManager.connect(getRemoteDevice(gameAddress), listener);
     }
 
     public static void addBluetoothListener(BluetoothActionListener listener){
@@ -133,9 +136,11 @@ public class AppBluetoothManager {
         }
     }
 
-    public static void addGame(GameInformation gameInformation){
+    /*package*/ static void addGame(GameInformation gameInformation){
+        Log.i("ABManager", "adding game " + gameInformation.GAME_NAME);
         gameList.add(gameInformation);
         if (gameListAdapter != null)gameListAdapter.notifyDataSetChanged();
+        else Log.i("ABManager", "gameListAdapter is null");
     }
 
     //----------------------------------------------------------------------------------------------
@@ -356,7 +361,7 @@ public class AppBluetoothManager {
             Log.d("ABManager", "Found a Device: " + '"' + deviceName + '"');
             if (isHosting(deviceName) && !deviceAlreadyOnList(device)) {
                 Log.d("ABManager", "Found a Game: " + '"' + deviceName.replace(APP_IDENTIFIER, "") + '"');
-                ConnectionManager.connect(device.getAddress(), connectionListenerSearch);
+                ConnectionManager.connect(getRemoteDevice(device.getAddress()), connectionListenerSearch);
             }
         }
 

@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -689,16 +688,10 @@ public class StartActivity extends GotLActivity {
             }
         };
 
-
-        @Override
-        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-            adapter = new GameInformationAdapter(getActivity().getApplicationContext());
-        }
-
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.tab_search, container, false);
+            adapter = new GameInformationAdapter(getActivity().getApplicationContext());
 
             swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout_tabSearch);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -747,7 +740,7 @@ public class StartActivity extends GotLActivity {
         }
 
         private void showStartSearch(){
-            gameList.setVisibility(View.INVISIBLE);
+            //gameList.setVisibility(View.INVISIBLE);
             imageButtonSearch.setVisibility(View.VISIBLE);
             textViewInfo.setVisibility(View.VISIBLE);
         }
