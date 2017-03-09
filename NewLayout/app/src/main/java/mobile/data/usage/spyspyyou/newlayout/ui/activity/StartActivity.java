@@ -43,9 +43,10 @@ import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 import mobile.data.usage.spyspyyou.newlayout.game.World;
-import mobile.data.usage.spyspyyou.newlayout.game.WorldVars;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton;
+
+import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEST_MAP;
 
 public class StartActivity extends GotLActivity {
 
@@ -303,7 +304,7 @@ public class StartActivity extends GotLActivity {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        world = new World(WorldVars.TEST_WORLD);
+                        world = new World(TEST_MAP);
                         Activity activity = getActivity();
                         if (activity != null) activity.runOnUiThread(setWorldImage);
                     }
@@ -691,7 +692,7 @@ public class StartActivity extends GotLActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.tab_search, container, false);
-            adapter = new GameInformationAdapter(getActivity().getApplicationContext());
+            adapter = new GameInformationAdapter(getActivity());
 
             swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout_tabSearch);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -731,7 +732,7 @@ public class StartActivity extends GotLActivity {
         }
 
         private void refresh(){
-            if (adapter.setData(AppBluetoothManager.searchGames(getActivity(), adapter))) {
+            if (AppBluetoothManager.searchGames(getActivity(), adapter)) {
                 adapter.notifyDataSetChanged();
                 hideStartSearch();
             }else{
@@ -739,16 +740,26 @@ public class StartActivity extends GotLActivity {
             }
         }
 
-        private void showStartSearch(){
-            //gameList.setVisibility(View.INVISIBLE);
-            imageButtonSearch.setVisibility(View.VISIBLE);
-            textViewInfo.setVisibility(View.VISIBLE);
+        private void showStartSearch() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    gameList.setVisibility(View.INVISIBLE);
+                    imageButtonSearch.setVisibility(View.VISIBLE);
+                    textViewInfo.setVisibility(View.VISIBLE);
+                }
+            });
         }
 
         private void hideStartSearch(){
-            gameList.setVisibility(View.VISIBLE);
-            imageButtonSearch.setVisibility(View.INVISIBLE);
-            textViewInfo.setVisibility(View.INVISIBLE);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    gameList.setVisibility(View.VISIBLE);
+                    imageButtonSearch.setVisibility(View.INVISIBLE);
+                    textViewInfo.setVisibility(View.INVISIBLE);
+                }
+            });
         }
     }
 

@@ -305,6 +305,7 @@ import java.util.concurrent.TimeUnit;
                 close();
             } catch (Exception e) {
                 Log.w("Connection", "Received invalid Message");
+                e.printStackTrace();
             }
         }
 

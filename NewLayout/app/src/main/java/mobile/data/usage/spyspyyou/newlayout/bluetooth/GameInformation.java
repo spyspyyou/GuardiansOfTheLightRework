@@ -9,7 +9,8 @@ public class GameInformation extends Message {
     public final String
             HOST_ADDRESS,
             GAME_NAME;
-    //public final World WORLD;
+    private final byte[][] WORLD_DATA;
+    public transient World WORLD;
     public final boolean
             CHARACTERS_UNIQUE,
             ALLOWED_FLUFFY,
@@ -25,7 +26,8 @@ public class GameInformation extends Message {
     public GameInformation(String address, String gameName, World world, boolean charactersUnique, boolean allowedFluffy, boolean allowedSlime, boolean allowedGhost, boolean allowedNox, int playerMax, int sweetRegen, int manaRegen, int selectionTime){
         HOST_ADDRESS = address;
         GAME_NAME = gameName;
-        //WORLD = world;
+        WORLD = world;
+        WORLD_DATA = world.getData();
         CHARACTERS_UNIQUE = charactersUnique;
         ALLOWED_FLUFFY = allowedFluffy;
         ALLOWED_SLIME = allowedSlime;
@@ -36,9 +38,11 @@ public class GameInformation extends Message {
         MANA_REGEN = manaRegen;
         SELECTION_TIME = selectionTime;
     }
+
     @Override
     protected void onReception() {
         Log.i("GameInformation", "received");
+        WORLD = new World(WORLD_DATA);
         AppBluetoothManager.addGame(this);
         ConnectionManager.disconnect(HOST_ADDRESS);
     }

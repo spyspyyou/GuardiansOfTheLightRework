@@ -42,20 +42,23 @@ public class AppBluetoothManager {
 
     private static BluetoothAdapter bluetoothAdapter = null;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver = null;
-    private static ArrayList<GameInformation> gameList = new ArrayList<>();
     private static GameInformationAdapter gameListAdapter;
     private static final ArrayList<BluetoothActionListener> listeners = new ArrayList<>();
     private static final ConnectionListener connectionListenerSearch = new ConnectionListener() {
-
+        private int connections = 0;
         @Override
         public void onConnectionEstablished(BluetoothDevice bluetoothDevice) {
             new GameInformationRequest(getLocalAddress()).send(bluetoothDevice.getAddress());
+            ++connections;
         }
 
         @Override
         public void onConnectionFailed(BluetoothDevice bluetoothDevice) {}
         @Override
-        public void onConnectionClosed(BluetoothDevice bluetoothDevice) {}
+        public void onConnectionClosed(BluetoothDevice bluetoothDevice) {
+            --connections;
+            if (connections == 0)notifySearchFinished();
+        }
     };
 
     /**
@@ -103,20 +106,20 @@ public class AppBluetoothManager {
         setBluetoothName();
     }
 
-    public static ArrayList<GameInformation> searchGames(Activity activity, GameInformationAdapter adapter){
+    public static boolean searchGames(Activity activity, GameInformationAdapter adapter){
         if (!assureCoarseLocationPermission(activity)){
             Log.w("APManager", "ain't got no coarse location permission");
-            return null;
+            return false;
         }
 
         if (prepareBluetooth(activity, false)){
             bluetoothAdapter.cancelDiscovery();
             bluetoothAdapter.startDiscovery();
-            gameList.clear();
             gameListAdapter = adapter;
-            return gameList;
+            gameListAdapter.clear();
+            return true;
         }
-        return null;
+        return false;
     }
 
     public static void joinGame(String gameAddress, @Nullable ConnectionListener listener){
@@ -138,9 +141,7 @@ public class AppBluetoothManager {
 
     /*package*/ static void addGame(GameInformation gameInformation){
         Log.i("ABManager", "adding game " + gameInformation.GAME_NAME);
-        gameList.add(gameInformation);
-        if (gameListAdapter != null)gameListAdapter.notifyDataSetChanged();
-        else Log.i("ABManager", "gameListAdapter is null");
+        gameListAdapter.addGame(gameInformation);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -336,7 +337,6 @@ public class AppBluetoothManager {
         }
 
         private void onDiscoveryFinish(){
-            notifySearchFinished();
             Log.i("ABManager", "discovery finished");
         }
 
@@ -359,7 +359,7 @@ public class AppBluetoothManager {
             }
 
             Log.d("ABManager", "Found a Device: " + '"' + deviceName + '"');
-            if (isHosting(deviceName) && !deviceAlreadyOnList(device)) {
+            if (isHosting(deviceName)) {
                 Log.d("ABManager", "Found a Game: " + '"' + deviceName.replace(APP_IDENTIFIER, "") + '"');
                 ConnectionManager.connect(getRemoteDevice(device.getAddress()), connectionListenerSearch);
             }
@@ -375,13 +375,6 @@ public class AppBluetoothManager {
             if (!registered)return;
             registered = false;
             context.getApplicationContext().unregisterReceiver(this);
-        }
-
-        private boolean deviceAlreadyOnList(BluetoothDevice bluetoothDevice){
-            for (GameInformation gameInformation: gameList){
-                if (gameInformation.HOST_ADDRESS.equals(bluetoothDevice.getAddress()))return true;
-            }
-            return false;
         }
 
         private boolean isHosting(String name){

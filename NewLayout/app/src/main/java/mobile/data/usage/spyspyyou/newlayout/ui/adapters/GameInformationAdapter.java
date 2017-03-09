@@ -1,11 +1,10 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.adapters;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,16 +15,10 @@ import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 public class GameInformationAdapter extends BaseAdapter {
 
     private ArrayList<GameInformation> games = new ArrayList<>();
-    private Context appContext;
+    private Activity activity;
 
-    public GameInformationAdapter(Context applicationContext){
-        appContext = applicationContext;
-    }
-
-    public boolean setData(ArrayList<GameInformation> mGames){
-        if (mGames == null)return false;
-        games = mGames;
-        return true;
+    public GameInformationAdapter(Activity usingActivity){
+        activity = usingActivity;
     }
 
     @Override
@@ -47,10 +40,10 @@ public class GameInformationAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         GameInformation gameInformation = games.get(position);
-        if(view == null) view = RelativeLayout.inflate(appContext, R.layout.list_game, parent);
+        if(view == null) view = activity.getLayoutInflater().inflate(R.layout.list_game, parent, false);
 
         ImageView imageViewWorld = (ImageView) view.findViewById(R.id.imageView_gameInformation_world);
-        //imageViewWorld.setImageBitmap(gameInformation.WORLD.getBitmapRepresentation());
+        imageViewWorld.setImageBitmap(gameInformation.WORLD.getBitmapRepresentation());
         TextView textViewName = (TextView) view.findViewById(R.id.textView_gameInformation_name);
         textViewName.setText(gameInformation.GAME_NAME);
 
@@ -76,5 +69,28 @@ public class GameInformationAdapter extends BaseAdapter {
         textViewSelectionTime.setText(""+gameInformation.SELECTION_TIME);
 
         return view;
+    }
+
+    public void clear(){
+        games.clear();
+    }
+
+    public void addGame(GameInformation gameInformation){
+        if (hasGame(gameInformation))return;
+        games.add(gameInformation);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
+    private boolean hasGame(GameInformation gameInformation){
+        ArrayList<GameInformation>copyList = (ArrayList<GameInformation>) games.clone();
+        for (GameInformation gameInfo:copyList) {
+            if (gameInformation.HOST_ADDRESS.equals(gameInfo.HOST_ADDRESS))return true;
+        }
+        return false;
     }
 }
