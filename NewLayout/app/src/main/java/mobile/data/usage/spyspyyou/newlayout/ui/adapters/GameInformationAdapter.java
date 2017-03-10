@@ -1,6 +1,11 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.adapters;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -11,14 +16,19 @@ import java.util.ArrayList;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
+import mobile.data.usage.spyspyyou.newlayout.ui.activity.ClientLobbyActivity;
 
 public class GameInformationAdapter extends BaseAdapter {
 
-    private ArrayList<GameInformation> games = new ArrayList<>();
-    private Activity activity;
+    public static final String HOST_EXTRA = "host_extra";
 
-    public GameInformationAdapter(Activity usingActivity){
-        activity = usingActivity;
+    private static ArrayList<GameInformation> games = new ArrayList<>();
+    private final Handler HANDLER;
+    private final LayoutInflater INFLATER;
+
+    public GameInformationAdapter(Activity activity){
+        HANDLER = new Handler();
+        INFLATER = activity.getLayoutInflater();
     }
 
     @Override
@@ -37,13 +47,14 @@ public class GameInformationAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
         GameInformation gameInformation = games.get(position);
-        if(view == null) view = activity.getLayoutInflater().inflate(R.layout.list_game, parent, false);
+        if(view == null) view = INFLATER.inflate(R.layout.list_game, parent, false);
 
         ImageView imageViewWorld = (ImageView) view.findViewById(R.id.imageView_gameInformation_world);
         imageViewWorld.setImageBitmap(gameInformation.WORLD.getBitmapRepresentation());
+
         TextView textViewName = (TextView) view.findViewById(R.id.textView_gameInformation_name);
         textViewName.setText(gameInformation.GAME_NAME);
 
@@ -68,6 +79,16 @@ public class GameInformationAdapter extends BaseAdapter {
         TextView textViewSelectionTime = (TextView) view.findViewById(R.id.textView_gameInformation_selectionTime);
         textViewSelectionTime.setText(""+gameInformation.SELECTION_TIME);
 
+        final FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab_gameInformation);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(fab.getContext(), ClientLobbyActivity.class);
+                intent.putExtra(HOST_EXTRA, games.get(position).HOST_ADDRESS);
+                fab.getContext().startActivity(intent);
+            }
+        });
+
         return view;
     }
 
@@ -78,9 +99,10 @@ public class GameInformationAdapter extends BaseAdapter {
     public void addGame(GameInformation gameInformation){
         if (hasGame(gameInformation))return;
         games.add(gameInformation);
-        activity.runOnUiThread(new Runnable() {
+        HANDLER.post(new Runnable() {
             @Override
             public void run() {
+                Log.i("GIAdapter", "notifying adapter data size = " + games.size());
                 notifyDataSetChanged();
             }
         });
@@ -93,4 +115,5 @@ public class GameInformationAdapter extends BaseAdapter {
         }
         return false;
     }
+
 }

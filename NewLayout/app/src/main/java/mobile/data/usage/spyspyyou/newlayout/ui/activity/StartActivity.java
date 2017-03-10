@@ -39,20 +39,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.util.Random;
+
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 import mobile.data.usage.spyspyyou.newlayout.game.World;
+import mobile.data.usage.spyspyyou.newlayout.game.WorldVars;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton;
 
-import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.TEST_MAP;
+import static mobile.data.usage.spyspyyou.newlayout.game.WorldVars.BASE_MAP;
 
 public class StartActivity extends GotLActivity {
 
-    private PagerAdapter mPagerAdapter;
-    private ViewPager mViewPager;
-    private ActionBarDrawerToggle mDrawerToggle;
+    private ActionBarDrawerToggle drawerToggle;
     private static GameInformation gameInformation;
     private CreateFragment createFragment;
     private SearchFragment searchFragment;
@@ -79,7 +80,7 @@ public class StartActivity extends GotLActivity {
             @Override
             public void onClick(View view) {
                 //todo:start world edit
-                Snackbar.make(view, "Create a new World", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(view, "In dev", Snackbar.LENGTH_LONG).show();
             }
         });
 
@@ -92,7 +93,7 @@ public class StartActivity extends GotLActivity {
 
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.hello_world, R.string.hello_world) {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.hello_world, R.string.hello_world) {
             float  lastOffset = 0;
 
             @Override
@@ -116,12 +117,12 @@ public class StartActivity extends GotLActivity {
                 supportInvalidateOptionsMenu();
             }
         };
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        drawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        drawerToggle.setDrawerIndicatorEnabled(true);
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.viewPager_activityStart);
+        PagerAdapter mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.viewPager_activityStart);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -157,7 +158,7 @@ public class StartActivity extends GotLActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
+        drawerToggle.syncState();
     }
 
     @Override
@@ -184,7 +185,7 @@ public class StartActivity extends GotLActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
@@ -293,18 +294,23 @@ public class StartActivity extends GotLActivity {
                 editor;
 
         private World
-                world;
+                world = new World(BASE_MAP);
 
         private Runnable
                 worldGenerator = new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        byte[][] baseWorld = BASE_MAP.clone();
+                        Random random = new Random(System.currentTimeMillis());
+                        for (int y = 3; y < baseWorld[0].length - 3; ++y){
+                            for (int x = 3; x < baseWorld.length - 3; ++x){
+                                int newRand = random.nextInt(5);
+                                if (newRand == 0)baseWorld[x][y] = WorldVars.VOID;
+                                else if (newRand == 1)baseWorld[x][y] = WorldVars.WALL;
+                                else baseWorld[x][y] = WorldVars.FLOOR;
+                            }
                         }
-                        world = new World(TEST_MAP);
+                        world = new World(baseWorld);
                         Activity activity = getActivity();
                         if (activity != null) activity.runOnUiThread(setWorldImage);
                     }
@@ -341,6 +347,7 @@ public class StartActivity extends GotLActivity {
             String name = sharedPreferences.getString(PREF_GAME_NAME, "\3");
             if (!name.equals("\3")){
                 editTextGameName.setText(name);
+                editTextGameName.setFocusable(false);
             }
             editTextGameName.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -646,12 +653,13 @@ public class StartActivity extends GotLActivity {
 
     public static class SearchFragment extends Fragment {
 
+        //todo:remove connectionListener after joining the game
         private ListView gameList;
         private GameInformationAdapter adapter;
         private TextView textViewInfo;
         private ImageButton imageButtonSearch;
         private SwipeRefreshLayout swipeRefreshLayout;
-        private AppBluetoothManager.BluetoothActionListener listener = new AppBluetoothManager.BluetoothActionListener() {
+        private AppBluetoothManager.BluetoothActionListener btListener = new AppBluetoothManager.BluetoothActionListener() {
 
             @Override
             public void onStart() {
@@ -670,6 +678,7 @@ public class StartActivity extends GotLActivity {
 
             @Override
             public void onGameSearchFinished() {
+                if (!swipeRefreshLayout.isRefreshing())return;
                 swipeRefreshLayout.setRefreshing(false);
                 if (adapter.getCount() == 0){
                     Snackbar.make(swipeRefreshLayout, "No Games Found", Snackbar.LENGTH_LONG)
@@ -692,7 +701,6 @@ public class StartActivity extends GotLActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.tab_search, container, false);
-            adapter = new GameInformationAdapter(getActivity());
 
             swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshLayout_tabSearch);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -704,6 +712,7 @@ public class StartActivity extends GotLActivity {
             swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
 
             gameList = (ListView) v.findViewById(R.id.listView_tabSearch);
+            adapter = new GameInformationAdapter(getActivity());
             gameList.setAdapter(adapter);
 
             imageButtonSearch = (ImageButton) v.findViewById(R.id.imageButton_tabSearch);
@@ -721,14 +730,13 @@ public class StartActivity extends GotLActivity {
         @Override
         public void onAttach(Context context) {
             super.onAttach(context);
-            AppBluetoothManager.addBluetoothListener(listener);
-
+            AppBluetoothManager.addBluetoothListener(btListener);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
-            AppBluetoothManager.removeBluetoothListener(listener);
+            AppBluetoothManager.removeBluetoothListener(btListener);
         }
 
         private void refresh(){
@@ -744,7 +752,7 @@ public class StartActivity extends GotLActivity {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    gameList.setVisibility(View.INVISIBLE);
+                    gameList.setVisibility(View.VISIBLE);
                     imageButtonSearch.setVisibility(View.VISIBLE);
                     textViewInfo.setVisibility(View.VISIBLE);
                 }

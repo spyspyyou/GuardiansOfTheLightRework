@@ -28,14 +28,12 @@
                     android:textColor="@color/colorAccent"
                     android:textSize="12sp"/>
 
-                <EditText
+                <mobile.data.usage.spyspyyou.newlayout.ui.views.FocusManagedEditText
                     android:id="@+id/editText_tabCreate_gameName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:focusable="false"
                     android:hint="Game Name"
-                    android:imeActionLabel="Done"
                     android:imeOptions="actionDone"
                     android:inputType="textPersonName"
                     android:maxLength="32"

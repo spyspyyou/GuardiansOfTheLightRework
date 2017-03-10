@@ -4,8 +4,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/activity_margin"
-                android:background="@drawable/background_rounded"
-                android:elevation="@dimen/cardview_default_elevation"
+                android:background="@drawable/background_border"
+                android:elevation="2dp"
                 android:orientation="vertical"
                 android:padding="@dimen/activity_padding">
 
@@ -76,7 +76,8 @@
                 android:layout_margin="@dimen/activity_margin_small"
                 android:layout_weight="1"
                 android:background="@drawable/fluffy"
-                android:padding="@dimen/activity_padding"/>
+                android:padding="@dimen/activity_padding"
+                android:tint="@android:color/holo_red_dark"/>
 
             <ImageView
                 android:id="@+id/imageView_gameInformation_slime"
@@ -85,7 +86,8 @@
                 android:layout_margin="@dimen/activity_margin_small"
                 android:layout_weight="1"
                 android:background="@drawable/slime"
-                android:padding="@dimen/activity_padding"/>
+                android:padding="@dimen/activity_padding"
+                android:tint="@android:color/holo_red_dark"/>
 
             <ImageView
                 android:id="@+id/imageView_gameInformation_ghost"
@@ -94,7 +96,8 @@
                 android:layout_margin="@dimen/activity_margin_small"
                 android:layout_weight="1"
                 android:background="@drawable/ghost"
-                android:padding="@dimen/activity_padding"/>
+                android:padding="@dimen/activity_padding"
+                android:tint="@android:color/holo_red_dark"/>
 
             <ImageView
                 android:id="@+id/imageView_gameInformation_nox"
@@ -103,7 +106,8 @@
                 android:layout_margin="@dimen/activity_margin_small"
                 android:layout_weight="1"
                 android:background="@android:color/background_dark"
-                android:padding="@dimen/activity_padding"/>
+                android:padding="@dimen/activity_padding"
+                android:tint="@android:color/holo_red_dark"/>
 
         </LinearLayout>
 
@@ -140,7 +144,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" Sweets/min"
+                android:text=" /min"
                 android:textSize="18sp"/>
         </LinearLayout>
 

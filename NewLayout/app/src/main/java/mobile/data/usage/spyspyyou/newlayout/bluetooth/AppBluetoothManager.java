@@ -39,27 +39,30 @@ public class AppBluetoothManager {
     private static String localAddress = "";
 
     private static boolean isServer = false;
+    private static int searchConnections = 0;
 
     private static BluetoothAdapter bluetoothAdapter = null;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver = null;
     private static GameInformationAdapter gameListAdapter;
     private static final ArrayList<BluetoothActionListener> listeners = new ArrayList<>();
     private static final ConnectionListener connectionListenerSearch = new ConnectionListener() {
-        private int connections = 0;
         @Override
         public void onConnectionEstablished(BluetoothDevice bluetoothDevice) {
             new GameInformationRequest(getLocalAddress()).send(bluetoothDevice.getAddress());
-            ++connections;
         }
 
         @Override
-        public void onConnectionFailed(BluetoothDevice bluetoothDevice) {}
+        public void onConnectionFailed(BluetoothDevice bluetoothDevice) {
+            --searchConnections;
+        }
+
         @Override
         public void onConnectionClosed(BluetoothDevice bluetoothDevice) {
-            --connections;
-            if (connections == 0)notifySearchFinished();
+            --searchConnections;
+            if (searchConnections == 0)notifySearchFinished();
         }
     };
+
 
     /**
      * Called when an Activity uses Bluetooth
@@ -100,7 +103,7 @@ public class AppBluetoothManager {
         return false;
     }
 
-    public static void stopServer(Activity activity){
+    public static void stopServer(){
         ConnectionManager.stopServer();
         isServer = false;
         setBluetoothName();
@@ -115,6 +118,7 @@ public class AppBluetoothManager {
         if (prepareBluetooth(activity, false)){
             bluetoothAdapter.cancelDiscovery();
             bluetoothAdapter.startDiscovery();
+            ConnectionManager.disconnect();
             gameListAdapter = adapter;
             gameListAdapter.clear();
             return true;
@@ -124,6 +128,7 @@ public class AppBluetoothManager {
 
     public static void joinGame(String gameAddress, @Nullable ConnectionListener listener){
         bluetoothAdapter.cancelDiscovery();
+        ConnectionManager.clearConnectionQueue();
         ConnectionManager.connect(getRemoteDevice(gameAddress), listener);
     }
 
@@ -139,9 +144,16 @@ public class AppBluetoothManager {
         }
     }
 
-    /*package*/ static void addGame(GameInformation gameInformation){
-        Log.i("ABManager", "adding game " + gameInformation.GAME_NAME);
-        gameListAdapter.addGame(gameInformation);
+    public static void disconnectFrom(String address){
+        ConnectionManager.disconnect(address);
+    }
+
+    public static void addConnectionListener(String address, ConnectionListener listener){
+        ConnectionManager.addListener(address, listener);
+    }
+
+    public static void removeConnectionListener(String address, ConnectionListener listener){
+        ConnectionManager.removeListener(address, listener);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -181,6 +193,11 @@ public class AppBluetoothManager {
                 listener.onGameSearchFinished();
             }
         }
+    }
+
+    /*package*/ static void addGame(GameInformation gameInformation){
+        Log.i("ABManager", "adding game " + gameInformation.GAME_NAME);
+        gameListAdapter.addGame(gameInformation);
     }
 
     /*package*/ static void notifyConnectionEstablished(String address){
@@ -333,10 +350,12 @@ public class AppBluetoothManager {
 
         private void onDiscoveryStart(){
             notifySearchStarted();
+            searchConnections = 0;
             Log.i("ABManager", "starting discovery");
         }
 
         private void onDiscoveryFinish(){
+            if (searchConnections == 0)notifySearchFinished();
             Log.i("ABManager", "discovery finished");
         }
 
@@ -362,6 +381,7 @@ public class AppBluetoothManager {
             if (isHosting(deviceName)) {
                 Log.d("ABManager", "Found a Game: " + '"' + deviceName.replace(APP_IDENTIFIER, "") + '"');
                 ConnectionManager.connect(getRemoteDevice(device.getAddress()), connectionListenerSearch);
+                ++searchConnections;
             }
         }
 

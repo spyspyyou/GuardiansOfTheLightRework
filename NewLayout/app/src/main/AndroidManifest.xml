@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.LobbyActivity"
+            android:name=".ui.activity.ClientLobbyActivity"
             android:label="@string/title_activity_lobby">
         </activity>
         <activity

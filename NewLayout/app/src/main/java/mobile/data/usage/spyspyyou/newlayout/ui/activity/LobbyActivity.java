@@ -11,14 +11,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.newlayout.ui.adapters.TeamAdapter;
 
-public class LobbyActivity extends GotLActivity {
+public abstract class LobbyActivity extends GotLActivity {
 
-    private AppBluetoothManager.BluetoothActionListener listener = new AppBluetoothManager.BluetoothActionListener() {
+    private AppBluetoothManager.BluetoothActionListener btStopListener = new AppBluetoothManager.BluetoothActionListener() {
         @Override
         public void onStart() {
 
@@ -45,6 +47,9 @@ public class LobbyActivity extends GotLActivity {
 
         }
     };
+    protected static TeamAdapter
+            teamBlue,
+            teamGreen;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,9 +59,18 @@ public class LobbyActivity extends GotLActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_activityLobby);
         setSupportActionBar(toolbar);
 
+        ListView
+                listBlue = (ListView) findViewById(R.id.listView_activityLobby_blue),
+                listGreen = (ListView) findViewById(R.id.listView_activityLobby_green);
+        teamBlue = new TeamAdapter(this);
+        teamGreen = new TeamAdapter(this);
+        listBlue.setAdapter(teamBlue);
+        listGreen.setAdapter(teamGreen);
+
         final LinearLayout
                 linearLayoutToggleChat = (LinearLayout) findViewById(R.id.linearLayout_activityLobby_toggle),
                 linearLayoutChar = (LinearLayout) findViewById(R.id.linearLayout_activityLobby_chat);
+
         final ImageView imageViewArrow = (ImageView) findViewById(R.id.imageView_activityLobby_arrow);
         imageViewArrow.setRotation(180);
         linearLayoutToggleChat.setOnTouchListener(new View.OnTouchListener() {
@@ -79,19 +93,20 @@ public class LobbyActivity extends GotLActivity {
                 return false;
             }
         });
-
+        teamBlue.addPlayer("name", AppBluetoothManager.getLocalAddress(), R.drawable.floor_tile);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        AppBluetoothManager.addBluetoothListener(listener);
+        AppBluetoothManager.addBluetoothListener(btStopListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppBluetoothManager.removeBluetoothListener(listener);
+        AppBluetoothManager.removeBluetoothListener(btStopListener);
+        AppBluetoothManager.releaseRequirements(this);
     }
 
     @Override
@@ -124,4 +139,5 @@ public class LobbyActivity extends GotLActivity {
         }
         return false;
     }
+
 }

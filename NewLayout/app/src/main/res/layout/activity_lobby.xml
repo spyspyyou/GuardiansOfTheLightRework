@@ -42,14 +42,18 @@
                 android:orientation="horizontal">
 
                 <ListView
+                    android:id="@+id/listView_activityLobby_blue"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:background="@drawable/background_border"/>
 
                 <ListView
+                    android:id="@+id/listView_activityLobby_green"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:background="@drawable/background_border"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -89,8 +93,7 @@
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                />
+                android:layout_weight="1"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -101,12 +104,11 @@
 
                 <EditText
                     android:id="@+id/editText2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
                     android:hint="Message"
-                    android:focusable="false"
                     android:inputType="textPersonName"/>
 
                 <ImageButton

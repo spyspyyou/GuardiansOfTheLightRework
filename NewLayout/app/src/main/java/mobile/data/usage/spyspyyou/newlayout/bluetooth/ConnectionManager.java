@@ -20,9 +20,10 @@ import java.util.concurrent.TimeUnit;
 /*package*/ class ConnectionManager {
     //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
     private static final byte MAX_CONNECTIONS = 7;
+    // in  millis
     private static final int
             TIME_OUT_LONG = 1000,
-            TIME_OUT_SHORT = 100;
+            TIME_OUT_SHORT = 2;
 
     private static final String BASE_UUID_STRING = "fc165dae-c277-4854-be70-b38d0486e35";
     private static final UUID[] UUID_ARRAY = new UUID[MAX_CONNECTIONS];
@@ -45,7 +46,6 @@ import java.util.concurrent.TimeUnit;
         if (serverActive)return;
         serverActive = true;
         if (clientActive)cCThread.cancel();
-        disconnect();
         aCThread = new ACThread();
         aCThread.start();
         Log.i("ConnectionManager", "started the Server");
@@ -54,10 +54,6 @@ import java.util.concurrent.TimeUnit;
     /*package*/ static void stopServer(){
         if (serverActive) aCThread.cancelAvailability();
         Log.i("ConnectionManager", "stopped the Server");
-    }
-
-    private static boolean hasConnections(){
-        return !connections.isEmpty();
     }
 
     /*package*/ static void connect(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener){
@@ -97,6 +93,24 @@ import java.util.concurrent.TimeUnit;
         for (String receptor:receptors){
             if (connections.containsKey(receptor))connections.get(receptor).send(message);
         }
+    }
+
+    /*package*/ static void addListener(String address, AppBluetoothManager.ConnectionListener listener){
+        Connection connection = connections.get(address);
+        if (connection != null){
+            connection.LISTENER.add(listener);
+        }
+    }
+
+    /*package*/ static void removeListener(String address, AppBluetoothManager.ConnectionListener listener){
+        Connection connection = connections.get(address);
+        if (connection != null){
+            connection.LISTENER.remove(listener);
+        }
+    }
+
+    private static boolean hasConnections(){
+        return !connections.isEmpty();
     }
 
     private static class CCThread extends Thread {
@@ -163,7 +177,7 @@ import java.util.concurrent.TimeUnit;
             clientActive = false;
             connectionQueue.clear();
             try {
-                bluetoothSocket.close();
+                if (bluetoothSocket != null)bluetoothSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -242,7 +256,7 @@ import java.util.concurrent.TimeUnit;
     private static class Connection {
         private final UUID UUID;
 
-        private final ArrayList<AppBluetoothManager.ConnectionListener> listeners = new ArrayList<>();
+        private final ArrayList<AppBluetoothManager.ConnectionListener> LISTENER = new ArrayList<>();
         private final LinkedBlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
 
         private final ObjectInputStream INPUT_STREAM;
@@ -274,31 +288,28 @@ import java.util.concurrent.TimeUnit;
             if (serverActive)aCThread.freeUUIDS.remove(UUID);
             if (!ConnectionHandlerThread.activeHandler)new ConnectionHandlerThread().start();
 
-            Log.d("Connection", "notifying listeners");
+            Log.d("Connection", "notifying LISTENER");
             AppBluetoothManager.notifyConnectionEstablished(getAddress());
             if (listener != null) {
-                listeners.add(listener);
+                LISTENER.add(listener);
                 listener.onConnectionEstablished(BLUETOOTH_SOCKET.getRemoteDevice());
             }
             Log.i("Connection", "successfully established a connection to\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\nAddress: " + getAddress());
         }
 
-        private void performReadWrite(){
+        private void performReadWrite() {
             try {
                 Message message = messageQueue.poll(TIME_OUT_SHORT, TimeUnit.MILLISECONDS);
-                if (message == null)message = HANDSHAKE;
-                    Log.v("Connection", "sending message of type " + message.getClass().getSimpleName());
-                    OUTPUT_STREAM.writeObject(message);
-                    OUTPUT_STREAM.flush();
-                    Log.v("Connection", "finished writing message");
-                //todo:improve
-                if (true) {
-                    Log.v("Connection", "reading message");
-                    ((Message) INPUT_STREAM.readObject()).onReception();
-                    Log.v("Connection", "finished reading message");
-                }else{
-                    Log.v("Connection", "message reading skipped");
-                }
+                if (message == null) message = HANDSHAKE;
+                Log.v("Connection", "sending message of type " + message.getClass().getSimpleName());
+                OUTPUT_STREAM.writeObject(message);
+                OUTPUT_STREAM.flush();
+                Log.v("Connection", "finished writing message");
+                Log.v("Connection", "reading message");
+                message = ((Message) INPUT_STREAM.readObject());
+                if (message instanceof Handshake)Log.v("Connection", "read message of type Handshake");
+                else Log.d("Connection", "read message of type " + message.getClass().getSimpleName());
+                message.onReception();
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("Connection", "failed read/write, connection broken");
@@ -317,7 +328,7 @@ import java.util.concurrent.TimeUnit;
         /*package*/ void close(){
             Log.w("Connection", "Closing connection\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\nAddress: " + getAddress());
 
-            for (AppBluetoothManager.ConnectionListener listener : listeners)
+            for (AppBluetoothManager.ConnectionListener listener : LISTENER)
                 listener.onConnectionClosed(BLUETOOTH_SOCKET.getRemoteDevice());
 
             try {
@@ -338,7 +349,7 @@ import java.util.concurrent.TimeUnit;
 
             if (connections.containsKey(getAddress()))
                 connections.remove(getAddress());
-            if (serverActive)aCThread.freeUUIDS.add(UUID);
+            if (serverActive && aCThread != null)aCThread.freeUUIDS.add(UUID);
         }
 
         /*package*/ String getAddress(){
