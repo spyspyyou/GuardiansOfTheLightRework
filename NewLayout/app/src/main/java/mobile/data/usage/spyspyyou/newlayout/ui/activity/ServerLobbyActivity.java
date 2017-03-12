@@ -8,8 +8,10 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
+import mobile.data.usage.spyspyyou.newlayout.ui.messages.ChatMessage;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.JoinAnswer;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.JoinRequest;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.TeamInfoMessage;
@@ -69,16 +71,18 @@ public class ServerLobbyActivity extends LobbyActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        HOST = true;
         gameInformation = StartActivity.getGameInformation();
+        teamBlue.addPlayer("name", AppBluetoothManager.getLocalAddress(), R.drawable.floor_tile);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AppBluetoothManager.REQUEST_BLUETOOTH){
+        if (requestCode == AppBluetoothManager.REQUEST_BLUETOOTH) {
             if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(getBaseContext(), "Bluetooth is required.", Toast.LENGTH_LONG).show();
                 finish();
-            }else{
+            } else {
                 AppBluetoothManager.startServer(this);
             }
         }
@@ -98,44 +102,58 @@ public class ServerLobbyActivity extends LobbyActivity {
         AppBluetoothManager.removeBluetoothListener(connectionMadeListener);
         gameInformation = null;
         AppBluetoothManager.stopServer();
-        for (String conListener:regConListeners)AppBluetoothManager.removeConnectionListener(conListener, connectionListener);
+        for (String conListener : regConListeners) AppBluetoothManager.removeConnectionListener(conListener, connectionListener);
     }
 
-    public static GameInformation getGameInformation(){
+    @Override
+    protected void send() {
+        ChatMessage message = new ChatMessage("Host Name", editTextMessage.getText().toString());
+        message.send(teamBlue.getPlayerAddresses());
+        message.send(teamGreen.getPlayerAddresses());
+        editTextMessage.setText("");
+    }
+
+    public static GameInformation getGameInformation() {
         return gameInformation;
     }
 
-    public static void requestJoin(JoinRequest joinRequest){
-        if (gameInformation != null){
-            if(teamBlue.getCount() + teamGreen.getCount() < gameInformation.PLAYER_MAX){
+    public static void requestJoin(JoinRequest joinRequest) {
+        if (gameInformation != null) {
+            if (teamBlue.getCount() + teamGreen.getCount() < gameInformation.PLAYER_MAX) {
                 new JoinAnswer(true).send(joinRequest.REQUEST_ADDRESS);
-                if (teamBlue.getCount() < gameInformation.PLAYER_MAX){
+                if (teamBlue.getCount() < gameInformation.PLAYER_MAX) {
                     teamBlue.addPlayer(joinRequest.PLAYER_NAME, joinRequest.REQUEST_ADDRESS, joinRequest.PIC);
-                }else{
+                } else {
                     teamGreen.addPlayer(joinRequest.PLAYER_NAME, joinRequest.REQUEST_ADDRESS, joinRequest.PIC);
                 }
                 updateTeams();
-            }else {
+            } else {
                 new JoinAnswer(false).send(joinRequest.REQUEST_ADDRESS);
             }
-        }else{
+        } else {
             AppBluetoothManager.disconnectFrom(joinRequest.REQUEST_ADDRESS);
         }
     }
 
-    public static void updateTeams(){
+    public static void updateTeams() {
         TeamInfoMessage teamInfoMessage = new TeamInfoMessage(teamBlue.getData(), teamGreen.getData());
         teamInfoMessage.send(teamBlue.getPlayerAddresses());
         teamInfoMessage.send(teamGreen.getPlayerAddresses());
     }
 
-    public void onDisconnect(String address){
+    public void onDisconnect(String address) {
         if (teamBlue.removePlayer(address) != null || teamGreen.removePlayer(address) != null)
             updateTeams();
     }
 
-    public static void requestTeam(boolean teamBlue){
-
+    public static void requestTeam(String address, boolean blue) {
+        if (blue && teamBlue.getCount() < gameInformation.PLAYER_MAX) {
+            teamBlue.addPlayer(teamGreen.removePlayer(address));
+        } else if (!blue && teamGreen.getCount() < gameInformation.PLAYER_MAX) {
+            teamGreen.addPlayer(teamBlue.removePlayer(address));
+        } else {
+            //todo:inform of failure
+        }
+        updateTeams();
     }
-
 }

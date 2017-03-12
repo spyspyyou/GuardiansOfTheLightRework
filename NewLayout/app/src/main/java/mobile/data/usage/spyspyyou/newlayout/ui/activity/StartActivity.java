@@ -26,6 +26,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -57,6 +58,7 @@ public class StartActivity extends GotLActivity {
     private static GameInformation gameInformation;
     private CreateFragment createFragment;
     private SearchFragment searchFragment;
+    private EditText editTextUserName;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +93,17 @@ public class StartActivity extends GotLActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        editTextUserName = (EditText) findViewById(R.id.editText_drawerProfile);
+        editTextUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editTextUserName.getWindowToken(), 0);
+                }
+            }
+        });
+
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.hello_world, R.string.hello_world) {
@@ -109,10 +122,13 @@ public class StartActivity extends GotLActivity {
                 lastOffset = slideOffset;
             }
 
+            @Override
             public void onDrawerClosed(View view) {
                 supportInvalidateOptionsMenu();
+                editTextUserName.setFocusable(false);
             }
 
+            @Override
             public void onDrawerOpened(View drawerView) {
                 supportInvalidateOptionsMenu();
             }
@@ -319,7 +335,6 @@ public class StartActivity extends GotLActivity {
                     @Override
                     public void run() {
                         if (toggleButtonRandom.isChecked()){
-                            Snackbar.make(linearLayoutList, "random World updated.", Snackbar.LENGTH_LONG).show();
                             imageViewWorld.setImageBitmap(world.getBitmapRepresentation());
                             progressBarWorldLoading.setVisibility(View.GONE);
                         }
@@ -344,8 +359,8 @@ public class StartActivity extends GotLActivity {
             imageButtonEditWorld = (ImageButton) view.findViewById(R.id.imageButton_tabCreate_edit);
 
             editTextGameName = (EditText) view.findViewById(R.id.editText_tabCreate_gameName);
-            String name = sharedPreferences.getString(PREF_GAME_NAME, "\3");
-            if (!name.equals("\3")){
+            String name = sharedPreferences.getString(PREF_GAME_NAME, "");
+            if (!name.equals("")){
                 editTextGameName.setText(name);
                 editTextGameName.setFocusable(false);
             }

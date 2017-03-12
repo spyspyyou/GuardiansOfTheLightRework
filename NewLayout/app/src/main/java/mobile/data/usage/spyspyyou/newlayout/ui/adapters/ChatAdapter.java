@@ -1,24 +1,30 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.adapters;
 
-import android.content.Context;
+import android.app.Activity;
+import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
+import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.newlayout.ui.messages.ChatMessage;
 
 public class ChatAdapter extends BaseAdapter {
 
-    private Context appContext;
+    private final ArrayList<ChatMessage> messages = new ArrayList<>();
+    private final Handler HANDLER;
+    private final LayoutInflater INFLATER;
+    private final String LOCAL_ADDRESS;
 
-    private ArrayList<Objects>messages = new ArrayList<>();
-
-    public ChatAdapter(Context appContext){
-        this.appContext = appContext;
+    public ChatAdapter(Activity activity) {
+        HANDLER = new Handler();
+        INFLATER = activity.getLayoutInflater();
+        LOCAL_ADDRESS = AppBluetoothManager.getLocalAddress();
     }
 
     @Override
@@ -39,10 +45,36 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
-        if(view == null) view = RelativeLayout.inflate(appContext, R.layout.list_game, parent);
+        boolean isMe = messages.get(position).ADDRESS.equals(LOCAL_ADDRESS);
+        if (view == null) {
+            if (isMe) {
+                view = INFLATER.inflate(R.layout.list_chat_me, parent, false);
+            } else{
+                view = INFLATER.inflate(R.layout.list_chat_other, parent, false);
+            }
+        }
 
+        TextView textViewMessage;
+        if (isMe){
+            textViewMessage = (TextView) view.findViewById(R.id.textView_chatMe_message);
 
+        }else{
+            textViewMessage = (TextView) view.findViewById(R.id.textView_chatOther_message);
+            TextView senderName = (TextView) view.findViewById(R.id.textView_chatOther_name);
+            senderName.setText(messages.get(position).NAME);
+        }
+        textViewMessage.setText(messages.get(position).MESSAGE);
 
         return view;
+    }
+
+    public void addMessage(ChatMessage chatMessage) {
+        messages.add(chatMessage);
+        HANDLER.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
     }
 }

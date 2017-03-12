@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
+import mobile.data.usage.spyspyyou.newlayout.ui.messages.ChatMessage;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.JoinRequest;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.PlayerInfo;
 
@@ -41,12 +42,19 @@ public class ClientLobbyActivity extends LobbyActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        HOST = false;
         Bundle extras = getIntent().getExtras();
         HOST_ADDRESS = extras.getString(GameInformationAdapter.HOST_EXTRA);
         AppBluetoothManager.joinGame(HOST_ADDRESS, connectionListener);
         loadingDialog = new LoadingDialog();
         loadingDialog.show(getSupportFragmentManager(), "Joining Game");
         loadingDialog.setCancelable(false);
+    }
+
+    @Override
+    protected void send() {
+        new ChatMessage("Client Name", editTextMessage.getText().toString()).send(HOST_ADDRESS);
+        editTextMessage.setText("");
     }
 
     public static class LoadingDialog extends DialogFragment {

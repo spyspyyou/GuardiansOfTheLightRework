@@ -1,23 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_margin="@dimen/activity_margin"
-              android:background="@drawable/background_chat_other"
-              android:orientation="vertical"
-              android:padding="@dimen/activity_padding">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/activity_margin"
+    android:layout_marginLeft="@dimen/activity_margin"
+    android:layout_marginRight="@dimen/activity_margin"
+    android:layout_marginStart="@dimen/activity_margin"
+    android:paddingEnd="80dp"
+    android:paddingRight="80dp">
 
-    <TextView
-        android:id="@+id/textView_chatOther_name"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="username"
-        android:textSize="12sp"/>
+        android:background="@drawable/background_chat_other"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_padding">
 
-    <TextView
-        android:id="@+id/textView_chatOther_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="THE CHAT MESSAGE TEXT\nwith a next line"
-        android:textColor="@android:color/black"/>
-</LinearLayout>
+        <TextView
+            android:id="@+id/textView_chatOther_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_weight="1"
+            android:text="username"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/textView_chatOther_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textView_chatOther_name"
+            android:layout_weight="1"
+            android:text="THE CHAT MESSAGE TEXT\nwith a next line"
+            android:textColor="@android:color/black"/>
+    </LinearLayout>
+
+</RelativeLayout>

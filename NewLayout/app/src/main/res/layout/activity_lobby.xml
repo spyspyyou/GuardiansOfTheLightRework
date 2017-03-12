@@ -6,119 +6,122 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_activityLobby"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:title="Lobby"
-        app:titleTextColor="@android:color/white"/>
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
-
-        <LinearLayout
+        <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawerLayout_activityLobby"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:padding="@dimen/activity_padding">
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Teams"
-                android:textColor="@color/colorAccent"/>
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/linearLayout_editMessage">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                >
 
-                <ListView
-                    android:id="@+id/listView_activityLobby_blue"
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar_activityLobby"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/background_border"/>
-
-                <ListView
-                    android:id="@+id/listView_activityLobby_green"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/background_border"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout_activityLobby_chat"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/linearLayout_activityLobby_toggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/background_button"
-                android:clickable="true"
-                android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorPrimary"
+                    android:minHeight="?attr/actionBarSize"
+                    android:theme="?attr/actionBarTheme"
+                    app:title="Lobby"
+                    app:titleTextColor="@android:color/white"/>
 
                 <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="@dimen/activity_margin"
-                    android:text="Lobby Chat"
+                    android:text="Teams"
                     android:textColor="@color/colorAccent"/>
 
-                <ImageView
-                    android:id="@+id/imageView_activityLobby_arrow"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="@dimen/activity_padding"
-                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"/>
+                    android:orientation="horizontal">
 
+                    <ListView
+                        android:id="@+id/listView_activityLobby_blue"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/background_border"/>
+
+                    <ListView
+                        android:id="@+id/listView_activityLobby_green"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/background_border"/>
+                </LinearLayout>
             </LinearLayout>
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/activity_padding"
-                android:animateLayoutChanges="true">
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="@android:color/white"
+                android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/editText2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="Message"
-                    android:inputType="textPersonName"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@color/colorPrimary"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/activity_margin"
+                    android:text="Lobby Chat"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
 
-                <ImageButton
-                    android:id="@+id/imageButton2"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/background_button"
-                    app:srcCompat="@drawable/ic_send_black_24dp"/>
+                <ListView
+                    android:id="@+id/listView_activityLobby_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="5dp"
+                    android:padding="@dimen/activity_padding"/>
+
             </LinearLayout>
+
+        </android.support.v4.widget.DrawerLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout_editMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:animateLayoutChanges="true"
+            android:background="@android:color/white"
+            android:orientation="horizontal"
+            android:padding="@dimen/activity_padding">
+
+            <mobile.data.usage.spyspyyou.newlayout.ui.views.FocusManagedEditText
+                android:id="@+id/editText_activityLobby_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:focusable="false"
+                android:hint="Message"
+                android:inputType="textPersonName"/>
+
+            <ImageButton
+                android:id="@+id/imageButton_activityLobby_send"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/background_button"
+                app:srcCompat="@drawable/ic_send_black_24dp"/>
         </LinearLayout>
 
-    </LinearLayout>
+        <View
+            android:id="@+id/view_divider"
+            style="@style/Divider"
+            android:layout_above="@+id/linearLayout_editMessage"/>
+    </RelativeLayout>
+
 </android.support.design.widget.CoordinatorLayout>

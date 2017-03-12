@@ -25,7 +25,6 @@
             android:layout_below="@+id/appbar"
             android:orientation="vertical">
 
-
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
