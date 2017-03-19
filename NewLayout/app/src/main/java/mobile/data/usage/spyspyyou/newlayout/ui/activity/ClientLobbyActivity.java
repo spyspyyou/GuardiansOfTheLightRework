@@ -23,7 +23,7 @@ public class ClientLobbyActivity extends LobbyActivity {
     private final AppBluetoothManager.ConnectionListener connectionListener = new AppBluetoothManager.ConnectionListener() {
         @Override
         public void onConnectionEstablished(BluetoothDevice bluetoothDevice) {
-            new JoinRequest("my player name", R.drawable.fluffy).send(bluetoothDevice.getAddress());
+            new JoinRequest(sharedPreferences.getString(StartActivity.PREF_NAME, "Client Name"), sharedPreferences.getInt(StartActivity.PREF_PIC, 0)).send(bluetoothDevice.getAddress());
         }
 
         @Override
@@ -37,7 +37,6 @@ public class ClientLobbyActivity extends LobbyActivity {
         }
     };
     private static LoadingDialog loadingDialog;
-    private static String HOST_ADDRESS;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,4 +78,5 @@ public class ClientLobbyActivity extends LobbyActivity {
         teamBlue.setData(blue);
         teamGreen.setData(green);
     }
+
 }

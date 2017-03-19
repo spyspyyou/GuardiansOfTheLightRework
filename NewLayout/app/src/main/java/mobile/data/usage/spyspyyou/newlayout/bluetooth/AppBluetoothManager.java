@@ -39,7 +39,7 @@ public class AppBluetoothManager {
     private static String localAddress = "";
 
     private static boolean isServer = false;
-    private static int searchConnections = 0;
+    private static int searchConnections = -1;
 
     private static BluetoothAdapter bluetoothAdapter = null;
     private static BluetoothBroadcastReceiver bluetoothBroadcastReceiver = null;
@@ -59,7 +59,10 @@ public class AppBluetoothManager {
         @Override
         public void onConnectionClosed(BluetoothDevice bluetoothDevice) {
             --searchConnections;
-            if (searchConnections == 0)notifySearchFinished();
+            if (searchConnections == 0){
+                notifySearchFinished();
+                searchConnections = -1;
+            }
         }
     };
 
@@ -79,6 +82,7 @@ public class AppBluetoothManager {
         localAddress = Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
         if (localAddress == null)localAddress = bluetoothAdapter.getAddress();
         bluetoothBroadcastReceiver = new BluetoothBroadcastReceiver();
+        Log.i("ABManager", "initialization complete, local Address is " + localAddress);
     }
 
     //----------------------------------------------------------------------------------------------
@@ -92,6 +96,7 @@ public class AppBluetoothManager {
         bluetoothBroadcastReceiver.unregister(context);
         bluetoothAdapter.cancelDiscovery();
         ConnectionManager.disconnect();
+        bluetoothAdapter.disable();
     }
 
     public static boolean startServer(Activity activity){
@@ -355,7 +360,10 @@ public class AppBluetoothManager {
         }
 
         private void onDiscoveryFinish(){
-            if (searchConnections == 0)notifySearchFinished();
+            if (searchConnections == 0){
+                notifySearchFinished();
+                searchConnections = -1;
+            }
             Log.i("ABManager", "discovery finished");
         }
 

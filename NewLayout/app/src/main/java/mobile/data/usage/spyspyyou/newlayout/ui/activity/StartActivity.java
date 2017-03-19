@@ -2,16 +2,20 @@ package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -20,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -48,21 +54,34 @@ import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
 import mobile.data.usage.spyspyyou.newlayout.game.World;
 import mobile.data.usage.spyspyyou.newlayout.game.WorldVars;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.GameInformationAdapter;
+import mobile.data.usage.spyspyyou.newlayout.ui.adapters.ProfilePicAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.views.ToggleImageButton;
 
 import static mobile.data.usage.spyspyyou.newlayout.game.WorldVars.BASE_MAP;
+import static mobile.data.usage.spyspyyou.newlayout.teststuff.VARS.PROFILE_PICTURES;
+import static mobile.data.usage.spyspyyou.newlayout.ui.activity.StartActivity.ProfilePicDialog.picId;
 
 public class StartActivity extends GotLActivity {
+
+    public static final String
+            PREF_PROFILE = "profilePrefs",
+            PREF_PIC = "pic",
+            PREF_NAME = "username";
 
     private ActionBarDrawerToggle drawerToggle;
     private static GameInformation gameInformation;
     private CreateFragment createFragment;
     private SearchFragment searchFragment;
     private EditText editTextUserName;
+    private ImageButton imageButtonProfilePic;
+    private static SharedPreferences profilePreference;
+    private static SharedPreferences.Editor editor;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        profilePreference = getApplicationContext().getSharedPreferences(PREF_PROFILE, MODE_PRIVATE);
+        editor = profilePreference.edit();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_activityStart);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout_activityStart);
@@ -162,6 +181,43 @@ public class StartActivity extends GotLActivity {
         });
 
         tabLayout.setupWithViewPager(mViewPager);
+
+        final ProfilePicDialog profilePicDialog = new ProfilePicDialog();
+        imageButtonProfilePic = (ImageButton) findViewById(R.id.imageButton_drawerProfile);
+
+        imageButtonProfilePic.setImageResource(PROFILE_PICTURES[profilePreference.getInt(PREF_PIC, picId)]);
+        imageButtonProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                profilePicDialog.show(getSupportFragmentManager(), "Profile Pic");
+            }
+        });
+        profilePicDialog.setOnDetachListener(new Runnable() {
+            @Override
+            public void run() {
+                imageButtonProfilePic.setImageResource(PROFILE_PICTURES[picId]);
+            }
+        });
+
+        EditText editTextUserName = (EditText) findViewById(R.id.editText_drawerProfile);
+        editTextUserName.setText(profilePreference.getString(PREF_NAME, ""));
+        editTextUserName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                editor.putString(PREF_NAME, s.toString());
+                editor.apply();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     @Override
@@ -202,6 +258,10 @@ public class StartActivity extends GotLActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    public static GameInformation getGameInformation(){
+        return gameInformation;
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
@@ -793,7 +853,63 @@ public class StartActivity extends GotLActivity {
         }
     }
 
-    public static GameInformation getGameInformation(){
-        return gameInformation;
+    public static class ProfilePicDialog extends DialogFragment {
+
+        private static final int dismissDelay = 130;
+        private Handler handler;
+        public static int picId = 0;
+        private Runnable onDetachListener;
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            handler = new Handler();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            View
+                    body = getActivity().getLayoutInflater().inflate(R.layout.dialog_profile_pic, null),
+                    title = getActivity().getLayoutInflater().inflate(R.layout.title_profile, null);
+
+            ListView listView = (ListView) body.findViewById(R.id.listView_dialogProfile);
+            final ProfilePicAdapter profilePicAdapter = new ProfilePicAdapter(getActivity());
+            listView.setAdapter(profilePicAdapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    picId = position;
+                    profilePicAdapter.setSelection(picId);
+                    editor.putInt(PREF_PIC, picId);
+                    editor.commit();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dismiss();
+                        }
+                    }, dismissDelay);
+                }
+            });
+            profilePicAdapter.setSelection(picId = profilePreference.getInt(PREF_PIC, picId));
+            listView.setSelection(picId);
+
+            builder.setCustomTitle(title);
+            builder.setView(body);
+            builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            return builder.create();
+        }
+
+        public void setOnDetachListener(Runnable runnable){
+            onDetachListener = runnable;
+        }
+
+        @Override
+        public void onDetach() {
+            super.onDetach();
+            if(onDetachListener != null)onDetachListener.run();
+        }
     }
 }

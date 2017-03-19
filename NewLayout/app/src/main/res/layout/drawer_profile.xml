@@ -9,22 +9,45 @@
     android:orientation="vertical"
     >
 
-    <ImageView
-        android:id="@+id/imageView_drawerProfile"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="175dp"
-        android:padding="32dp"
-        app:srcCompat="@mipmap/ic_launcher"/>
+        android:layout_margin="@dimen/activity_margin">
+
+        <ImageButton
+            android:id="@+id/imageButton_drawerProfile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_button"
+            android:padding="@dimen/activity_padding"
+            android:scaleType="fitCenter"
+            app:srcCompat="@mipmap/ic_launcher"/>
+
+        <ImageView
+            android:id="@+id/imageView_drawerProfile"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/activity_padding"
+            app:srcCompat="@drawable/ic_create_black_24dp"/>
+    </RelativeLayout>
 
     <mobile.data.usage.spyspyyou.newlayout.ui.views.FocusManagedEditText
         android:id="@+id/editText_drawerProfile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
+        android:layout_marginStart="@dimen/activity_margin"
         android:ems="10"
         android:hint="Name"
         android:imeOptions="actionDone"
-        android:inputType="textPersonName"/>
+        android:inputType="textPersonName"
+        android:maxLength="32"/>
 
     <LinearLayout
         android:layout_width="match_parent"

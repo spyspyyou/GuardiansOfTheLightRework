@@ -3,6 +3,7 @@ package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -24,6 +26,7 @@ import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.ChatAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.TeamAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.ChatMessage;
+import mobile.data.usage.spyspyyou.newlayout.ui.messages.TeamRequest;
 
 public abstract class LobbyActivity extends GotLActivity {
 
@@ -61,11 +64,14 @@ public abstract class LobbyActivity extends GotLActivity {
     protected EditText editTextMessage;
     public static boolean HOST = false;
     private static ChatAdapter chatAdapter;
+    protected static String HOST_ADDRESS;
+    protected SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+        sharedPreferences = getSharedPreferences(StartActivity.PREF_PROFILE, MODE_PRIVATE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_activityLobby);
         setSupportActionBar(toolbar);
@@ -79,15 +85,24 @@ public abstract class LobbyActivity extends GotLActivity {
                 listBlue = (ListView) findViewById(R.id.listView_activityLobby_blue),
                 listGreen = (ListView) findViewById(R.id.listView_activityLobby_green),
                 listChat = (ListView) findViewById(R.id.listView_activityLobby_chat);
+
+        editTextMessage = (EditText) findViewById(R.id.editText_activityLobby_message);
+
         teamBlue = new TeamAdapter(this, true);
         teamGreen = new TeamAdapter(this, false);
         chatAdapter = new ChatAdapter(this);
         listBlue.setAdapter(teamBlue);
         listGreen.setAdapter(teamGreen);
         listChat.setAdapter(chatAdapter);
+        listChat.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                editTextMessage.setFocusable(false);
+                return true;
+            }
+        });
 
         chatDrawer = (DrawerLayout) findViewById(R.id.drawerLayout_activityLobby);
-        editTextMessage = (EditText) findViewById(R.id.editText_activityLobby_message);
         editTextMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -106,13 +121,29 @@ public abstract class LobbyActivity extends GotLActivity {
             }
         };
         chatDrawer.addDrawerListener(drawerToggle);
-        ImageButton imageButtonSend = (ImageButton) findViewById(R.id.imageButton_activityLobby_send);
+        ImageButton
+                imageButtonSend = (ImageButton) findViewById(R.id.imageButton_activityLobby_send),
+                imageButtonBlue = (ImageButton) findViewById(R.id.imageButton_activityLobby_blue),
+                imageButtonGreen = (ImageButton) findViewById(R.id.imageButton_activityLobby_green);
         imageButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editTextMessage.getText().length() > 0) send();
             }
         });
+        imageButtonBlue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new TeamRequest(true).send(HOST_ADDRESS);
+            }
+        });
+        imageButtonGreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new TeamRequest(false).send(HOST_ADDRESS);
+            }
+        });
+
     }
 
     @Override
@@ -164,6 +195,10 @@ public abstract class LobbyActivity extends GotLActivity {
             chatMessage.send(teamBlue.getPlayerAddresses());
             chatMessage.send(teamGreen.getPlayerAddresses());
         }
+    }
+
+    protected void startSelection(){
+
     }
 
     protected abstract void send();
