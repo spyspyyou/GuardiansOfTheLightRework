@@ -1,7 +1,23 @@
 <resources>
+
+    <!-- test -->
+    <string name="hello_world">test</string>
+
+    <!-- Activity Level -->
     <string name="app_name">NewLayout</string>
     <string name="title_activity_start">Guardians of the Light</string>
-    <string name="hello_world">test</string>
     <string name="search_info">Click to search for Games nearby.</string>
     <string name="title_activity_lobby">Lobby</string>
+
+    <!-- Game -->
+    <string name="fluffy">Fluffy</string>
+    <string name="slime">Slime</string>
+    <string name="ghost">Ghost</string>
+    <string name="nox">Nox</string>
+    <string name="description_fluffy">Stun your enemies with powerful electrostatic lightning.</string>
+    <string name="description_slime">Lay down tracks of slime to slow down your enemies.</string>
+    <string name="description_ghost">Go invisible to confuse your opponents.</string>
+    <string name="description_nox">Let darkness fall, obscuring enemies\' vision.</string>
+
+
 </resources>

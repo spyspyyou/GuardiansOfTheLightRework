@@ -1,11 +1,15 @@
 package mobile.data.usage.spyspyyou.newlayout.ui.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,17 +20,22 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import mobile.data.usage.spyspyyou.newlayout.R;
 import mobile.data.usage.spyspyyou.newlayout.bluetooth.AppBluetoothManager;
+import mobile.data.usage.spyspyyou.newlayout.bluetooth.GameInformation;
+import mobile.data.usage.spyspyyou.newlayout.game.World;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.ChatAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.adapters.TeamAdapter;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.ChatMessage;
 import mobile.data.usage.spyspyyou.newlayout.ui.messages.TeamRequest;
+import mobile.data.usage.spyspyyou.newlayout.ui.views.ScrollViewCharacter;
 
 public abstract class LobbyActivity extends GotLActivity {
 
@@ -57,9 +66,11 @@ public abstract class LobbyActivity extends GotLActivity {
 
         }
     };
+
     protected static TeamAdapter
             teamBlue,
             teamGreen;
+
     private DrawerLayout chatDrawer;
     protected EditText editTextMessage;
     public static boolean HOST = false;
@@ -197,9 +208,49 @@ public abstract class LobbyActivity extends GotLActivity {
         }
     }
 
-    protected void startSelection(){
+    protected abstract void send();
 
+    public static class SelectionDialog extends DialogFragment {
+
+        private ScrollViewCharacter scrollViewCharacter;
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            setCancelable(false);
+
+            View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_selection, null);
+            View title = getActivity().getLayoutInflater().inflate(R.layout.title_profile, null);
+
+            TextView titleText = (TextView) title.findViewById(R.id.textView_titleProfile);
+            titleText.setText("Character Selection");
+
+            Button button = (Button) view.findViewById(R.id.button_dialogSelection);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dismiss();
+                        }
+                    }, 150);
+                }
+            });
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setView(view)
+                    .setCustomTitle(title);
+
+            scrollViewCharacter = (ScrollViewCharacter) view.findViewById(R.id.scrollView_dialogSelection);
+            scrollViewCharacter.setup(new GameInformation("address", "name", new World(new byte[0][0]), false, true, true, true, true, 0, 0, 0, 0), (TextView) view.findViewById(R.id.textView_dialogSelection_info));
+
+            return builder.create();
+        }
+
+        public byte getSelectedCharacter(){
+            return scrollViewCharacter.getSelectedCharacter();
+        }
     }
 
-    protected abstract void send();
 }

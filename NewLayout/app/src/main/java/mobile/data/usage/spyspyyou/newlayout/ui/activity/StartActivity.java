@@ -218,6 +218,7 @@ public class StartActivity extends GotLActivity {
 
             }
         });
+
     }
 
     @Override
@@ -743,6 +744,7 @@ public class StartActivity extends GotLActivity {
 
             @Override
             public void onStop() {
+                adapter.clear();
                 showStartSearch();
             }
 
@@ -912,4 +914,5 @@ public class StartActivity extends GotLActivity {
             if(onDetachListener != null)onDetachListener.run();
         }
     }
+
 }

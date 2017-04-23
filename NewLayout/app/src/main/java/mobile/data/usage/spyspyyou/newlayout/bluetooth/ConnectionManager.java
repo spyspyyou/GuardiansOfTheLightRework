@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
     private static final byte MAX_CONNECTIONS = 7;
     // in  millis
     private static final int
-            TIME_OUT_LONG = 1000,
-            TIME_OUT_SHORT = 2;
+            TIME_OUT_LONG = 5000,
+            TIME_OUT_SHORT = 500;
 
     private static final String BASE_UUID_STRING = "fc165dae-c277-4854-be70-b38d0486e35";
     private static final UUID[] UUID_ARRAY = new UUID[MAX_CONNECTIONS];
@@ -219,10 +219,10 @@ import java.util.concurrent.TimeUnit;
             Log.d("ACThread", "Started ACThread");
             BluetoothServerSocket bluetoothServerSocket;
             BluetoothSocket bluetoothSocket;
-            UUID uuid = null;
+            UUID uuid;
             while(serverActive) {
-                //todo:pause thread if all connections are used until a new one comes
-                if (!freeUUIDS.isEmpty())uuid = freeUUIDS.get(0);
+                if (freeUUIDS.isEmpty())cancelAvailability();
+                uuid = freeUUIDS.get(0);
                 try {
                     bluetoothServerSocket = bluetoothServerSockets.get(UUID_ARRAY[0]);
                     if (bluetoothServerSocket != null) {
@@ -299,7 +299,7 @@ import java.util.concurrent.TimeUnit;
 
         private void performReadWrite() {
             try {
-                Message message = messageQueue.poll(TIME_OUT_SHORT, TimeUnit.MILLISECONDS);
+                Message message = messageQueue.poll(TIME_OUT_SHORT, TimeUnit.NANOSECONDS);
                 if (message == null) message = HANDSHAKE;
                 Log.v("Connection", "sending message of type " + message.getClass().getSimpleName());
                 OUTPUT_STREAM.writeObject(message);
