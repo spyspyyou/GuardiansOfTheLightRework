@@ -18,11 +18,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /*package*/ class ConnectionManager {
-    //the UUID is one character too short which has to be added when the uuid is used. it defines the index of the connection
+
     private static final byte MAX_CONNECTIONS = 7;
-    // in  millis
+
     private static final int
+            // in  millis
             TIME_OUT_LONG = 5000,
+            //in nanos
             TIME_OUT_SHORT = 500;
 
     private static final String BASE_UUID_STRING = "fc165dae-c277-4854-be70-b38d0486e35";
@@ -41,6 +43,16 @@ import java.util.concurrent.TimeUnit;
     private volatile static boolean
             serverActive = false,
             clientActive = false;
+
+    /*package*/ static void initialize(){
+
+    }
+
+    /*package*/ static void releaseAll(){
+        stopServer();
+        clearConnectionQueue();
+        disconnect();
+    }
 
     /*package*/ static void startServer(){
         if (serverActive)return;
