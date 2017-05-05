@@ -125,6 +125,10 @@ import java.util.concurrent.TimeUnit;
         return !connections.isEmpty();
     }
 
+    /*package*/ static boolean isConnectionQueueEmpty(){
+        return cCThread.connectionQueue.size() == 0;
+    }
+
     private static class CCThread extends Thread {
 
         private LinkedBlockingQueue<ConnectionRequest> connectionQueue = new LinkedBlockingQueue<>();
@@ -301,7 +305,7 @@ import java.util.concurrent.TimeUnit;
             if (!ConnectionHandlerThread.activeHandler)new ConnectionHandlerThread().start();
 
             Log.d("Connection", "notifying LISTENER");
-            AppBluetoothManager.notifyConnectionEstablished(getAddress());
+            AppBluetoothManager.notifyConnectionEstablished(BLUETOOTH_SOCKET.getRemoteDevice());
             if (listener != null) {
                 LISTENER.add(listener);
                 listener.onConnectionEstablished(BLUETOOTH_SOCKET.getRemoteDevice());

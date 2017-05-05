@@ -22,13 +22,13 @@ public class BluetoothActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //todo: check if the request is relevant for the bluetooth API
         super.onActivityResult(requestCode, resultCode, data);
+        AppBluetoothManager.onActivityResult(requestCode, resultCode);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //todo: check if the request is relevant for the bluetooth API
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        AppBluetoothManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
