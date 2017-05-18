@@ -12,13 +12,19 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import static android.util.Log.i;
+
 /*package*/ class ConnectionManager {
 
+    /**
+     * should there be more than 10, the UUID generation has to be altered
+     */
     private static final byte MAX_CONNECTIONS = 7;
 
     private static final int
@@ -35,98 +41,106 @@ import java.util.concurrent.TimeUnit;
         }
     }
 
-    private static Map<String, Connection> connections = new LinkedHashMap<>();
+    private static final Map<BluetoothDevice, Connection> connections = new LinkedHashMap<>();
+    private volatile Queue<UUID> freeUUIDs = new Qu<>();
 
     private static ACThread aCThread;
     private static CCThread cCThread;
 
-    private volatile static boolean
-            serverActive = false,
-            clientActive = false;
-
-    /*package*/ static void initialize(){
-
-    }
-
     /*package*/ static void releaseAll(){
         stopServer();
-        clearConnectionQueue();
+        stopClient();
         disconnect();
     }
 
     /*package*/ static void startServer(){
-        if (serverActive)return;
-        serverActive = true;
-        if (clientActive)cCThread.cancel();
+        if (aCThread != null){
+            Log.i("ConnectionManager", "startServer, server already running");
+            return;
+        }
+        stopClient();
+        disconnect();
         aCThread = new ACThread();
         aCThread.start();
         Log.i("ConnectionManager", "started the Server");
     }
 
     /*package*/ static void stopServer(){
-        if (serverActive) aCThread.cancelAvailability();
-        Log.i("ConnectionManager", "stopped the Server");
+        aCThread.cancelAvailability();
+        aCThread = null;
+        i("ConnectionManager", "stopped the Server");
+    }
+
+    /*package*/ static void startClient(){
+        if (cCThread != null){
+            Log.i("ConnectionManager", "startClient, client already running");
+            return;
+        }
+        stopServer();
+        disconnect();
+        cCThread = new CCThread();
+        cCThread.start();
+        Log.i("ConnectionManager", "started the Server");
+    }
+
+    /*package*/ static void stopClient(){
+        cCThread.cancel();
+        cCThread = null;
+        i("ConnectionManager", "stopped the Server");
     }
 
     /*package*/ static void connect(BluetoothDevice bluetoothDevice, @Nullable AppBluetoothManager.ConnectionListener listener){
-        if (!clientActive){
-            if (serverActive)stopServer();
-            clientActive = true;
-            cCThread = new CCThread();
-            cCThread.start();
-        }
-        Log.d("ConnectionManager", "added " + bluetoothDevice.getName() + " to the connection list");
-        cCThread.connectionQueue.add(new ConnectionRequest(bluetoothDevice, listener));
+        if (cCThread != null) {
+            cCThread.connectionQueue.add(new ConnectionRequest(bluetoothDevice, listener));
+            Log.d("ConnectionManager", "added " + bluetoothDevice.getName() + " to the connection list");
+        }else
+            Log.d("ConnectionManager", "ccThread not running");
     }
 
-    /*package*/ static void clearConnectionQueue(){
-        if (clientActive)cCThread.connectionQueue.clear();
-    }
-
-    /*package*/ static void disconnect(String address) {
-        if (connections.containsKey(address)){
-            connections.get(address).close();
-            connections.remove(address);
+    /*package*/ static void disconnect(BluetoothDevice device) {
+        if (connections.containsKey(device)){
+            connections.get(device).close();
+            connections.remove(device);
         } else {
             Log.w("ConnectionManager", "No connection to device trying to disconnect from.");
         }
     }
 
     /*package*/ static void disconnect(){
-        if (clientActive)cCThread.cancel();
-        for (String address:connections.keySet()){
-            connections.get(address).close();
+        clearConnectionQueue();
+        for (BluetoothDevice bluetoothDevice:connections.keySet()){
+            connections.get(bluetoothDevice).close();
         }
         connections.clear();
-        Log.i("ConnectionManager", "disconnected all");
+        i("ConnectionManager", "disconnected all");
     }
 
-    /*package*/ static void send(String[]receptors, Message message) {
-        for (String receptor:receptors){
+    /*package*/ static void send(BluetoothDevice[]receptors, Message message) {
+        for (BluetoothDevice receptor:receptors){
             if (connections.containsKey(receptor))connections.get(receptor).send(message);
         }
     }
 
-    /*package*/ static void addListener(String address, AppBluetoothManager.ConnectionListener listener){
-        Connection connection = connections.get(address);
+    /*package*/ static void addListener(BluetoothDevice bluetoothDevice, AppBluetoothManager.ConnectionListener listener){
+        Connection connection = connections.get(bluetoothDevice);
         if (connection != null){
             connection.LISTENER.add(listener);
         }
     }
 
-    /*package*/ static void removeListener(String address, AppBluetoothManager.ConnectionListener listener){
-        Connection connection = connections.get(address);
+    /*package*/ static void removeListener(BluetoothDevice bluetoothDevice, AppBluetoothManager.ConnectionListener listener){
+        Connection connection = connections.get(bluetoothDevice);
         if (connection != null){
             connection.LISTENER.remove(listener);
         }
     }
 
-    private static boolean hasConnections(){
-        return !connections.isEmpty();
-    }
-
     /*package*/ static boolean isConnectionQueueEmpty(){
         return cCThread.connectionQueue.size() == 0;
+    }
+
+    private static boolean hasConnections(){
+        return !connections.isEmpty();
     }
 
     private static class CCThread extends Thread {
@@ -139,14 +153,15 @@ import java.util.concurrent.TimeUnit;
         public void run() {
             Log.d("CCThread", "Started CCThread");
 
-            ConnectionRequest element = null;
-            while (clientActive){
+            ConnectionRequest element;
+            while (!isInterrupted()){
                 try {
-                    element = connectionQueue.poll(TIME_OUT_LONG, TimeUnit.MILLISECONDS);
+                    element = connectionQueue.take();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    break;
                 }
-                if (element == null)continue;
+
                 if (connections.containsKey(element.BLUETOOTH_DEVICE.getAddress())) {
                     Log.w("CCThread", "Already connected to device\nName: " + element.BLUETOOTH_DEVICE.getName() + "\nAddress: " + element.BLUETOOTH_DEVICE.getAddress());
                     continue;
@@ -154,7 +169,7 @@ import java.util.concurrent.TimeUnit;
 
                 Log.d("CCThread", "Starting connection process\nName: " + element.BLUETOOTH_DEVICE.getName() + "\nAddress: " + element.BLUETOOTH_DEVICE.getAddress());
                 //todo: only check free UUIDs
-                for (byte index = 0; index < UUID_ARRAY.length; ++index) {
+                for (byte index = 0; index < UUID_ARRAY.length && !isInterrupted(); ++index) {
                     Log.d("CCThread", "Attempt with uuid index: " + index);
                     try {
                         bluetoothSocket = element.BLUETOOTH_DEVICE.createRfcommSocketToServiceRecord(UUID_ARRAY[index]);
@@ -190,7 +205,7 @@ import java.util.concurrent.TimeUnit;
         }
 
         private void cancel() {
-            clientActive = false;
+            interrupt();
             connectionQueue.clear();
             try {
                 if (bluetoothSocket != null)bluetoothSocket.close();
@@ -213,9 +228,6 @@ import java.util.concurrent.TimeUnit;
     }
 
     private static class ACThread extends Thread {
-
-        private Map<UUID, BluetoothServerSocket> bluetoothServerSockets = new LinkedHashMap<>();
-        private volatile ArrayList<UUID> freeUUIDS = new ArrayList<>();
 
         private ACThread() {
             for (UUID uuid:UUID_ARRAY){
@@ -240,7 +252,7 @@ import java.util.concurrent.TimeUnit;
                 if (freeUUIDS.isEmpty())cancelAvailability();
                 uuid = freeUUIDS.get(0);
                 try {
-                    bluetoothServerSocket = bluetoothServerSockets.get(UUID_ARRAY[0]);
+                    bluetoothServerSocket = AppBluetoothManager.getBluetoothServerSocket(uuid);
                     if (bluetoothServerSocket != null) {
                         Log.d("ACThread", "waiting for uuid " + uuid);
                         bluetoothSocket = bluetoothServerSocket.accept();
@@ -310,7 +322,7 @@ import java.util.concurrent.TimeUnit;
                 LISTENER.add(listener);
                 listener.onConnectionEstablished(BLUETOOTH_SOCKET.getRemoteDevice());
             }
-            Log.i("Connection", "successfully established a connection to\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\nAddress: " + getAddress());
+            i("Connection", "successfully established a connection to\nName: " + BLUETOOTH_SOCKET.getRemoteDevice().getName() + "\nAddress: " + getAddress());
         }
 
         private void performReadWrite() {
@@ -338,7 +350,7 @@ import java.util.concurrent.TimeUnit;
 
         /*package*/ synchronized void send(Message message) {
             if (!messageQueue.offer(message)) Log.w("Connection", "Message Queue full for Connection to " + BLUETOOTH_SOCKET.getRemoteDevice().getName());
-            else Log.i("Connection", "added message of type " + message.getClass().getSimpleName());
+            else i("Connection", "added message of type " + message.getClass().getSimpleName());
         }
 
         /*package*/ void close(){
