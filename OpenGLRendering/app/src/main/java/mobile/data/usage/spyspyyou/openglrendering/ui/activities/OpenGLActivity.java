@@ -3,6 +3,7 @@ package mobile.data.usage.spyspyyou.openglrendering.ui.activities;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -24,17 +25,17 @@ public class OpenGLActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
 
         glSurfaceView = new MyGLS(this);
         glSurfaceView.setEGLContextClientVersion(2);
         glSurfaceView.setRenderer(new Renderer());
-        //todo:decide over the render mode
+
         glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         setContentView(glSurfaceView);
     }
@@ -65,45 +66,64 @@ public class OpenGLActivity extends AppCompatActivity {
     }
 
     public static class MyGLS extends GLSurfaceView{
-
         public MyGLS(Context context) {
             super(context);
         }
-
     }
 
     public static class Renderer implements GLSurfaceView.Renderer {
 
         private Triangle triangle;
+        private int matrixPosHandle;
+        private float[] viewMatrix = new float[16];
+        private float[] projMatrix = new float[16];
+        private float[] theMatrix = new float[16];
 
         private static final String vertexShaderCode =
-                "attribute vec4 vPosition;" +
-                        "void main() {" +
-                        "  gl_Position = vPosition;" +
-                        "}";
+                "uniform mat4 uMVPMatrix;\n" +
+                "attribute vec4 vPosition;\n" +
+
+                 "void main() {\n" +
+                 "  gl_Position = uMVPMatrix * vPosition;\n" +
+                 "}";
 
         private static final String fragmentShaderCode =
-                "precision mediump float;" +
-                        "uniform vec4 vColor;" +
-                        "void main() {" +
-                        "  gl_FragColor = vColor;" +
-                        "}";
+                "precision mediump float;\n" +
+                "uniform vec4 vColor;\n" +
+
+                "void main() {\n" +
+                "  gl_FragColor = vColor;\n" +
+                "}";
 
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             //load any and all Resources;
-            GLES20.glClearColor(0.1f, 0.0f, 1.0f, 1.0f);
+            GLES20.glClearColor(0.2f, 0.4f, 0.8f, 1.0f);
             triangle = new Triangle();
+
+            int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
+                    vertexShaderCode);
+            int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
+                    fragmentShaderCode);
+            matrixPosHandle = GLES20.glGetUniformLocation(vertexShader, "uMVPMatrix");
+            Matrix.setLookAtM(viewMatrix, 0, 0, 0, -3, 0, 0, 0, 0, 1, 0);
         }
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             GLES20.glViewport(0, 0, width, height);
+
+            float ratio = (float) width/height;
+
+            Matrix.frustumM(projMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            Matrix.multiplyMM(theMatrix, 0, projMatrix, 0, viewMatrix, 0);
+
+            GLES20.glUniformMatrix4fv(matrixPosHandle, 1, false, theMatrix, 0);
             triangle.draw();
         }
 
